@@ -1,0 +1,14 @@
+{
+  "name": "amplicon_pipeline",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "Yoann Dufresne <yoann.dufresne0@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": ">=4.13.3",
+    "pug": ">=2.0.0-rc.1"
+  }
+}
