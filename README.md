@@ -7,7 +7,8 @@ Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinfor
 
 ## node.js libraries
 
-* Express: Web framework
+* Express: web framework
+* Pug: templates engine
 
 ## client js libraries
 
