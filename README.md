@@ -12,4 +12,4 @@ Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinfor
 
 ## client js libraries
 
-* Resumable.js: Reliable big file upload
+* JQuery: asynch requests

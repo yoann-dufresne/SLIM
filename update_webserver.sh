@@ -18,7 +18,8 @@ else
 fi
 
 echo "Rebuild the docker imqge"
-docker build --rm -t amplicon .
+docker build -t amplicon .
+docker rmi -f $(docker images -f "dangling=true" -q)
 
 echo "Restart the docker"
-docker run -p 8080:8080 -d amplicon
+docker run -p 8080:80 -d amplicon

@@ -1,0 +1,7 @@
+
+.module {
+	border: black solid 1px;
+	width: 100%;
+	min-height: 100px;
+	margin-bottom: 20px;
+}
