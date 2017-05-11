@@ -8,7 +8,7 @@ class PandaseqModule extends Module {
 		new_file_listeners.push(function(event) {that.newFileListener(event)});
 
 		// init files
-		$.get('/list', function (data) {
+		$.get('/list?token=' + exec_token, function (data) {
 			var event = {};
 			event.files = data;
 			that.newFileListener(event);

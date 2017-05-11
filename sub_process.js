@@ -13,7 +13,7 @@ exports.listen_commands = function (app) {
 
 			switch (soft.name) {
 				case 'pandaseq':
-					runPandaseq(soft.params, function (str) {
+					runPandaseq(params.token, soft.params, function (str) {
 						res.send(str);
 					});
 			}
@@ -34,11 +34,11 @@ exports.listen_commands = function (app) {
 //     console.log('closing code: ' + code);
 // });
 
-var runPandaseq = function (params, callback) {
+var runPandaseq = function (token, params, callback) {
 	exec('/app/lib/pandaseq/pandaseq \
-		-f /app/data/' + params.fwd + ' \
-		-r /app/data/' + params.rev + ' \
-		-w /app/data/tmp.txt',
+		-f /app/data/' + token + '/' + params.fwd + ' \
+		-r /app/data/' + token + '/' + params.rev + ' \
+		-w /app/data/' + token + '/' + params.output,
 	function (error, stdout, stderr) {
 		callback('ended');
 	});

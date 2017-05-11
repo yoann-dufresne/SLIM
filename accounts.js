@@ -1,8 +1,8 @@
 const fs = require('fs');
 
 
-export.token_generation = function (app) {
-	app.use('/token_generation', function (req, res) {
+exports.token_generation = function (app) {
+	app.get('/token_generation', function (req, res) {
 		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
 		var token = '';

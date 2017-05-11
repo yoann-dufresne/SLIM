@@ -16,6 +16,7 @@ files_input.onchange = function (event) {
 		// create a FormData object which will be sent as the data payload in the
 		// AJAX request
 		formData = new FormData();
+		formData.append('token', exec_token);
 
 		// loop through all the selected files
 		for (var i = 0; i < files.length; i++) {
@@ -98,7 +99,7 @@ button.onclick = function (event) {
 }
 
 new_file_listeners.push(function (e) {
-	$.get("/list", function( data ) {
+	$.get("/list?token=" + exec_token, function( data ) {
 		list.innerHTML = '';
 		var filenames = data;
 

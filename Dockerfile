@@ -30,6 +30,7 @@ RUN npm install
 COPY server.js /app
 COPY files_upload.js /app
 COPY sub_process.js /app
+COPY accounts.js /app
 COPY www/ /app/www/
 EXPOSE 80
 

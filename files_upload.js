@@ -5,7 +5,7 @@ const path = require('path');
 exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
-		fs.readdir("/app/data/", function(err, items) {
+		fs.readdir("/app/data/" + req.query.token, function(err, items) {
 			res.send(items);
 		});
 	});
@@ -15,6 +15,7 @@ exports.exposeDir = function (app) {
 exports.upload = function (app) {
 	// Uploading files service
 	app.post('/upload', function(req, res) {
+		console.log('body ' + req.body.token);
 		// create an incoming form object
 		var form = new formidable.IncomingForm();
 
@@ -23,6 +24,10 @@ exports.upload = function (app) {
 
 		// store all uploads in the /uploads directory
 		form.uploadDir = path.join(__dirname, '/data');
+		form.on('field', function(name, value) {
+			if (name == 'token')
+				form.uploadDir = path.join(__dirname, '/data/' + value);
+		});
 
 		// every time a file has been uploaded successfully,
 		// rename it to it's orignal name
