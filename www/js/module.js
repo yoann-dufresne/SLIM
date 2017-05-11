@@ -1,9 +1,11 @@
 
 // Objects to create and store pipeline modules
 
+var __next_id = 0;
 class Module {
 	constructor (name) {
 		this.name = name;
+		this.id = __next_id++;
 		this.toDOMelement();
 	}
 
@@ -25,6 +27,7 @@ class Module {
 		// DOM element creation
 		this.dom = document.createElement('div');
 		this.dom.classList.add('module');
+		this.dom.idx = this.id;
 
 		var title = document.createElement('h3');
 		title.innerHTML = "Module " + this.name;
