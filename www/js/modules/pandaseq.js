@@ -42,7 +42,11 @@ class PandaseqModule extends Module {
 	}
 
 	getConfiguration () {
+		var config = {};
+		config.fwd = this.fwd.value;
+		config.rev = this.rev.value;
+		config.output = this.output_file.value;
 		
-		return {};
+		return config;
 	}
 };
