@@ -11,44 +11,35 @@ head
 body
 	h1 Amplicon analysis pipeline
 
+
+
+	h2 Files uploader
+
+	div#uploader.module
+		div#up_list
+		form#up_form
+			p Add files:
+			input#up_files(type='file', name='uploaded' multiple)
+			button#up_submit Upload
+			div.progress
+				div.progress-bar(role="progressbar")
+
+	script(src='/js/upload.js')
+
+
+	h2 Analysis
+
 	div#modules
-
-		h2 Files uploader
-
-		div#uploader.module
-			div#up_list
-			form#up_form
-				p Add files:
-				input#up_files(type='file', name='uploaded' multiple)
-				button#up_submit Upload
-				div.progress
-					div.progress-bar(role="progressbar")
-
-		script(src='/js/upload.js')
-
-
-		h2 Analysis
-
-		div#joining.module
-			h3 Paired end joining
-			select.file_list#forward_reads
-			select.file_list#reverse_reads
-			input.output_file#out_panda
-
-		script(src='/js/joining.js')
+	
 
 
 
-		div#clustering.module
-			h3 OTU clustering
-
-		div#assign.module
-			h3 OTU assignations
-
-
-	button#add_module Add a module
+	select#module_list
+	button#add_module Add module
 
 	button#start Start analysis
 
 	script(src='/js/module.js')
+	// Module list
+	script(src='/js/modules/pandaseq.js')
 

@@ -5,8 +5,10 @@ var list = document.querySelector("#up_list");
 
 
 var formData;
+var up_filenames = [];
 files_input.onchange = function (event) {
-	files = event.target.files;
+	var files = event.target.files;
+	up_filenames = [];
 	
 	if (files.length > 0){
 		// One or more files selected, process the file upload
@@ -21,6 +23,7 @@ files_input.onchange = function (event) {
 
 		  // add the files to formData object for the data payload
 		  formData.append('uploads[]', file, file.name);
+		  up_filenames.push(file.name);
 		}
 
 	  }
@@ -48,8 +51,8 @@ button.onclick = function (event) {
 			{
 				// Success so call function to process the form
 				// submitForm(event, data);
-				console.log('SUCCESS: ' + data.success);
 				var event = new Event('new_file');
+				event.files = up_filenames;
 				document.dispatchEvent(event);
 			}
 			else

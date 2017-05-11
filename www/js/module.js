@@ -4,14 +4,21 @@
 class Module {
 	constructor (name) {
 		this.name = name;
-		this.dom = null;
-		this.config = {};
+		this.toDOMelement();
 	}
 
 	specificDOMelements () {
-		var p = document.createElement('p');
-		p.innerHTML = "Ga Bu Zo Meu";
-		this.dom.appendChild(p);
+		var specific = document.createElement('div');
+		specific.classList.add('specific');
+		this.dom.appendChild(specific);
+
+		$.get('/js/modules/' + this.name + '.html', function (data) {
+			specific.innerHTML = data;
+		});
+	}
+
+	getConfiguration () {
+		return {};
 	}
 
 	toDOMelement () {
@@ -47,15 +54,26 @@ class Module {
 var modules = [];
 var add_button = document.querySelector('#add_module');
 var modules_div = document.querySelector('#modules');
+var modules_list = document.querySelector('#module_list');
 
 var available_modules = [];
 $.get("/softwares", function( data ) {
 	available_modules = data;
+
+	for (var idx in available_modules) {
+		var opt = document.createElement('option');
+		opt.innerHTML = available_modules[idx];
+		opt.value = available_modules[idx];
+		modules_list.appendChild(opt);
+	}
 });
 
 add_button.onclick = function () {
-	var mod = new Module('Test');
-	mod.toDOMelement();
+	var mod;
+	switch (modules_list.value) {
+		case 'pandaseq':
+			mod = new PandaseqModule();
+	}
 
 	modules.push(mod);
 	modules_div.appendChild(mod.dom);
