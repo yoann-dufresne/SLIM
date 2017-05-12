@@ -11,6 +11,6 @@ exports.token_generation = function (app) {
 		}
 
 		res.send(token);
-		fs.mkdir("/app/data/" + token);
+		fs.mkdir("/app/data/" + token, function(){});
 	});
 }

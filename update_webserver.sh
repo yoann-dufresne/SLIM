@@ -17,7 +17,7 @@ else
 	echo "amplicon pipeline is not running"
 fi
 
-echo "Rebuild the docker imqge"
+echo "Rebuild the docker image"
 docker build -t amplicon .
 docker rmi -f $(docker images -f "dangling=true" -q)
 

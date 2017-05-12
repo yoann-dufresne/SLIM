@@ -4,6 +4,7 @@ var files_input = document.querySelector("#up_files");
 var list = document.querySelector("#up_list");
 
 
+
 var formData;
 var up_filenames = [];
 files_input.onchange = function (event) {
@@ -51,10 +52,7 @@ button.onclick = function (event) {
 			if(typeof data.error === 'undefined')
 			{
 				// Success so call function to process the form
-				// submitForm(event, data);
-				var event = new Event('new_file');
-				event.files = up_filenames;
-				document.dispatchEvent(event);
+				raiseNewFilesEvent(up_filenames, 'uploaded');
 			}
 			else
 			{

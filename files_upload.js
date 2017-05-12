@@ -15,24 +15,35 @@ exports.exposeDir = function (app) {
 exports.upload = function (app) {
 	// Uploading files service
 	app.post('/upload', function(req, res) {
-		console.log('body ' + req.body.token);
 		// create an incoming form object
 		var form = new formidable.IncomingForm();
 
 		// specify that we want to allow the user to upload multiple files in a single request
 		form.multiples = true;
 
-		// store all uploads in the /uploads directory
-		form.uploadDir = path.join(__dirname, '/data');
+		// set upload directory corresponding to the token send
+		var token = null;
 		form.on('field', function(name, value) {
-			if (name == 'token')
-				form.uploadDir = path.join(__dirname, '/data/' + value);
+			if (name == 'token') {
+				if (fs.existsSync('/app/data/' + value)) {
+					token = value;
+					form.uploadDir = path.join(__dirname, '/data/' + value);
+				} else {
+					res.status(403).send('Invalid token')
+				}
+			}	
 		});
 
 		// every time a file has been uploaded successfully,
 		// rename it to it's orignal name
 		form.on('file', function(field, file) {
-			fs.rename(file.path, path.join(form.uploadDir, file.name));
+			if (token == null)
+				fs.unlink(file.path, function(){})
+			else
+				fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
+					if (err)
+						console.log('Error during the upload: ' + err);
+				});
 		});
 
 		// log any errors that occur
