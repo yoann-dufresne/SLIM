@@ -19,12 +19,12 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 app.get('/', function (req, res) {
-  res.send(pipeline_GUI());
+	res.send(pipeline_GUI());
 });
 app.use('/js', express.static('www/js'))
 app.use('/css', express.static('www/css'))
 
-app.use('/visu', express.static('data/tmp.txt'))
+app.use('/visu', express.static('/app/data'))
 app.use('/softwares', express.static("www/pipeline_modules.json"))
 
 
@@ -33,14 +33,18 @@ console.log('Running on http://localhost:' + PORT);
 
 
 // Accounts
-var accounts = require('./accounts.js');
+const accounts = require('./accounts.js');
 accounts.token_generation(app);
 
 // Data exchanche
-var filesIO = require("./files_upload.js");
+const filesIO = require("./files_upload.js");
 filesIO.exposeDir(app);
 filesIO.upload(app);
 
+// Start job scheduler
+const scheduler = require('./scheduler.js');
+scheduler.start();
+
 // Sub_process call
-var sub = require("./sub_process.js");
+const sub = require("./sub_process.js");
 sub.listen_commands(app);

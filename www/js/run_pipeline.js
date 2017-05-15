@@ -22,8 +22,6 @@ run.onclick = function () {
 		};
 	}
 
-	console.log(config);
-
 	$.post( "/run", config)
 	.done(function( data ) {
 		console.log( "Data Loaded: " + data );

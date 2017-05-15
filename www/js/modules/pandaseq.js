@@ -56,12 +56,12 @@ class PandaseqModule extends Module {
 		inputs.fwd = this.fwd.value;
 		inputs.rev = this.rev.value;
 		var outputs = {};
-		outputs.assmbly = this.output_file.value;
+		outputs.assembly = this.output_file.value;
 		var params = {};
 
 		config.params = params;
 		config.inputs = inputs;
-		config.output = outputs;
+		config.outputs = outputs;
 		
 		return config;
 	}

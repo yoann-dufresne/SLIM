@@ -6,6 +6,13 @@ exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
 		fs.readdir("/app/data/" + req.query.token, function(err, items) {
+			for (var idx=0 ; idx<items.length ; idx++) {
+				if (items[idx].endsWith('.log') || items[idx].endsWith('.conf')) {
+					items.splice(idx, 1);
+					idx--;
+				}
+			}
+
 			res.send(items);
 		});
 	});
