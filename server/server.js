@@ -44,7 +44,6 @@ filesIO.upload(app);
 // Start job scheduler
 const scheduler = require('./scheduler.js');
 scheduler.start();
+scheduler.listen_commands(app);
+scheduler.expose_status(app);
 
-// Sub_process call
-const sub = require("./sub_process.js");
-sub.listen_commands(app);
