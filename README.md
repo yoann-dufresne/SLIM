@@ -16,11 +16,13 @@ The inputs and outputs formats are very constrained because of the program sched
 The scheduler will defined softwares priorities depending of the inputs/outputs dependencies.
 ```json
 {
-	inputs: {name1: value1, name2: value2, ...},
-	outputs: {name1: value1, name2: value2, ...},
-	params: {name1: value1, name2: value2, ...}
+	"inputs": {"name1": "value1", "name2": "value2", ...},
+	"outputs": {"name1": "value1", "name2": "value2", ...},
+	"params": {"name1": "value1", "name2": "value2", ...}
 }
 ```
+
+Using the getConfiguration method from the super class, you will get an object correctly formated without any entry in the inputs/outputs/params sub-objects.  
 
 ## Server software, trigger the good software with good parameters
 
