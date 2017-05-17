@@ -5,3 +5,46 @@
 	min-height: 100px;
 	margin-bottom: 20px;
 }
+
+#up_list ul {
+	list-style-type: none;
+}
+
+.download {
+	width: 20px;
+}
+
+.module .download {
+	visibility: hidden;
+}
+
+#up_list .download {
+	visibility: visible;
+}
+
+
+
+
+
+
+/* Status obects aspect */
+
+.spinner {
+	width:30px;
+	visibility: hidden;
+}
+.status {
+	visibility: hidden;
+}
+
+.running.spinner {
+	visibility: visible;
+}
+
+.running .status,.ready .status {
+	visibility: visible;
+}
+
+.module.ended .download {
+	visibility: visible;
+}

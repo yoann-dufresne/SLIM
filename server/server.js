@@ -23,8 +23,9 @@ app.get('/', function (req, res) {
 });
 app.use('/js', express.static('www/js'))
 app.use('/css', express.static('www/css'))
+app.use('/imgs', express.static('www/imgs'))
 
-app.use('/visu', express.static('/app/data'))
+app.use('/data', express.static('/app/data'))
 app.use('/softwares', express.static("www/pipeline_modules.json"))
 
 

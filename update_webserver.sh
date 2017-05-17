@@ -20,6 +20,7 @@ fi
 echo "Rebuild the docker image"
 docker build -t amplicon .
 docker rmi -f $(docker images -f "dangling=true" -q)
+docker ps --filter status=dead --filter status=exited -aq | xargs docker rm -v
 
 echo "Restart the docker"
 docker run -p 8080:80 -d amplicon

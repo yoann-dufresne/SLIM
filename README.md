@@ -1,6 +1,10 @@
 
 Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis.
 
+# Tools basicaly included
+
+# Install and run the pipeline
+
 # Create a module
 
 ## Web interface, create a module

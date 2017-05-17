@@ -1,13 +1,7 @@
 
-var button = document.querySelector("#up_submit");
-var files_input = document.querySelector("#up_files");
-var list = document.querySelector("#up_list");
-
-
-
-var formData;
+var up_formData;
 var up_filenames = [];
-files_input.onchange = function (event) {
+document.querySelector("#up_files").onchange = function (event) {
 	var files = event.target.files;
 	up_filenames = [];
 	
@@ -16,15 +10,15 @@ files_input.onchange = function (event) {
 
 		// create a FormData object which will be sent as the data payload in the
 		// AJAX request
-		formData = new FormData();
-		formData.append('token', exec_token);
+		up_formData = new FormData();
+		up_formData.append('token', exec_token);
 
 		// loop through all the selected files
 		for (var i = 0; i < files.length; i++) {
 		  var file = files[i];
 
-		  // add the files to formData object for the data payload
-		  formData.append('uploads[]', file, file.name);
+		  // add the files to up_formData object for the data payload
+		  up_formData.append('uploads[]', file, file.name);
 		  up_filenames.push(file.name);
 		}
 
@@ -33,7 +27,7 @@ files_input.onchange = function (event) {
 }
 
 
-button.onclick = function (event) {
+document.querySelector("#up_submit").onclick = function (event) {
 	// Stop stuff happening
 	event.stopPropagation();
 	event.preventDefault();
@@ -42,31 +36,27 @@ button.onclick = function (event) {
 	$.ajax({
 		url: '/upload',
 		type: 'POST',
-		data: formData,
+		data: up_formData,
 		cache:false,
 		processData: false, // Don't process the files
 		contentType: false, // Set content type to false as jQuery will tell the server its a query string request
 		
 		success: function(data, textStatus, jqXHR)
 		{
-			if(typeof data.error === 'undefined')
-			{
-				// Success so call function to process the form
-				raiseNewFilesEvent(up_filenames, 'uploaded');
-			}
-			else
-			{
+			if(typeof data.error === 'undefined') {
+				var event = new Event('new_file');
+				event.files = up_filenames;
+				document.dispatchEvent(event);
+			} else {
 				// Handle errors here
 				console.log('ERRORS: ' + data.error);
 			}
 		},
-		error: function(jqXHR, textStatus, errorThrown)
-		{
+		error: function(jqXHR, textStatus, errorThrown) {
 			// Handle errors here
 			console.log('ERRORS: ' + textStatus);
 			// STOP LOADING SPINNER
 		},
-
 		xhr: function() {
 			// create an XMLHttpRequest
 			var xhr = new XMLHttpRequest();
@@ -96,21 +86,26 @@ button.onclick = function (event) {
 	});
 }
 
-new_file_listeners.push(function (e) {
-	$.get("/list?token=" + exec_token, function( data ) {
-		list.innerHTML = '';
-		var filenames = data;
 
-		if (filenames.length > 0) {
-			list.innerHTML = '<p>Server file list</p>';
+
+// Print the file list
+file_manager.register_observer((manager) => {
+	var up_list = document.querySelector("#up_list");
+	up_list.innerHTML = '';
+
+	var filenames = manager.server_files;
+	if (filenames.length > 0) {
+			up_list.innerHTML = '<p>Server files</p>';
 			var ul = document.createElement("ul");
 			
 			for (var idx in filenames) {
+				var filename = filenames[idx];
+
 				var li = document.createElement("li");
-				li.innerHTML = filenames[idx];
+				li.innerHTML = '<a href="/data/' + exec_token + '/' + filename + '" download>\
+				<img src="/imgs/download.png" class="download"/></a>  ' + filename;
 				ul.appendChild(li);
 			}
-			list.appendChild(ul);
+			up_list.appendChild(ul);
 		}
-	});
 });
