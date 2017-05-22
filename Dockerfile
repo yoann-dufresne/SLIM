@@ -13,12 +13,16 @@ RUN apt-get update && apt-get install -y \
 	automake \
 	zlib1g-dev \
 	libbz2-dev \
-	pkg-config
+	pkg-config \
+	libboost-all-dev
 
 # Copy libraries
 RUN mkdir /app/lib
+COPY lib/DTD /app/lib/DTD
 COPY lib/pandaseq /app/lib/pandaseq
 
+# Compile DTD
+RUN cd /app/lib/DTD && make && cd /app
 # Compile pandaseq
 RUN cd /app/lib/pandaseq && ./autogen.sh && ./configure && make && cd /app
 
