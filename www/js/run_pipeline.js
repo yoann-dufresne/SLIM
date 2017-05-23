@@ -59,7 +59,8 @@ run.onclick = function () {
 
 	$.post( "/run", config)
 	.done(function( data ) {
-		console.log("Run ended");
+		console.log("Run started");
+		run.disabled = true;
 	});
 
 	status_interval = setInterval(()=>{update_run_status(exec_token);}, 5000);
@@ -76,6 +77,7 @@ var update_run_status = (token) => {
 		// Stop the update when the run is over
 		if (server_status.global == 'ended' || server_status.global == 'aborted') {
 			clearInterval(status_interval);
+			run.disabled = false;
 		}
 
 		// Update the GUI
@@ -94,8 +96,11 @@ var update_run_status = (token) => {
 			}
 
 			// Add the new status
-			if (server_status.jobs[divIdx])
+			if (server_status.jobs[divIdx]) {
 				element.classList.add(server_status.jobs[divIdx]);
+				var status = element.getElementsByClassName('status')[0];
+				status.innerHTML = server_status.jobs[divIdx];
+			}
 
 		}
 	});

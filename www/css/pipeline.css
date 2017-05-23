@@ -60,14 +60,25 @@ textarea {
 	visibility: hidden;
 }
 
-.running.spinner {
+.running .spinner {
 	visibility: visible;
 }
 
-.running .status,.ready .status {
+/* See the status */
+.running .status {
+	visibility: visible;
+	color: yellow
+}
+.ready .status {
+	color: blue;
+	visibility: visible;
+}
+.ended .status {
+	color: green;
 	visibility: visible;
 }
 
+/* Show the downoad links when the soft is ended */
 .module.ended .download {
 	visibility: visible;
 }
