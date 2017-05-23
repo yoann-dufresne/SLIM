@@ -46,6 +46,7 @@ class DemultiplexerModule extends Module {
 			lookup: csv,
 			onSelect: function(suggestion) {
 				that.tags_text.value = suggestion.data;
+				that.tags_text.onchange();
 			}
 		});
 
@@ -87,7 +88,13 @@ class DemultiplexerModule extends Module {
 		// Change the output files using the tags file
 		this.tags_text.onchange = function () {
 			that.out_files = [];
+			that.out_area.innerHTML = "";
 
+			// The file is not uploaded
+			if (file_manager.contents[that.tags_text.value] == undefined)
+				return;
+
+			// Get the file content
 			var data = file_manager.contents[that.tags_text.value].data;
 			for (var idx=0 ; idx<data.length ; idx++) {
 				var sample = data[idx];
@@ -104,7 +111,6 @@ class DemultiplexerModule extends Module {
 			}
 
 			// Add the files in the output text area
-			that.out_area.innerHTML = "";
 			for (var idx=0 ; idx<that.out_files.length ; idx++) {
 				that.out_area.innerHTML += that.out_files[idx] + "\n";
 			}
