@@ -1,42 +1,51 @@
 #!/bin/sh
 
-# For the libraries not present in npm
 if [ ! -d "lib" ]; then
 	mkdir lib
 fi
-if [ ! -d "lib/js" ]; then
-	mkdir lib/js
-fi
-
-cd lib/js
-
-cd ../..
-
-
-
-# For the tools to compile
 cd lib/
 
+
+
+# jquery autocomplete
+if [ ! -d "jquery-autocomplete" ]; then
+	git clone https://github.com/devbridge/jQuery-Autocomplete.git jquery-autocomplete
+else
+	cd jquery-autocomplete
+	git pull
+	cd ..
+fi
+
+
+# 
+if [ ! -d "papa" ]; then
+	git clone https://github.com/mholt/PapaParse.git papa
+else
+	cd papa
+	git pull
+	cd ..
+fi
+
+
 # Demultiplexing tool
-if [ -d "lib/DTD" ]; then
+if [ ! -d "DTD" ]; then
 	git clone https://github.com/yoann-dufresne/DoubleTagDemultiplexer.git DTD/
-	cd DTD
 else
 	cd DTD
 	git pull
+	cd ..
 fi
-cd ..
 
 
 # Pandaseq
-if [ -d "lib/pandaseq" ]; then
+if [ ! -d "pandaseq" ]; then
 	git clone https://github.com/neufeld/pandaseq.git pandaseq/
-	cd pandaseq
 else
 	cd pandaseq
 	git pull
+	cd ..
 fi
-cd ..
+
 
 
 

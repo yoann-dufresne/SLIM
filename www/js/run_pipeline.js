@@ -31,6 +31,10 @@ add_button.onclick = function () {
 	switch (modules_list.value) {
 		case 'pandaseq':
 			mod = new PandaseqModule();
+			break;
+		case 'demultiplexer':
+			mod = new DemultiplexerModule();
+			break;
 	}
 
 	modules.push(mod);
@@ -70,7 +74,7 @@ var update_run_status = (token) => {
 		var server_status = JSON.parse(data);
 
 		// Stop the update when the run is over
-		if (server_status.global == 'ended') {
+		if (server_status.global == 'ended' || server_status.global == 'aborted') {
 			clearInterval(status_interval);
 		}
 

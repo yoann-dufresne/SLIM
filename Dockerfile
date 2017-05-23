@@ -38,6 +38,8 @@ EXPOSE 80
 # copy npm libraries
 # jquery
 RUN cp node_modules/jquery/dist/jquery.js /app/www/js/jquery.js
+COPY lib/jquery-autocomplete/dist/jquery.autocomplete.js /app/www/js/jquery.autocomplete.js
+COPY lib/papa/papaparse.js /app/www/js/papaparse.js
 
 # prepare data folder
 RUN mkdir /app/data

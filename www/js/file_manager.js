@@ -8,6 +8,8 @@ class FileManager {
 		this.rmvObs = [];
 
 		this.eventListeners();
+
+		this.contents = {};
 	}
 
 	getFiles () {

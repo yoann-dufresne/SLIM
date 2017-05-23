@@ -3,7 +3,13 @@
 head
 	link(rel="stylesheet", type="text/css", href="css/pipeline.css")
 
+	// JQuery
 	script(src='/js/jquery.js')
+	// Jquery module for autocomplete text fields
+	script(src='/js/jquery.autocomplete.js')
+	// CSV parser
+	script(src='/js/papaparse.js')
+	// Our own client side file manager
 	script(src='/js/file_manager.js')
 
 //p #{name}'s Pug source code!
@@ -45,4 +51,5 @@ body
 
 	// Module list
 	script(src='/js/modules/pandaseq.js')
+	script(src='/js/modules/demultiplexer.js')
 
