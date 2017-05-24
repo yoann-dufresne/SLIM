@@ -15,11 +15,22 @@ class FileManager {
 	load_from_server () {
 		var that = this;
 		$.get('/list?token=' + exec_token, (data) => {
+			// Get all the server files
 			var event = new Event('new_file');
 			event.files = data;
 			document.dispatchEvent(event);
 
-			// TODO: Add CSV contents
+			// Load the content of CSV files
+			for (var idx=0 ; idx<data.length ; idx++) {
+				var filename = data[idx];
+
+				if (!filename.endsWith('.csv'))
+					continue;
+
+				$.get('/data/' + exec_token + '/' + filename, (data) => {
+					that.contents[filename] = Papa.parse(data, {header: true});
+				});
+			}
 		});
 	}
 
