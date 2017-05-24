@@ -1,4 +1,8 @@
 
+* {
+	text-align: center;
+}
+
 /* Global style */
 input[type="text"] {
     width: 400px;
@@ -8,11 +12,28 @@ textarea {
     height: 100px;
 }
 
+#start {
+	display: block;
+	margin: auto;
+	margin-top: 20px;
+	margin-bottom: 150px;
+}
+
+/* General Module */
+
 .module {
 	border: black solid 1px;
-	width: 100%;
+	width: 600px;
 	min-height: 100px;
+	margin: auto;
 	margin-bottom: 20px;
+	text-align: left;
+}
+
+.mod_head * {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 5px;
 }
 
 
@@ -28,10 +49,12 @@ textarea {
 
 .module .download {
 	visibility: hidden;
+	width: 0px;
 }
 
 #up_list .download {
 	visibility: visible;
+	width: 20px;
 }
 
 
@@ -53,32 +76,61 @@ textarea {
 /* Status obects aspect */
 
 .spinner {
-	width:30px;
+	width:0px;
 	visibility: hidden;
 }
 .status {
 	visibility: hidden;
+	width: 0px;
 }
 
 .running .spinner {
 	visibility: visible;
+	width: 30px;
 }
 
 /* See the status */
 .running .status {
+	color: yellow;
 	visibility: visible;
-	color: yellow
+	width: auto;
 }
 .ready .status {
 	color: blue;
 	visibility: visible;
+	width: auto;
 }
 .ended .status {
 	color: green;
 	visibility: visible;
+	width: auto;
+}
+.aborted .status {
+	color: red;
+	visibility: visible;
+	width: auto;
 }
 
 /* Show the downoad links when the soft is ended */
 .module.ended .download {
 	visibility: visible;
+	width: 20px;
+}
+
+
+
+
+
+/* ------------------------ Module specific ---------------------------- */
+
+.demux_out {
+	height: 200px;
+	overflow: auto;
+	border: solid black 1px;
+	margin-right: 50px;
+	margin-left: 50px;
+}
+
+.demux_out p {
+	margin: 0px;
 }

@@ -35,17 +35,21 @@ class Module {
 		this.dom.classList.add('module');
 		this.dom.idx = this.id;
 
+		var header = document.createElement('div');
+		header.classList.add('mod_head');
+		// Title
 		var title = document.createElement('h3');
 		title.innerHTML = "Module " + this.name;
-		this.dom.appendChild(title);
+		header.appendChild(title);
+		// Execution status
+		header.innerHTML += '<img src="imgs/spinner.gif" alt="Spinner" class="spinner" />\
+		<p class="status">ready</p>';
+		this.dom.appendChild(header);
 
-		var status = document.createElement('div');
-		status.innerHTML = '<img src="imgs/spinner.gif" alt="Spinner" class="spinner" />\
-		<p class="status">Ready</p>';
-		this.dom.appendChild(status);
-
+		// Module content
 		this.specificDOMelements();
 
+		// Remove module
 		var rmv = document.createElement('button');
 		rmv.innerHTML = 'Remove this module';
 		var that = this;

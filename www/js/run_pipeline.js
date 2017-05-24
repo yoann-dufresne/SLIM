@@ -78,6 +78,10 @@ var update_run_status = (token) => {
 		if (server_status.global == 'ended' || server_status.global == 'aborted') {
 			clearInterval(status_interval);
 			run.disabled = false;
+
+			for (var key in server_status.jobs)
+				if (server_status.jobs[key] != 'ended')
+					server_status.jobs[key] = 'aborted'
 		}
 
 		// Update the GUI
@@ -90,13 +94,14 @@ var update_run_status = (token) => {
 			var divIdx = element.idx;
 
 			// Remove previous class values
-			var possible_status = ['running', 'ready', 'ended'];
+			var possible_status = ['running', 'ready', 'ended', 'aborted'];
 			for (var sIdx in possible_status) {
 				element.classList.remove(possible_status[sIdx]);
 			}
 
 			// Add the new status
 			if (server_status.jobs[divIdx]) {
+				console.log(divIdx, server_status.jobs[divIdx]);
 				element.classList.add(server_status.jobs[divIdx]);
 				var status = element.getElementsByClassName('status')[0];
 				status.innerHTML = server_status.jobs[divIdx];

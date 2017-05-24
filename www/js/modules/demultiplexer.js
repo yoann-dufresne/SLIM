@@ -79,7 +79,7 @@ class DemultiplexerModule extends Module {
 		this.tags_text = inputs[2];
 		this.primers_text = inputs[3];
 
-		this.out_area = this.dom.getElementsByTagName('textarea')[0];
+		this.out_area = this.dom.getElementsByClassName('demux_out')[0];
 
 		// Load suggestions in the inputs
 		this.onFileChange(file_manager, {});
@@ -112,7 +112,9 @@ class DemultiplexerModule extends Module {
 
 			// Add the files in the output text area
 			for (var idx=0 ; idx<that.out_files.length ; idx++) {
-				that.out_area.innerHTML += that.out_files[idx] + "\n";
+				that.out_area.innerHTML += '<p>' + that.out_files[idx] +
+				'  <a href="/data/' + exec_token + '/' + that.out_files[idx] +
+				'"><img src="/imgs/download.png" class="download"></a></p>';
 			}
 
 			// Notify the files manager
