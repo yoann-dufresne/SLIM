@@ -19,14 +19,32 @@ class FileManager {
 			event.files = data;
 			document.dispatchEvent(event);
 
-			for (var idx=0 ; idx<data.length ; idx++){
-				// TODO
-			}
+			// TODO: Add CSV contents
 		});
 	}
 
-	getFiles () {
-		return this.server_files.concat(this.futur_files).sort();
+	filterFiles (filenames, extentions) {
+		var filtered = [];
+
+		for (var eIdx=0 ; eIdx<extentions.length ; eIdx++) {
+			var ext = extentions[eIdx];
+			for (var idx=0 ; idx<filenames.length ; idx++) {
+				var filename = filenames[idx];
+				if (filename.endsWith(ext))
+					filtered.push(filename);
+			}
+		}
+
+		return filtered;
+	}
+
+	getFiles (extentions = []) {
+		var files = this.server_files.concat(this.futur_files);
+
+		if (extentions.length == 0)
+			return files;
+
+		return this.filterFiles (files, extentions);
 	}
 
 	register_observer (callback) {

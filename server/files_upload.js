@@ -50,7 +50,7 @@ exports.upload = function (app) {
 			else
 				fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
 					if (err)
-						console.log('Error during the upload: ' + err);
+						console.log('Error during file upload: ' + err);
 				});
 		});
 
@@ -61,7 +61,7 @@ exports.upload = function (app) {
 
 		// once all the files have been uploaded, send a response to the client
 		form.on('end', function() {
-			res.end('success');
+			res.send('success');
 		});
 
 		// parse the incoming request containing the form data

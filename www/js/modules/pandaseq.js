@@ -4,57 +4,36 @@ class PandaseqModule extends Module {
 		super ("pandaseq");
 	}
 
-	onFileAdd (file_manager, event) {
-		var files = event.files;
-		for (var idx in files) {
+	onFileChange (file_manager, event) {
+		var that = this;
+		var files = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
+		var auto = [];
+		for (var idx=0 ; idx<files.length ; idx++) {
 			var filename = files[idx];
-
-			if (filename.endsWith('.fastq')
-					|| filename.endsWith('.fastq.gz')
-					|| filename.endsWith('.fastq.bz2')) {
-
-				var opt = document.createElement('option');
-				opt.value = filename; opt.innerHTML = filename;
-				
-				this.fwd.appendChild(opt);
-				this.rev.appendChild(opt.cloneNode(true));
-			}
-		}
-	}
-
-	onFileRmv (file_manager, event) {
-		var files = event.files;
-
-		// Remove in the list of filenames for the forward reads
-		for (var idx=0 ; idx<this.fwd.children.length ; idx++) {
-			var child = this.fwd.children[idx];
-
-			if (files.indexOf(child.value) != -1) {
-				this.fwd.removeChild(child);
-				idx--;
-			}
+			auto.push({value:filename, data:filename});
 		}
 
-		// Remove in the list of filenames for the reverse reads
-		for (var idx=0 ; idx<this.rev.children.length ; idx++) {
-			var child = this.rev.children[idx];
-
-			if (files.indexOf(child.value) != -1) {
-				this.rev.removeChild(child);
-				idx--;
+		$(this.fwd).autocomplete({
+			lookup: auto,
+			onSelect: function(suggestion) {
+				that.fwd.value = suggestion.data;
 			}
-		}
+		});
+
+		$(this.rev).autocomplete({
+			lookup: auto,
+			onSelect: function(suggestion) {
+				that.rev.value = suggestion.data;
+			}
+		});
 	}
 
 	onLoad () {
 		var that = this;
 
 		// Register to the file manager
-		file_manager.register_add_observer(function (man, event) {
-			that.onFileAdd(man, event);
-		});
-		file_manager.register_rmv_observer(function (man, event) {
-			that.onFileRmv(man, event);
+		file_manager.register_observer(function (man, event) {
+			that.onFileChange(man, event);
 		});
 
 		// Define things
@@ -62,15 +41,15 @@ class PandaseqModule extends Module {
 	}
 
 	defineIO () {
-		var selects = this.dom.getElementsByTagName('select');
-		this.fwd = selects[0];
-		this.rev = selects[1];
+		var inputs = this.dom.getElementsByTagName('input');
+		this.fwd = inputs[0];
+		this.rev = inputs[1];
 
 		var filenames = file_manager.getFiles();
-		this.onFileAdd(file_manager, {files:filenames});
+		this.onFileChange(file_manager, {files:filenames});
 		
 		var that = this;
-		this.output_file = this.dom.getElementsByTagName('input')[0];
+		this.output_file = this.dom.getElementsByTagName('input')[2];
 		this.out_val = this.output_file.value;
 		this.down_link = this.dom.getElementsByClassName('download_link')[0];
 		this.down_link.href = '/data/' + exec_token + '/' + this.out_val;
