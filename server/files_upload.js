@@ -13,6 +13,7 @@ exports.exposeDir = function (app) {
 				}
 			}
 
+			console.log(items);
 			res.send(items);
 		});
 	});

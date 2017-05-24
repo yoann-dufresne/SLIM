@@ -12,6 +12,19 @@ class FileManager {
 		this.contents = {};
 	}
 
+	load_from_server () {
+		var that = this;
+		$.get('/list?token=' + exec_token, (data) => {
+			var event = new Event('new_file');
+			event.files = data;
+			document.dispatchEvent(event);
+
+			for (var idx=0 ; idx<data.length ; idx++){
+				// TODO
+			}
+		});
+	}
+
 	getFiles () {
 		return this.server_files.concat(this.futur_files).sort();
 	}

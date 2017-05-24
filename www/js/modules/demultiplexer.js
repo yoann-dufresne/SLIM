@@ -118,7 +118,7 @@ class DemultiplexerModule extends Module {
 			}
 
 			// Notify the files manager
-			event = new Event('new_output');
+			var event = new Event('new_output');
 			event.files = that.out_files;
 			document.dispatchEvent(event);
 		}

@@ -1,11 +1,18 @@
 
-// --- Token managment ---
-var exec_token = '';
-$.get('/token_generation')
-.done(function(data) {
-	exec_token = data;
-	console.log(data);
-})
+// --- Modules init ---
+
+var createModule = (name, params) => {
+	switch (name) {
+		case 'pandaseq':
+			return new PandaseqModule(params);
+			break;
+		case 'demultiplexer':
+			return new DemultiplexerModule(params);
+			break;
+		default:
+			return undefined
+	}
+};
 
 
 // --- Modules additions/deletions ---
@@ -27,15 +34,7 @@ $.get("/softwares", function( data ) {
 });
 
 add_button.onclick = function () {
-	var mod;
-	switch (modules_list.value) {
-		case 'pandaseq':
-			mod = new PandaseqModule();
-			break;
-		case 'demultiplexer':
-			mod = new DemultiplexerModule();
-			break;
-	}
+	var mod = createModule(modules_list.value, {});
 
 	modules.push(mod);
 	modules_div.appendChild(mod.dom);
@@ -101,7 +100,6 @@ var update_run_status = (token) => {
 
 			// Add the new status
 			if (server_status.jobs[divIdx]) {
-				console.log(divIdx, server_status.jobs[divIdx]);
 				element.classList.add(server_status.jobs[divIdx]);
 				var status = element.getElementsByClassName('status')[0];
 				status.innerHTML = server_status.jobs[divIdx];
