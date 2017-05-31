@@ -67,4 +67,30 @@ class Module {
 };
 
 
+class ModuleManager {
+	constructor() {
+		var that = this;
+		this.modules = [];
+
+		$.get("/softwares", function( data ) {
+			that.available_modules = data;
+		});
+	}
+
+	createModule (name, params) {
+		switch (name) {
+			case 'pandaseq':
+				return new PandaseqModule(params);
+				break;
+			case 'demultiplexer':
+				return new DemultiplexerModule(params);
+				break;
+			default:
+				return undefined
+		}
+	}
+};
+var module_manager = new ModuleManager();
+
+
 

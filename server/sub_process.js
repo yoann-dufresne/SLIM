@@ -25,10 +25,10 @@ exports.run = function (token, config, callback) {
 
 var runPandaseq = function (token, config, callback) {
 	console.log("Running pandaseq with the command line:");
-	console.log('/app/lib/pandaseq/pandaseq \
-		-f /app/data/' + token + '/' + config.params.inputs.fwd + ' \
-		-r /app/data/' + token + '/' + config.params.inputs.rev + ' \
-		-w /app/data/' + token + '/' + config.params.outputs.assembly);
+	console.log('/app/lib/pandaseq/pandaseq ' +
+		' -f /app/data/' + token + '/' + config.params.inputs.fwd +
+		' -r /app/data/' + token + '/' + config.params.inputs.rev +
+		' -w /app/data/' + token + '/' + config.params.outputs.assembly);
 
 	var child = exec('/app/lib/pandaseq/pandaseq',
 		['-f', '/app/data/' + token + '/' + config.params.inputs.fwd,

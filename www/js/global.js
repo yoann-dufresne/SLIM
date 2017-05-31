@@ -2,8 +2,28 @@
 
 // --- Actions on load ---
 var on_token_generated = () => {
+	// Files loading
 	file_manager.load_from_server();
+
+	// Modules loading
+	$.get('/data/' + exec_token + '/exec.log')
+	.done((data) => {
+		if (data && data != '')
+			load_modules(JSON.eval(data));
+	});
 }
+
+var load_modules = (log) => {
+	// For each module in the log file
+	for (var idx in log.conf) {
+		var soft = log.conf[idx];
+
+		// Create the module
+		var module = module_manager.createModule (soft.name, soft.params);
+
+	}
+}
+
 
 
 

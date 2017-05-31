@@ -1,9 +1,10 @@
 
 class DemultiplexerModule extends Module {
-	constructor () {
+	constructor (params) {
 		super ("demultiplexer");
 
 		this.out_files = [];
+		this.params = params;
 	}
 
 	onFileChange (file_manager, event) {
@@ -78,6 +79,14 @@ class DemultiplexerModule extends Module {
 		this.r2_text = inputs[1];
 		this.tags_text = inputs[2];
 		this.primers_text = inputs[3];
+
+		// Reload inputs
+		if (this.params.inputs) {
+			this.r1_text.value = params.inputs.r1;
+			this.r2_text.value = params.inputs.r2;
+			this.tags_text.value = params.inputs.tags;
+			this.primers_text.value = params.inputs.primers;
+		}
 
 		this.out_area = this.dom.getElementsByClassName('demux_out')[0];
 

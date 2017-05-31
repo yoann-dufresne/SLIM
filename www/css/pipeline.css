@@ -7,10 +7,6 @@
 input[type="text"] {
     width: 400px;
 }
-textarea {
-    width: 400px;
-    height: 100px;
-}
 
 #start {
 	display: block;
@@ -38,6 +34,10 @@ textarea {
 
 
 /* Upload module */
+
+#up_list {
+	border: none;
+}
 
 #up_list ul {
 	list-style-type: none;
@@ -121,9 +121,9 @@ textarea {
 
 
 
-/* ------------------------ Module specific ---------------------------- */
+/* ------------------------ File lists ---------------------------- */
 
-.demux_out {
+.file_list {
 	height: 200px;
 	overflow: auto;
 	border: solid black 1px;
@@ -131,6 +131,6 @@ textarea {
 	margin-left: 50px;
 }
 
-.demux_out p {
+.file_list p {
 	margin: 0px;
 }

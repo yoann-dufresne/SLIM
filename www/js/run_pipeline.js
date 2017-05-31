@@ -1,42 +1,19 @@
 
-// --- Modules init ---
-
-var createModule = (name, params) => {
-	switch (name) {
-		case 'pandaseq':
-			return new PandaseqModule(params);
-			break;
-		case 'demultiplexer':
-			return new DemultiplexerModule(params);
-			break;
-		default:
-			return undefined
-	}
-};
-
-
 // --- Modules additions/deletions ---
-var modules = [];
 var add_button = document.querySelector('#add_module');
 var modules_div = document.querySelector('#modules');
 var modules_list = document.querySelector('#module_list');
 
-var available_modules = [];
-$.get("/softwares", function( data ) {
-	available_modules = data;
-
-	for (var idx in available_modules) {
-		var opt = document.createElement('option');
-		opt.innerHTML = available_modules[idx];
-		opt.value = available_modules[idx];
-		modules_list.appendChild(opt);
-	}
-});
+for (var idx in module_manager.available_modules) {
+	var opt = document.createElement('option');
+	opt.innerHTML = module_manager.available_modules[idx];
+	opt.value = module_manager.available_modules[idx];
+	modules_list.appendChild(opt);
+}
 
 add_button.onclick = function () {
-	var mod = createModule(modules_list.value, {});
-
-	modules.push(mod);
+	var mod = module_manager.createModule(modules_list.value, {});
+	module_manager.modules.push(mod);
 	modules_div.appendChild(mod.dom);
 };
 
@@ -47,8 +24,8 @@ var run = document.querySelector('#start');
 var status_interval;
 run.onclick = function () {
 	var config = {token:exec_token};
-	for (var idx in modules) {
-		var module = modules[idx];
+	for (var idx in module_manager.modules) {
+		var module = module_manager.modules[idx];
 
 		config[module.id] = {
 			name: module.name,
