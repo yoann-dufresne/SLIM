@@ -82,13 +82,20 @@ class DemultiplexerModule extends Module {
 
 		// Reload inputs
 		if (this.params.inputs) {
-			this.r1_text.value = params.inputs.r1;
-			this.r2_text.value = params.inputs.r2;
-			this.tags_text.value = params.inputs.tags;
-			this.primers_text.value = params.inputs.primers;
+			this.r1_text.value = this.params.inputs.r1;
+			this.r2_text.value = this.params.inputs.r2;
+			this.tags_text.value = this.params.inputs.tags;
+			this.primers_text.value = this.params.inputs.primers;
 		}
 
-		this.out_area = this.dom.getElementsByClassName('demux_out')[0];
+		this.out_area = this.dom.getElementsByClassName('file_list')[0];
+		// Reload outputs
+		if (this.params.outputs) {
+			for (var filename in this.params.outputs) {
+				this.out_files.push(filename)
+				this.out_area.innerHTML += this.format_output(filename);
+			}
+		}
 
 		// Load suggestions in the inputs
 		this.onFileChange(file_manager, {});
@@ -121,9 +128,7 @@ class DemultiplexerModule extends Module {
 
 			// Add the files in the output text area
 			for (var idx=0 ; idx<that.out_files.length ; idx++) {
-				that.out_area.innerHTML += '<p>' + that.out_files[idx] +
-				'  <a href="/data/' + exec_token + '/' + that.out_files[idx] +
-				'"><img src="/imgs/download.png" class="download"></a></p>';
+				that.out_area.innerHTML += that.format_output(that.out_files[idx]);
 			}
 
 			// Notify the files manager
@@ -131,6 +136,12 @@ class DemultiplexerModule extends Module {
 			event.files = that.out_files;
 			document.dispatchEvent(event);
 		}
+	}
+
+	format_output(filename) {
+		return '<p>' + filename +
+		'  <a href="/data/' + exec_token + '/' + filename +
+		'"><img src="/imgs/download.png" class="download"></a></p>'
 	}
 
 	getConfiguration () {

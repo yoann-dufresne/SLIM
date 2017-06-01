@@ -55,7 +55,8 @@ class FileManager {
 		if (extentions.length == 0)
 			return files;
 
-		return this.filterFiles (files, extentions);
+		files = this.filterFiles (files, extentions);
+		return files;
 	}
 
 	register_observer (callback) {
@@ -104,7 +105,7 @@ class FileManager {
 				var filename = event.files[idx];
 				var file_idx = that.server_files.indexOf(filename);
 				if (file_idx != -1)
-					that.server_files.splice(file_idx);
+					that.server_files.splice(file_idx, 1);
 			}
 			that.notifyRmv(event);
 		});
@@ -125,7 +126,7 @@ class FileManager {
 				var filename = event.files[idx];
 				var file_idx = that.futur_files.indexOf(filename);
 				if (file_idx != -1)
-					that.futur_files.splice(file_idx);
+					that.futur_files.splice(file_idx, 1);
 			}
 			that.notifyRmv(event);
 		});

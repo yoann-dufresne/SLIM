@@ -1,7 +1,9 @@
 
 class PandaseqModule extends Module {
-	constructor () {
+	constructor (params) {
 		super ("pandaseq");
+
+		this.params = params;
 	}
 
 	onFileChange (file_manager, event) {
@@ -41,19 +43,36 @@ class PandaseqModule extends Module {
 	}
 
 	defineIO () {
+		var that = this;
+
+		// --- Inputs ---
 		var inputs = this.dom.getElementsByTagName('input');
 		this.fwd = inputs[0];
 		this.rev = inputs[1];
 
+		this.fwd.onchange = () => {that.input_change()};
+		this.rev.onchange = () => {that.input_change()};
+
+		// Reload inputs
+		if (this.params.inputs) {
+			this.fwd.value = this.params.inputs.fwd;
+			this.rev.value = this.params.inputs.rev;
+		}
+
 		var filenames = file_manager.getFiles();
 		this.onFileChange(file_manager, {files:filenames});
 		
-		var that = this;
+		// --- Outputs ---
 		this.output_file = this.dom.getElementsByTagName('input')[2];
-		this.out_val = this.output_file.value;
 		this.down_link = this.dom.getElementsByClassName('download_link')[0];
-		this.down_link.href = '/data/' + exec_token + '/' + this.out_val;
 
+		// Reload outputs
+		if (this.params.outputs) {
+			this.output_file.value = this.params.outputs.assembly;
+		}
+		
+		this.out_val = this.output_file.value;
+		this.down_link.href = '/data/' + exec_token + '/' + this.out_val;
 
 		this.output_file.onchange = function () {
 			// Send a remove event for the precedent output value
@@ -69,6 +88,24 @@ class PandaseqModule extends Module {
 			document.dispatchEvent(event);
 		}
 		this.output_file.onchange();
+
+		// --- Parameters ---
+	}
+
+	input_change () {
+		// If the names are standards
+		if (this.fwd.value.includes('_fwd.fastq') && this.rev.value.includes('_rev.fastq')) {
+			// Get the main name
+			var i1 = this.fwd.value.indexOf('_fwd.fastq');
+			var sub1 = this.fwd.value.substring(0, i1);
+			var i2 = this.rev.value.indexOf('_rev.fastq');
+			var sub2 = this.rev.value.substring(0, i2);
+
+			if (sub2 == sub1) {
+				this.output_file.value = sub1 + '.fasta';
+				this.output_file.onchange();
+			}
+		}
 	}
 
 	getConfiguration () {

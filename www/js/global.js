@@ -9,7 +9,7 @@ var on_token_generated = () => {
 	$.get('/data/' + exec_token + '/exec.log')
 	.done((data) => {
 		if (data && data != '')
-			load_modules(JSON.eval(data));
+			load_modules(JSON.parse(data));
 	});
 }
 
@@ -19,8 +19,7 @@ var load_modules = (log) => {
 		var soft = log.conf[idx];
 
 		// Create the module
-		var module = module_manager.createModule (soft.name, soft.params);
-
+		var module = module_manager.createModule (soft.name, soft.params, soft.status);
 	}
 }
 

@@ -55,9 +55,9 @@ class Module {
 		var that = this;
 		rmv.onclick = function () {
 			// remove from modules list
-			var idx = modules.indexOf(that);
+			var idx = module_manager.modules.indexOf(that);
 			if (idx > -1) {
-				modules.splice(idx, 1);
+				module_manager.modules.splice(idx, 1);
 			}
 			// remove from dom
 			modules_div.removeChild(that.dom);
@@ -72,21 +72,48 @@ class ModuleManager {
 		var that = this;
 		this.modules = [];
 
+		this.dom_modules = 
+
 		$.get("/softwares", function( data ) {
 			that.available_modules = data;
+
+			var modules_list = document.querySelector('#module_list');
+			for (var idx in data) {
+				var opt = document.createElement('option');
+				opt.innerHTML = data[idx];
+				opt.value = data[idx];
+				modules_list.appendChild(opt);
+			}
 		});
 	}
 
-	createModule (name, params) {
+	createModule (name, params, status) {
+		var module;
+		// Create the module object
 		switch (name) {
 			case 'pandaseq':
-				return new PandaseqModule(params);
+				module = new PandaseqModule(params);
 				break;
 			case 'demultiplexer':
-				return new DemultiplexerModule(params);
+				module = new DemultiplexerModule(params);
 				break;
 			default:
-				return undefined
+				return
+		}
+
+		// Add the module to module list
+		this.modules.push(module);
+
+		// Add the module to the dom
+		var div = document.querySelector('#modules');
+		div.appendChild(module.dom);
+
+		// Modify the execution status
+		if (status) {
+			module.dom.classList.add(status);
+
+			var p_stat = module.dom.getElementsByClassName('status')[0];
+			p_stat.innerHTML = status;
 		}
 	}
 };

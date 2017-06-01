@@ -2,19 +2,10 @@
 // --- Modules additions/deletions ---
 var add_button = document.querySelector('#add_module');
 var modules_div = document.querySelector('#modules');
-var modules_list = document.querySelector('#module_list');
-
-for (var idx in module_manager.available_modules) {
-	var opt = document.createElement('option');
-	opt.innerHTML = module_manager.available_modules[idx];
-	opt.value = module_manager.available_modules[idx];
-	modules_list.appendChild(opt);
-}
 
 add_button.onclick = function () {
-	var mod = module_manager.createModule(modules_list.value, {});
-	module_manager.modules.push(mod);
-	modules_div.appendChild(mod.dom);
+	var modules_list = document.querySelector('#module_list');
+	module_manager.createModule(modules_list.value, {});
 };
 
 
@@ -35,7 +26,6 @@ run.onclick = function () {
 
 	$.post( "/run", config)
 	.done(function( data ) {
-		console.log("Run started");
 		run.disabled = true;
 	});
 
