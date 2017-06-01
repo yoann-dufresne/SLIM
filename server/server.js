@@ -3,6 +3,7 @@
 const express = require('express');
 const pug = require('pug');
 const bodyParser = require('body-parser')
+const fs = require('fs');
 
 
 // Pug webpages pre-compilation
@@ -21,12 +22,13 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.get('/', function (req, res) {
 	res.send(pipeline_GUI());
 });
-app.use('/js', express.static('www/js'))
-app.use('/css', express.static('www/css'))
-app.use('/imgs', express.static('www/imgs'))
+app.use('/js', express.static('www/js'));
+app.use('/css', express.static('www/css'));
+app.use('/imgs', express.static('www/imgs'));
 
-app.use('/data', express.static('/app/data'))
-app.use('/softwares', express.static("www/pipeline_modules.json"))
+app.use('/data', express.static('/app/data'));
+
+app.use('/softwares', express.static("www/pipeline_modules.json"));
 
 
 app.listen(PORT);

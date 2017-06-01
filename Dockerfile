@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
 	zlib1g-dev \
 	libbz2-dev \
 	pkg-config \
-	libboost-all-dev
+	libboost-all-dev \
+	pigz
 
 # Copy libraries
 RUN mkdir /app/lib

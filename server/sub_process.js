@@ -3,6 +3,59 @@ const fs = require('fs');
 
 
 
+var compress_outputs = (config, callback, token, str) => {
+	// Compress outputs
+	if (config.params.outputs) {
+		// Retrive jokers
+		var jokers = [];
+		for (var filename in config.params.outputs) {
+			if (filename.includes('*'))
+				jokers.push(filename);
+		}
+
+		// If no joker
+		if (jokers.length == 0) {
+			callback(token, str);
+			return;
+		}
+
+		var nbThreads = jokers.length;
+		// Compress
+		for (var idx=0 ; idx<jokers.length ; idx++) {
+			var joker = jokers[idx];
+			var begin = joker.substring(0, joker.indexOf('*'));
+			var end = joker.substring(joker.indexOf('*') + 1);
+
+			// Get all the files linked to the joker
+			var files = [];
+			for (var filename in config.params.outputs) {
+				if (filename.startsWith(begin) && filename.endsWith(end)) {
+					if (! filename.includes('*'))
+						files.push('/app/data/' + token + '/' + filename);
+				}
+			}
+
+			// Start the compression
+			if (files.length > 0) {
+				var options = ['--use-compress-program=pigz',
+					'-Pcf', '/app/data/' + token + '/' + joker + '.gz'].concat(files);
+				var child = exec('tar', options);
+				child.on('close', () => {
+					nbThreads--;
+					if (nbThreads == 0) {
+						callback(token, str);
+					}
+				});
+
+				child.stderr.on('data', function(data) {
+					console.log('compress err', data.toString());
+				});
+			}
+		}
+	} else {
+		callback(token, str);
+	}
+}
 
 
 // ----- Software executions -----
@@ -11,12 +64,16 @@ const fs = require('fs');
 exports.run = function (token, config, callback) {
 	var soft_name = config.name;
 
+	var modified_callback = (token, str) => {
+		compress_outputs(config, callback, token, str);
+	};
+
 	switch (soft_name) {
 		case 'pandaseq':
-			runPandaseq(token, config, callback);
+			runPandaseq(token, config, modified_callback);
 		break;
 		case 'demultiplexer':
-			runDtd(token, config, callback);
+			runDtd(token, config, modified_callback);
 		break;
 		default:
 			callback(token, 'Software ' + soft_name + ' undetecteed');

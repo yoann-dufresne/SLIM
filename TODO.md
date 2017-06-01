@@ -1,6 +1,6 @@
-
-* Reload modules  
-Get the previous exection and reload all the modules in the same configuration.  
+  
+* Jokers in filenames  
+Allow a * in the filenames  
 * Module name dependancy  
 Remove name dependancy for all the modules. This can be done by an advanced usage of the pipeline_modules.json file.  
 * Multiple tasks  

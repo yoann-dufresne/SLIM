@@ -12,8 +12,7 @@ exports.exposeDir = function (app) {
 					idx--;
 				}
 			}
-
-			console.log(items);
+			
 			res.send(items);
 		});
 	});
