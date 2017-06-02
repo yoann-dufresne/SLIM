@@ -88,6 +88,7 @@ exports.addJob = function (token) {
 
 // ----- Job submitions -----
 
+
 exports.listen_commands = function (app) {
 	app.post('/run', function (req, res) {
 		params = req.body;
@@ -106,6 +107,17 @@ exports.listen_commands = function (app) {
 			res.status(403).send('Invalid token')
 			return;
 		}
+
+		// Modify the the parameters if there are joken tokens in the inputs
+		let files = getAllFiles(params, token);
+		//console.log(JSON.stringify(params), '\n\n');
+		var test = expand_parameters (params, files);
+		console.log(JSON.stringify(test));
+
+		// TODO : to remove
+		res.send("canceled");
+		return;
+		// /TODO
 
 		// Save the conf and return message
 		fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {
@@ -251,3 +263,90 @@ var computeSoftwareOrder = function (params, token) {
 
 	return order;
 }
+
+
+var expand_parameters = (params, no_joker_files) => {
+	for (var soft_id in params) {
+		var inputs = params[soft_id].params.inputs;
+		var outputs = params[soft_id].params.outputs;
+
+		// Store all the files for a common joker subpart
+		var configurations = {};
+
+		// Explore all the inputs
+		for (var in_id in inputs) {
+			var filename = inputs[in_id];
+
+			// Save for 
+			if (filename.includes('*')) {
+				let begin = filename.substring(0, filename.indexOf('*'));
+				let end = filename.substring(filename.indexOf('*')+1);
+
+				// Look for corresponding files
+				for (var idx=0 ; idx<no_joker_files.length ; idx++) {
+					var candidate = no_joker_files[idx];
+					// If the file correspond, extract the core text
+					if (candidate.startsWith(begin) && candidate.endsWith(end)) {
+						var core = candidate.substring(begin.length);
+						core = core.substring(0, core.indexOf(end));
+
+						// Get the config
+						var config = configurations[core] ? configurations[core] :
+							JSON.parse(JSON.stringify(params[soft_id]));
+						// Update the config
+						config.params.inputs[in_id] = candidate;
+						configurations[core] = config;
+					}
+				}
+			}
+		}
+
+		var conf_array = [];
+		// Update outputs if *
+		for (id in configurations) {
+			let config = configurations[id];
+			for (out_id in config.params.outputs) {
+				let filename = config.params.outputs[out_id];
+
+				if (filename.includes('*')) {
+					// Save the joker
+					if (!config.out_jokers)
+						config.out_jokers = {};
+					config.out_jokers[out_id] = filename;
+
+					// Replace the * by the complete name
+					config.params.outputs[out_id] = filename.replace('\*', id);
+				}
+			}
+
+			conf_array.push(config);
+		}
+		// Update if no joker
+		if (conf_array.length == 0) {
+			conf_array.push(params[soft_id]);
+		}
+
+		params[soft_id] = conf_array;
+	}
+
+	return params;
+};
+
+
+var getAllFiles = (params, token) => {
+	// Get Uploaded files
+	var filenames = fs.readdirSync('/app/data/' + token);
+
+	// Get the files that will be created
+	for (var soft_id in params) {
+		var outputs = params[soft_id].params.outputs;
+
+		for (var out_id in outputs) {
+			let filename = outputs[out_id];
+			if (filenames.indexOf(filename) == -1)
+				filenames.push(filename);
+		}
+	}
+
+	return filenames
+};

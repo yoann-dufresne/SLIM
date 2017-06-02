@@ -8,7 +8,8 @@ var compress_outputs = (config, callback, token, str) => {
 	if (config.params.outputs) {
 		// Retrive jokers
 		var jokers = [];
-		for (var filename in config.params.outputs) {
+		for (var filename_idx in config.params.outputs) {
+			var filename = config.params.outputs[filename_idx];
 			if (filename.includes('*'))
 				jokers.push(filename);
 		}
@@ -28,7 +29,8 @@ var compress_outputs = (config, callback, token, str) => {
 
 			// Get all the files linked to the joker
 			var files = [];
-			for (var filename in config.params.outputs) {
+			for (var filename_idx in config.params.outputs) {
+				var filename = config.params.outputs[filename_idx];
 				if (filename.startsWith(begin) && filename.endsWith(end)) {
 					if (! filename.includes('*'))
 						files.push('/app/data/' + token + '/' + filename);
