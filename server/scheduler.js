@@ -6,6 +6,7 @@ const sub_process = require('./sub_process.js');
 var waiting_jobs = [];
 var running_jobs = {};
 
+const MAX_JOBS = 1;
 
 exports.start = function () {
 	setInterval (scheduler, 10000);
@@ -13,7 +14,7 @@ exports.start = function () {
 
 var scheduler = function () {
 	// Add a new job if not so busy
-	if (Object.keys(running_jobs).length == 0 && waiting_jobs.length > 0) {
+	if (Object.keys(running_jobs).length < MAX_JOBS && waiting_jobs.length > 0) {
 		var token = waiting_jobs.shift();
 		fs.readFile ('/app/data/' + token + '/exec.log', (err, data) => {
 			if (err) throw err;
@@ -44,44 +45,74 @@ var scheduler = function () {
 			// Update the software status
 			job.status = "running";
 			job.running_soft = nextId;
-			job.conf[nextId].status = "running";
-			job.conf[nextId].log = 'out_' + nextId + '.log';
 
-			// Callback of the sub-process
-			sub_process.run(token, job.conf[nextId], (token, err) => {
-				var job = running_jobs[token];
+			// Define output log files and status for all the sub-jobs in the current job
+			// Sub-jobs are input/output variations on the same software
+			var configs_array = job.conf[nextId];
+			for (var sub_idx=0 ; sub_idx<configs_array.length ; sub_idx++) {
+				configs_array[sub_idx].status = "waiting";
+				configs_array[sub_idx].log = 'out_' + nextId + '_' + sub_idx + '.log';
+			}
+			job.conf[nextId] = configs_array;
 
-				// Abord the pipeline if an error occur.
-				if (err) {
-					job.status = 'aborted';
-					job.msg = err;
-					fs.writeFile('/app/data/' + token + '/exec.log', JSON.stringify(job), (err) => {});
-					delete running_jobs[token];
-
-					console.log(token + ': aborted');
-					return;
-				}
-
-				// Add software output to the log file and modify the status.
-				job.status = 'ready';
-				job.conf[job.running_soft].status = "ended";
-				delete job.running_soft;
-
-				// Save the status
-				running_jobs[token] = job;
-				fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
-			});
-
-			// Save the staatus
+			// Save the status
 			running_jobs[token] = job;
 			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
 			console.log (token + ': status updated');
+
+			// Start the sub-process
+			sub_process_start(token, configs_array);
 		}
 	}
 };
 
-exports.addJob = function (token) {
-	waiting_jobs.push(token);
+
+var sub_process_start = (token, configs_array) => {
+	let job = running_jobs[token];
+	let sub_idx = job.sub_running_job ? job.sub_running_job : 0;
+	job.sub_running_job = sub_idx;
+
+	let current_params = configs_array[sub_idx];
+	job.conf[job.running_soft][sub_idx].status = 'running';
+	fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+
+	sub_process.run(token, current_params, (token, err) => {
+		let job = running_jobs[token];
+
+		// Abord the pipeline if an error occur.
+		if (err) {
+			job.status = 'aborted';
+			job.msg = err;
+			fs.writeFile('/app/data/' + token + '/exec.log', JSON.stringify(job), (err) => {});
+			delete running_jobs[token];
+
+			console.log(token + ': aborted');
+			return;
+		}
+
+		// Add software output to the log file and modify the status.
+		job.conf[job.running_soft][sub_idx].status = "ended";
+		job.sub_running_job += 1;
+
+		// Save the status
+		running_jobs[token] = job;
+		fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+
+		// recursively call sub_process_start
+		if (job.sub_running_job < configs_array.length) {
+			sub_process_start (token, configs_array);
+		} else {// Stop the job
+			job.status = 'ready';
+
+			// Compact output if needed
+			if (job.conf[job.running_soft][0].out_jokers) {
+				sub_process.compress_outputs(token, job.conf[job.running_soft][0].out_jokers);
+			}
+			
+			delete job.running_soft;
+			delete job.sub_running_job;
+		}
+	});
 };
 
 
@@ -91,7 +122,7 @@ exports.addJob = function (token) {
 
 exports.listen_commands = function (app) {
 	app.post('/run', function (req, res) {
-		params = req.body;
+		var params = req.body;
 
 		// Token verifications
 		if (params.token == undefined) {
@@ -108,17 +139,6 @@ exports.listen_commands = function (app) {
 			return;
 		}
 
-		// Modify the the parameters if there are joken tokens in the inputs
-		let files = getAllFiles(params, token);
-		//console.log(JSON.stringify(params), '\n\n');
-		var test = expand_parameters (params, files);
-		console.log(JSON.stringify(test));
-
-		// TODO : to remove
-		res.send("canceled");
-		return;
-		// /TODO
-
 		// Save the conf and return message
 		fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {
 			if (err) throw err;
@@ -128,20 +148,25 @@ exports.listen_commands = function (app) {
 
 		// Create the execution log file
 		var logFile = '/app/data/' + token + '/exec.log';
+		
+		for (var idx in params) {
+			params[idx].status = "waiting";
+		}
 		var exe = {
 			status: "waiting",
 			conf: params,
 			order: null
 		};
-		for (var idx in exe.params) {
-			exe.params[idx].status = "waiting";
-		}
 		fs.writeFileSync(logFile, JSON.stringify(exe));
 
 		// Schedule the softwares
 		var order = computeSoftwareOrder(params, token);
+		// Modify the the parameters if there are joken tokens in the inputs
+		let files = getAllFiles(params, token);
+		exe.conf = expand_parameters (params, files, order);
+
 		// If dependencies are not satisfied
-		if (order.length < Object.keys(params).length) {
+		if (order.length < Object.keys(exe.conf).length) {
 			exe.status = 'aborted';
 			exe.msg = "dependencies not satisfied";
 
@@ -181,11 +206,40 @@ exports.expose_status = function (app) {
 			if (status.global == 'aborted')
 				status.msg = exec.msg;
 
+			// Browse process
 			for (var idx in exec.conf) {
-				if (exec.conf[idx].status == undefined)
+				sub_status = {};
+				// Analyse the sub process results
+				for (var sub_idx=0 ; sub_idx<exec.conf[idx].length ; sub_idx++) {
+					let st = exec.conf[idx][sub_idx].status;
+					sub_status[st] = sub_status[st] ? sub_status[st] + 1 : 1;
+				}
+
+				// Write
+				switch (Object.keys(sub_status).length ) {
+				case 0:
 					status.jobs[idx] = 'ready';
-				else
-					status.jobs[idx] = exec.conf[idx].status;
+					break;
+				case 1:
+					status.jobs[idx] = Object.keys(sub_status)[0];
+					break;
+				default:
+					// If aborted
+					if (sub_status['aborted']) {
+						status.jobs[idx] = 'aborted';
+						break;
+					}
+
+					// If it's running
+					var total = 0;
+					for (var key in sub_status) {
+						total += sub_status[key];
+					}
+
+					status.jobs[idx] = 'running';
+					status.sub_jobs = total;
+					status.sub_ended = sub_status['ended'] ? sub_status['ended'] : 0;
+				}
 			}
 
 			res.send(JSON.stringify(status));
@@ -265,8 +319,10 @@ var computeSoftwareOrder = function (params, token) {
 }
 
 
-var expand_parameters = (params, no_joker_files) => {
-	for (var soft_id in params) {
+var expand_parameters = (params, no_joker_files, order) => {
+	for (var idx=0 ; idx<order.length ; idx++) {
+		var soft_id = order[idx];
+
 		var inputs = params[soft_id].params.inputs;
 		var outputs = params[soft_id].params.outputs;
 
@@ -285,6 +341,10 @@ var expand_parameters = (params, no_joker_files) => {
 				// Look for corresponding files
 				for (var idx=0 ; idx<no_joker_files.length ; idx++) {
 					var candidate = no_joker_files[idx];
+
+					if (candidate.includes('*'))
+						continue;
+
 					// If the file correspond, extract the core text
 					if (candidate.startsWith(begin) && candidate.endsWith(end)) {
 						var core = candidate.substring(begin.length);
@@ -301,29 +361,39 @@ var expand_parameters = (params, no_joker_files) => {
 			}
 		}
 
+
+		// Explore all the outputs
+		var out_jokers = {};
+		for (var out_id in outputs) {
+			let filename = outputs[out_id];
+			if (filename.includes('*')) {
+				out_jokers[out_id] = filename;
+			}
+		}
+
+
 		var conf_array = [];
-		// Update outputs if *
+		// Update outputs if * in input
 		for (id in configurations) {
 			let config = configurations[id];
 			for (out_id in config.params.outputs) {
 				let filename = config.params.outputs[out_id];
 
 				if (filename.includes('*')) {
-					// Save the joker
-					if (!config.out_jokers)
-						config.out_jokers = {};
-					config.out_jokers[out_id] = filename;
-
 					// Replace the * by the complete name
 					config.params.outputs[out_id] = filename.replace('\*', id);
 				}
 			}
+			if (Object.keys(out_jokers).length > 0)
+				config.out_jokers = out_jokers;
 
 			conf_array.push(config);
 		}
 		// Update if no joker
 		if (conf_array.length == 0) {
 			conf_array.push(params[soft_id]);
+			if (Object.keys(out_jokers).length > 0)
+				conf_array[0].out_jokers = out_jokers;
 		}
 
 		params[soft_id] = conf_array;
@@ -343,7 +413,7 @@ var getAllFiles = (params, token) => {
 
 		for (var out_id in outputs) {
 			let filename = outputs[out_id];
-			if (filenames.indexOf(filename) == -1)
+			if ((!filename.includes('*')) && filenames.indexOf(filename) == -1)
 				filenames.push(filename);
 		}
 	}

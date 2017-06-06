@@ -3,60 +3,44 @@ const fs = require('fs');
 
 
 
-var compress_outputs = (config, callback, token, str) => {
-	// Compress outputs
-	if (config.params.outputs) {
-		// Retrive jokers
-		var jokers = [];
-		for (var filename_idx in config.params.outputs) {
-			var filename = config.params.outputs[filename_idx];
-			if (filename.includes('*'))
-				jokers.push(filename);
-		}
-
-		// If no joker
-		if (jokers.length == 0) {
-			callback(token, str);
-			return;
-		}
-
+exports.compress_outputs = (token, jokers) => {
+	console.log(token, jokers);
+	fs.readdir("/app/data/" + token, (err, items) => {
 		var nbThreads = jokers.length;
+		console.log(items);
 		// Compress
-		for (var idx=0 ; idx<jokers.length ; idx++) {
-			var joker = jokers[idx];
+		for (var id in jokers) {
+			var joker = jokers[id];
 			var begin = joker.substring(0, joker.indexOf('*'));
 			var end = joker.substring(joker.indexOf('*') + 1);
 
+			console.log('joker : ', joker, begin, end);
+
 			// Get all the files linked to the joker
 			var files = [];
-			for (var filename_idx in config.params.outputs) {
-				var filename = config.params.outputs[filename_idx];
+			for (var filename_idx=0 ; filename_idx<items.length ; filename_idx++) {
+				var filename = items[filename_idx];
 				if (filename.startsWith(begin) && filename.endsWith(end)) {
 					if (! filename.includes('*'))
 						files.push('/app/data/' + token + '/' + filename);
 				}
 			}
 
+			console.log("Files : ", files);
+
 			// Start the compression
 			if (files.length > 0) {
 				var options = ['--use-compress-program=pigz',
 					'-Pcf', '/app/data/' + token + '/' + joker + '.gz'].concat(files);
 				var child = exec('tar', options);
-				child.on('close', () => {
-					nbThreads--;
-					if (nbThreads == 0) {
-						callback(token, str);
-					}
-				});
+				child.on('close', () => {});
 
 				child.stderr.on('data', function(data) {
 					console.log('compress err', data.toString());
 				});
 			}
 		}
-	} else {
-		callback(token, str);
-	}
+	});
 }
 
 
@@ -66,16 +50,12 @@ var compress_outputs = (config, callback, token, str) => {
 exports.run = function (token, config, callback) {
 	var soft_name = config.name;
 
-	var modified_callback = (token, str) => {
-		compress_outputs(config, callback, token, str);
-	};
-
 	switch (soft_name) {
 		case 'pandaseq':
-			runPandaseq(token, config, modified_callback);
+			runPandaseq(token, config, callback);
 		break;
 		case 'demultiplexer':
-			runDtd(token, config, modified_callback);
+			runDtd(token, config, callback);
 		break;
 		default:
 			callback(token, 'Software ' + soft_name + ' undetecteed');
