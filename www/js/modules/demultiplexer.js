@@ -141,7 +141,7 @@ class DemultiplexerModule extends Module {
 	format_output(filename) {
 		return '<p>' + filename +
 		'  <a href="/data/' + exec_token + '/' + filename +
-		(filename.includes('*') ? '.gz' : '') +
+		(filename.includes('*') ? '.tar.gz' : '') +
 		'"><img src="/imgs/download.png" class="download"></a></p>'
 	}
 

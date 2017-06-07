@@ -82,7 +82,8 @@ class PandaseqModule extends Module {
 
 			// Update the output value
 			that.out_val = that.output_file.value;
-			that.down_link.href = '/data/' + exec_token + '/' + that.out_val;
+			that.down_link.href = '/data/' + exec_token + '/' + that.out_val
+				+ (that.out_val.includes('*') ? '.tar.gz' : '');
 			event = new Event('new_output');
 			event.files = [that.out_val];
 			document.dispatchEvent(event);

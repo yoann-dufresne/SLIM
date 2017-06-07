@@ -22,7 +22,7 @@ exports.compress_outputs = (token, jokers) => {
 				var filename = items[filename_idx];
 				if (filename.startsWith(begin) && filename.endsWith(end)) {
 					if (! filename.includes('*'))
-						files.push('/app/data/' + token + '/' + filename);
+						files.push(filename);
 				}
 			}
 
@@ -31,7 +31,8 @@ exports.compress_outputs = (token, jokers) => {
 			// Start the compression
 			if (files.length > 0) {
 				var options = ['--use-compress-program=pigz',
-					'-Pcf', '/app/data/' + token + '/' + joker + '.gz'].concat(files);
+					'-Pcf', '/app/data/' + token + '/' + joker + '.tar.gz',
+					'-C', '/app/data/' + token + '/'].concat(files);
 				var child = exec('tar', options);
 				child.on('close', () => {});
 
