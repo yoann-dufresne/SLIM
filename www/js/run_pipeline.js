@@ -36,7 +36,7 @@ run.onclick = function () {
 
 // --- Status update ---
 
-var update_run_status = (token) => {
+var update_run_status = (token, callback=(status)=>{}) => {
 	$.get('/status?token=' + token).done((data) => {
 		var server_status = JSON.parse(data);
 
@@ -70,8 +70,14 @@ var update_run_status = (token) => {
 				element.classList.add(server_status.jobs[divIdx]);
 				var status = element.getElementsByClassName('status')[0];
 				status.innerHTML = server_status.jobs[divIdx];
-			}
 
+				if (server_status.sub_jobs && server_status.sub_ended) {
+					status.innerHTML += ' (' + server_status.sub_ended;
+					status.innerHTML += '/' + server_status.sub_jobs + ')';
+				}
+			}
 		}
+
+		callback(server_status);
 	});
 }

@@ -24,7 +24,20 @@ var load_modules = (log) => {
 	}
 
 	// Update status
-	update_run_status(exec_token);
+	update_run_status(exec_token, (status)=> {
+		if (['ready', 'running', 'waiting'].includes(status.global)) {
+			// Set update interval
+			var inter = setInterval(()=>{
+				update_run_status(exec_token, (status) =>{
+					if (['ended', 'aborted'].includes(status.global))
+						clearInterval(inter);
+				});
+			}, 5000);
+
+			// Froze the start button
+			document.querySelector('#start').disabled = true;
+		}
+	});
 }
 
 
