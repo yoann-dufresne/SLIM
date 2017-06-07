@@ -6,7 +6,7 @@ var on_token_generated = () => {
 	file_manager.load_from_server();
 
 	// Modules loading
-	$.get('/data/' + exec_token + '/exec.log')
+	$.get('/data/' + exec_token + '/pipeline.conf')
 	.done((data) => {
 		if (data && data != '')
 			load_modules(JSON.parse(data));
@@ -14,13 +14,17 @@ var on_token_generated = () => {
 }
 
 var load_modules = (log) => {
+
 	// For each module in the log file
-	for (var idx in log.conf) {
-		var soft = log.conf[idx];
+	for (var idx in log) {
+		var soft = log[idx];
 
 		// Create the module
 		var module = module_manager.createModule (soft.name, soft.params, soft.status);
 	}
+
+	// Update status
+	update_run_status(exec_token);
 }
 
 
