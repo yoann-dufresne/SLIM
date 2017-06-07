@@ -95,7 +95,7 @@ input[type="text"] {
 	visibility: visible;
 	width: auto;
 }
-.ready .status {
+.waiting .status, .ready .status {
 	color: blue;
 	visibility: visible;
 	width: auto;

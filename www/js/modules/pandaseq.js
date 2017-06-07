@@ -103,7 +103,7 @@ class PandaseqModule extends Module {
 			var sub2 = this.rev.value.substring(0, i2);
 
 			if (sub2 == sub1) {
-				this.output_file.value = sub1 + '.fasta';
+				this.output_file.value = sub1 + '_panda.fasta';
 				this.output_file.onchange();
 			}
 		}

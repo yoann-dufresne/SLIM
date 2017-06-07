@@ -7,14 +7,12 @@ exports.compress_outputs = (token, jokers) => {
 	console.log(token, jokers);
 	fs.readdir("/app/data/" + token, (err, items) => {
 		var nbThreads = jokers.length;
-		console.log(items);
+		
 		// Compress
 		for (var id in jokers) {
 			var joker = jokers[id];
 			var begin = joker.substring(0, joker.indexOf('*'));
 			var end = joker.substring(joker.indexOf('*') + 1);
-
-			console.log('joker : ', joker, begin, end);
 
 			// Get all the files linked to the joker
 			var files = [];
@@ -25,8 +23,6 @@ exports.compress_outputs = (token, jokers) => {
 						files.push(filename);
 				}
 			}
-
-			console.log("Files : ", files);
 
 			// Start the compression
 			if (files.length > 0) {

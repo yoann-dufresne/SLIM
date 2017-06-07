@@ -60,7 +60,7 @@ var update_run_status = (token) => {
 			var divIdx = element.idx;
 
 			// Remove previous class values
-			var possible_status = ['running', 'ready', 'ended', 'aborted'];
+			var possible_status = ['waiting', 'running', 'ready', 'ended', 'aborted'];
 			for (var sIdx in possible_status) {
 				element.classList.remove(possible_status[sIdx]);
 			}
