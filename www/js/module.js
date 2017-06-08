@@ -61,6 +61,12 @@ class Module {
 			}
 			// remove from dom
 			modules_div.removeChild(that.dom);
+			// remove outputs from the accessible files
+			var outputs = that.getConfiguration().outputs;
+			var files = Object.values(outputs);
+			var event = new Event('rmv_output');
+			event.files = files;
+			document.dispatchEvent(event);
 		}
 		this.dom.appendChild(rmv);
 	}

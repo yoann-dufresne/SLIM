@@ -10,21 +10,16 @@ class DemultiplexerModule extends Module {
 	onFileChange (file_manager, event) {
 		/* Select elements for autocomplete fields */
 		var elements = file_manager.getFiles();
-		var fastq  = [];
-		var fasta  = [];
-		var csv  = [];
-		for (var idx in elements) {
-			var filename = elements[idx];
+		var fastq  = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
+		for (var idx=0 ; idx<fastq.length ; idx++)
+			fastq[idx] = {value:fastq[idx], data:fastq[idx]};
+		var fasta  = file_manager.getFiles(['.fasta']);
+		for (var idx=0 ; idx<fasta.length ; idx++)
+			fasta[idx] = {value:fasta[idx], data:fasta[idx]};
+		var csv  = file_manager.getFiles(['.csv']);
+		for (var idx=0 ; idx<csv.length ; idx++)
+			csv[idx] = {value:csv[idx], data:csv[idx]};
 
-			if (filename.endsWith('.fastq')
-					|| filename.endsWith('.fastq.gz')
-					|| filename.endsWith('.fastq.bz2'))
-				fastq.push({value:filename, data:filename});
-			else if (filename.endsWith('fasta'))
-				fasta.push({value:filename, data:filename});
-			else if (filename.endsWith('csv'))
-				csv.push({value:filename, data:filename});
-		}
 
 		/* Change the autocomplete field */
 		// Input fastq
