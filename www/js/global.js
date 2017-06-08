@@ -14,6 +14,11 @@ var on_token_generated = () => {
 }
 
 var load_modules = (log) => {
+	// Wait for modules loading
+	if (Object.keys(module_manager.moduleCreators).length == 0) {
+		setTimeout(()=>{load_modules (log);}, 50);
+		return;
+	}
 
 	// For each module in the log file
 	for (var idx in log) {

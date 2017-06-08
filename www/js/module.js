@@ -16,7 +16,7 @@ class Module {
 		this.dom.appendChild(specific);
 
 		var that = this;
-		$.get('/js/modules/' + this.name + '.html', function (data) {
+		$.get('/modules/' + this.name + '.html', function (data) {
 			specific.innerHTML = data;
 		}).done (function() {that.onLoad()});
 	}
@@ -90,23 +90,34 @@ class ModuleManager {
 				modules_list.appendChild(opt);
 			}
 		});
+
+		this.moduleCreators = {};
+	}
+
+	loadModules () {
+		if (!this.available_modules || this.available_modules.length == 0) {
+			// If modules are not still loaded, try again in 50ms
+			var that = this;
+			setTimeout(()=>{that.loadModules()}, 50);
+			return;
+		}
+
+		// Load each module
+		for (var idx=0 ; idx<this.available_modules.length ; idx++) {
+			var name = this.available_modules[idx];
+
+			$.get('/modules/' + name + '.js', (data) => {
+				eval(data);
+			});
+		}
 	}
 
 	createModule (name, params, status) {
-		var module;
-		// Create the module object
-		switch (name) {
-			case 'pandaseq':
-				module = new PandaseqModule(params);
-				break;
-			case 'demultiplexer':
-				module = new DemultiplexerModule(params);
-				break;
-			default:
-				return
-		}
+		if (!this.moduleCreators[name])
+			return;
 
-		// Add the module to module list
+		// Create the module
+		var module = this.moduleCreators[name](params);
 		this.modules.push(module);
 
 		// Add the module to the dom
@@ -123,6 +134,6 @@ class ModuleManager {
 	}
 };
 var module_manager = new ModuleManager();
-
+module_manager.loadModules();
 
 

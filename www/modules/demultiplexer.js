@@ -156,3 +156,8 @@ class DemultiplexerModule extends Module {
 		return config;
 	}
 };
+
+module_manager.moduleCreators.demultiplexer = (params) => {
+	return new DemultiplexerModule(params);
+};
+

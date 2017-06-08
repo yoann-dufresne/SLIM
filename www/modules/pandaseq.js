@@ -121,3 +121,8 @@ class PandaseqModule extends Module {
 	}
 };
 
+
+module_manager.moduleCreators.pandaseq = (params) => {
+	return new PandaseqModule(params);
+};
+
