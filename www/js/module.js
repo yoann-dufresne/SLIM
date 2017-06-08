@@ -78,9 +78,8 @@ class ModuleManager {
 		var that = this;
 		this.modules = [];
 
-		this.dom_modules = 
-
 		$.get("/softwares", function( data ) {
+			data = JSON.parse(data);
 			that.available_modules = data;
 
 			var modules_list = document.querySelector('#module_list');

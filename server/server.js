@@ -28,7 +28,9 @@ app.use('/imgs', express.static('www/imgs'));
 
 app.use('/data', express.static('/app/data'));
 
-app.use('/softwares', express.static("www/pipeline_modules.json"));
+// app.use('/softwares', express.static("www/pipeline_modules.json"));
+const sub_process = require('./sub_process.js');
+sub_process.expose_modules(app);
 
 
 app.listen(PORT);
