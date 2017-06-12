@@ -63,6 +63,10 @@ class DemultiplexerModule extends Module {
 			that.onFileChange(man, event);
 		});
 
+		let as = this.dom.getElementsByClassName('options')[0].getElementsByTagName('a');
+		as[0].href = '/data/' + exec_token + '/mistag_R1.fastq';
+		as[1].href = '/data/' + exec_token + '/mistag_R2.fastq';
+
 		// Define things
 		this.defineIO();
 	}
@@ -74,6 +78,7 @@ class DemultiplexerModule extends Module {
 		this.r2_text = inputs[1];
 		this.tags_text = inputs[2];
 		this.primers_text = inputs[3];
+		this.mistags = inputs[4];
 
 		// Reload inputs
 		if (this.params.inputs) {
@@ -152,6 +157,8 @@ class DemultiplexerModule extends Module {
 			var filename = this.out_files[idx];
 			config.outputs[filename] = filename;
 		}
+
+		config.params.mistags = this.mistags.checked;
 		
 		return config;
 	}

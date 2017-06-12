@@ -10,15 +10,44 @@ class Module {
 		this.toDOMelement();
 	}
 
-	specificDOMelements () {
-		var specific = document.createElement('div');
-		specific.classList.add('specific');
-		this.dom.appendChild(specific);
+	specificDOMelements (callback) {
+		this.specific = document.createElement('div');
+		this.specific.classList.add('specific');
+		this.dom.appendChild(this.specific);
 
 		var that = this;
 		$.get('/modules/' + this.name + '.html', function (data) {
-			specific.innerHTML = data;
-		}).done (function() {that.onLoad()});
+			that.specific.innerHTML = data;
+		}).done (() => {that.onLoad(), callback();});
+	}
+
+	createOptionBox (option) {
+		var box = document.createElement("div");
+		box.style.marginTop = '10px';
+		
+		// Expand options
+		var expand = document.createElement("button");
+		expand.classList.add('expandOptions');
+		expand.innerHTML = 'More options';
+		expand.onclick = () => {
+			expand.style.display = 'none';
+			option.style.display = 'inline-block';
+		}
+		box.appendChild(expand);
+
+		// Retract options
+		var retract = document.createElement("button");
+		retract.classList.add('retractOptions');
+		retract.innerHTML = 'Less options';
+		retract.onclick = () => {
+			expand.style.display = 'inline-block';
+			option.style.display = 'none';
+		}
+		option.insertBefore(retract, option.firstChild);
+		option.style.display = 'none';
+
+		box.appendChild(option);
+		return box;
 	}
 
 	onLoad () {
@@ -46,13 +75,23 @@ class Module {
 		<p class="status">ready</p>';
 		this.dom.appendChild(header);
 
+		var that = this;
+		var transformOptions = () => {
+			// Options format
+			var option = that.dom.getElementsByClassName('options');
+			if (option.length > 0) {
+				option = option[0];
+				var optionBox = that.createOptionBox(option.cloneNode(true));
+				that.specific.replaceChild(optionBox, option);
+			}
+		}
+
 		// Module content
-		this.specificDOMelements();
+		this.specificDOMelements(transformOptions);
 
 		// Remove module
 		var rmv = document.createElement('button');
 		rmv.innerHTML = 'Remove this module';
-		var that = this;
 		rmv.onclick = function () {
 			// remove from modules list
 			var idx = module_manager.modules.indexOf(that);

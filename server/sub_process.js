@@ -59,7 +59,6 @@ exports.run = function (token, config, callback) {
 
 
 exports.compress_outputs = (token, jokers) => {
-	console.log(token, jokers);
 	fs.readdir("/app/data/" + token, (err, items) => {
 		var nbThreads = jokers.length;
 		
