@@ -7,3 +7,20 @@
 <p>Output file</p>
 <input type="text" name="output" class="output_filename" value='panda.fasta' />
 <a class="download_link" href="" download><img src="/imgs/download.png" class="download"/></a>
+
+<div class="options">
+	<div class="pandaQuality">
+		<p>Quality threshold:</p>
+		<input type="text" name="quality" class="quality" value="0.6">
+	</div>
+	<div class="pandaLength">
+		<p>Out read length:</p>
+		<p>Min: <input type="text" name="minLength" class="minLength" value="-1">
+		Max: <input type="text" name="maxLength" class="maxLength" value="-1"></p>
+	</div>
+	<div class="pandaOverlap">
+		<p>Reads overlap:</p>
+		<p>Min: <input type="text" name="minOverlap" class="minOverlap" value="-1">
+		Max: <input type="text" name="maxOverlap" class="maxOverlap" value="-1"></p>
+	</div>
+</div>

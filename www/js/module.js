@@ -81,8 +81,10 @@ class Module {
 			var option = that.dom.getElementsByClassName('options');
 			if (option.length > 0) {
 				option = option[0];
-				var optionBox = that.createOptionBox(option.cloneNode(true));
-				that.specific.replaceChild(optionBox, option);
+				var clone = option.cloneNode(true);
+				that.specific.replaceChild(clone, option);
+				var optionBox = that.createOptionBox(option);
+				that.specific.replaceChild(optionBox, clone);
 			}
 		}
 

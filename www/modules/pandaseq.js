@@ -91,6 +91,25 @@ class PandaseqModule extends Module {
 		this.output_file.onchange();
 
 		// --- Parameters ---
+		var options_div = this.dom.getElementsByClassName('options')[0];
+		var inputs = options_div.getElementsByTagName('input');
+
+		var nanVerification = (elem) => {
+			if (isNaN(elem.value)) {
+				elem.value = 0;
+			}
+		};
+
+		this.threshold = inputs[0];
+		this.threshold.onchange = ()=>{nanVerification(that.threshold)};
+		this.min_length = inputs[1];
+		this.min_length.onchange = ()=>{nanVerification(that.min_length)};
+		this.max_length = inputs[2];
+		this.max_length.onchange = ()=>{nanVerification(that.max_length)};
+		this.min_overlap = inputs[3];
+		this.min_overlap.onchange = ()=>{nanVerification(that.min_overlap)};
+		this.max_overlap = inputs[4];
+		this.max_overlap.onchange = ()=>{nanVerification(that.max_overlap)};
 	}
 
 	input_change () {
@@ -116,6 +135,12 @@ class PandaseqModule extends Module {
 		config.inputs.rev = this.rev.value;
 		
 		config.outputs.assembly = this.output_file.value;
+
+		config.params.threshold = this.threshold.value;
+		config.params.min_length = this.min_length.value;
+		config.params.max_length = this.max_length.value;
+		config.params.min_overlap = this.min_overlap.value;
+		config.params.max_overlap = this.max_overlap.value;
 		
 		return config;
 	}
