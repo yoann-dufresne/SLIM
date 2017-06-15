@@ -72,7 +72,7 @@ class PandaseqModule extends Module {
 		}
 		
 		this.out_val = this.output_file.value;
-		this.down_link.href = '/data/' + exec_token + '/' + this.out_val;
+		this.down_link.href = file_manager.get_download_link(this.out_val);
 
 		this.output_file.onchange = function () {
 			// Send a remove event for the precedent output value
@@ -82,8 +82,7 @@ class PandaseqModule extends Module {
 
 			// Update the output value
 			that.out_val = that.output_file.value;
-			that.down_link.href = '/data/' + exec_token + '/' + that.out_val
-				+ (that.out_val.includes('*') ? '.tar.gz' : '');
+			that.down_link.href = file_manager.get_download_link(that.out_val);
 			event = new Event('new_output');
 			event.files = [that.out_val];
 			document.dispatchEvent(event);

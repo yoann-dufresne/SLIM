@@ -74,7 +74,7 @@ class ChimeraModule extends Module {
 			that.filtered_value = that.filtered.value;
 
 			// change download link
-			that.download_nonchimera.href = '/data/' + exec_token + '/' + that.filtered_value;
+			that.download_nonchimera.href = file_manager.get_download_link(that.filtered_value);
 		};
 		this.filtered.onchange();
 

@@ -64,8 +64,8 @@ class DemultiplexerModule extends Module {
 		});
 
 		let as = this.dom.getElementsByClassName('options')[0].getElementsByTagName('a');
-		as[0].href = '/data/' + exec_token + '/mistag_R1.fastq';
-		as[1].href = '/data/' + exec_token + '/mistag_R2.fastq';
+		as[0].href = file_manager.get_download_link('mistag_R1.fastq');
+		as[1].href = file_manager.get_download_link('mistag_R2.fastq');
 
 		// Define things
 		this.defineIO();
@@ -140,9 +140,8 @@ class DemultiplexerModule extends Module {
 
 	format_output(filename) {
 		return '<p>' + filename +
-		'  <a href="/data/' + exec_token + '/' + filename +
-		(filename.includes('*') ? '.tar.gz' : '') +
-		'"><img src="/imgs/download.png" class="download"></a></p>'
+		'  <a href="' + file_manager.get_download_link(filename) +
+		'"><img src="/imgs/download.png" class="download"></a></p>';
 	}
 
 	getConfiguration () {

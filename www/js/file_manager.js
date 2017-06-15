@@ -34,6 +34,12 @@ class FileManager {
 		});
 	}
 
+	get_download_link (filename) {
+		var link = '/data/' + exec_token + '/' + filename;
+		if (filename.includes('*'))
+			link += '.tar.gz';
+	}
+
 	filterFiles (filenames, extentions) {
 		var filtered = [];
 
