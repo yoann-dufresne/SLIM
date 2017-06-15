@@ -17,19 +17,23 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz
 
+# install app dependencies
+COPY package.json /app
+RUN npm install
+
 # Copy libraries
 RUN mkdir /app/lib
 COPY lib/DTD /app/lib/DTD
 COPY lib/pandaseq /app/lib/pandaseq
+COPY lib/vsearch /app/lib/vsearch
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
 # Compile pandaseq
 RUN cd /app/lib/pandaseq && ./autogen.sh && ./configure && make && cd /app
+# Compile vsearch
+RUN cd /app/lib/vsearch && ./autogen.sh && ./configure && make && cd /app
 
-# install app dependencies
-COPY package.json /app
-RUN npm install
 
 # prepare the web server
 COPY server /app

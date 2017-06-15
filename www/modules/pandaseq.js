@@ -8,10 +8,10 @@ class PandaseqModule extends Module {
 
 	onFileChange (file_manager, event) {
 		var that = this;
-		var files = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
+		var fastq = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
 		var auto = [];
-		for (var idx=0 ; idx<files.length ; idx++) {
-			var filename = files[idx];
+		for (var idx=0 ; idx<fastq.length ; idx++) {
+			var filename = fastq[idx];
 			auto.push({value:filename, data:filename});
 		}
 
@@ -63,7 +63,7 @@ class PandaseqModule extends Module {
 		this.onFileChange(file_manager, {files:filenames});
 		
 		// --- Outputs ---
-		this.output_file = this.dom.getElementsByTagName('input')[2];
+		this.output_file = inputs[2];
 		this.down_link = this.dom.getElementsByClassName('download_link')[0];
 
 		// Reload outputs

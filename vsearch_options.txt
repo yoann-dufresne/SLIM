@@ -1,0 +1,12 @@
+--fasta_width 0
+One line sequences
+
+--notrunclabels
+Full header used
+
+--quiet
+Only warnings and errors
+
+--threads
+Maximum thread to use
+

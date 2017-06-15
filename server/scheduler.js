@@ -320,7 +320,8 @@ var computeSoftwareOrder = function (params, token) {
 
 
 var expand_parameters = (params, no_joker_files, order) => {
-	for (var idx=0 ; idx<order.length ; idx++) {
+	console.log('order', order);
+	for (var idx in order) {
 		var soft_id = order[idx];
 
 		var inputs = params[soft_id].params.inputs;
@@ -382,6 +383,8 @@ var expand_parameters = (params, no_joker_files, order) => {
 				if (filename.includes('*')) {
 					// Replace the * by the complete name
 					config.params.outputs[out_id] = filename.replace('\*', id);
+					console.log(config.params.outputs[out_id]);
+					no_joker_files.push(config.params.outputs[out_id]);
 				}
 			}
 			if (Object.keys(out_jokers).length > 0)

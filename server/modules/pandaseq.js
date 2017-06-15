@@ -1,14 +1,16 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
+const tools = require('../toolbox.js');
 
 
 exports.name = 'pandaseq';
 
 exports.run = function (token, config, callback) {
 	var options = config.params.params;
+	var outfile = '/app/data/' + token + '/' + config.params.outputs.assembly;
 	var command = ['-f', '/app/data/' + token + '/' + config.params.inputs.fwd,
 		'-r', '/app/data/' + token + '/' + config.params.inputs.rev,
-		'-w', '/app/data/' + token + '/' + config.params.outputs.assembly,
+		'-w', outfile,
 		'-t', options.threshold];
 
 	// Length options
@@ -27,6 +29,7 @@ exports.run = function (token, config, callback) {
 		command = command.concat(['-O', options.max_overlap]);
 	}
 
+	// Joining
 	console.log('Running pandaseq');
 	console.log('/app/lib/pandaseq/pandaseq', command.join(' '));
 	var child = exec('/app/lib/pandaseq/pandaseq', command);
@@ -39,9 +42,14 @@ exports.run = function (token, config, callback) {
 		fs.appendFileSync('/app/data/' + token + '/' + config.log, data);
 	});
 	child.on('close', function(code) {
-		if (code == 0)
-			callback(token, null);
-		else
+		if (code == 0) {
+			// Dereplicate and sort
+			tools.dereplicate(outfile, () => {
+				tools.sort(outfile, () => {
+					callback(token, null);
+				});
+			});
+		} else
 			callback(token, "pandaseq terminate on code " + code);
 	});
 };

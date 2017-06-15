@@ -71,7 +71,8 @@ var update_run_status = (token, callback=(status)=>{}) => {
 				var status = element.getElementsByClassName('status')[0];
 				status.innerHTML = server_status.jobs[divIdx];
 
-				if (server_status.sub_jobs && server_status.sub_ended) {
+				if (server_status.sub_jobs && server_status.sub_ended &&
+						server_status.jobs[divIdx] == "running") {
 					status.innerHTML += ' (' + server_status.sub_ended;
 					status.innerHTML += '/' + server_status.sub_jobs + ')';
 				}

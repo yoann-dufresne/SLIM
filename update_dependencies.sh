@@ -47,5 +47,15 @@ else
 fi
 
 
+# Vsearch
+if [ ! -d "vsearch" ]; then
+	git clone https://github.com/torognes/vsearch.git vsearch/
+else
+	cd vsearch
+	git pull
+	cd ..
+fi
+
+
 
 
