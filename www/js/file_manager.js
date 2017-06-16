@@ -45,9 +45,9 @@ class FileManager {
 	filterFiles (filenames, extentions) {
 		var filtered = [];
 
-		for (var eIdx=0 ; eIdx<extentions.length ; eIdx++) {
+		for (var eIdx in extentions) {
 			var ext = extentions[eIdx];
-			for (var idx=0 ; idx<filenames.length ; idx++) {
+			for (var idx in filenames) {
 				var filename = filenames[idx];
 				if (filename.endsWith(ext))
 					filtered.push(filename);
