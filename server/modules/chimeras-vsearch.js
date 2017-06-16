@@ -10,8 +10,10 @@ exports.run = function (token, config, callback) {
 		'--nonchimeras', directory + config.params.outputs.nonchimeras,
 		'--sizeout'];
 
-	if (config.params.outputs.chimeras != "") {
-		options.concat(['--chimeras', directory + config.params.outputs.chimeras]);
+	console.log(JSON.stringify(config.params.outputs));
+
+	if (config.params.outputs.chimeras) {
+		options = options.concat(['--chimeras', directory + config.params.outputs.chimeras]);
 	}
 
 	console.log("Running dtd with the command line:");

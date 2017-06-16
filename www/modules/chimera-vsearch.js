@@ -5,6 +5,7 @@ class ChimeraModule extends Module {
 
 		this.params = params;
 		this.filtered_value = "";
+		this.chimeras_value = "";
 	}
 
 	onFileChange (file_manager, event) {
@@ -34,19 +35,21 @@ class ChimeraModule extends Module {
 
 		var inputs = this.dom.getElementsByTagName('input');
 		var links = this.dom.getElementsByTagName('a');
+		this.chimeras_link = this.dom.getElementsByClassName('chimeras_link')[0];
 
 		/// --- Inputs ---
 
 		// Save inputs
 		this.input = inputs[0];
 		this.filtered = inputs[1];
+		this.chimeras = inputs[2];
 
 		// Add suffix to output
 		this.input.onchange = () => {
 			var idx = that.input.value.indexOf('.fasta');
 			var sub = that.input.value.substring(0, idx);
 
-			that.filtered.value = sub + '_nonchimera.fasta';
+			that.filtered.value = sub + '_nonchimeras.fasta';
 			that.filtered.onchange();
 		}
 
@@ -76,11 +79,42 @@ class ChimeraModule extends Module {
 			// change download link
 			that.download_nonchimera.href = file_manager.get_download_link(that.filtered_value);
 		};
-		this.filtered.onchange();
 
 		// Reload outputs
 		if (this.params.outputs) {
-			this.filtered = this.params.outputs.nonchimeras;
+			this.filtered.value = this.params.outputs.nonchimeras;
+		}
+		this.filtered.onchange();
+
+		// --- options ---
+		this.chimeras.onchange = () => {
+			if (that.chimeras_value != "") {
+				// Remove previous output from global files
+				var event = new Event('rmv_output');
+				event.files = [that.chimeras_value];
+				document.dispatchEvent(event);
+			}
+
+			// Change the value
+			that.chimeras_value = that.chimeras.value;
+
+			if (that.chimeras_value != "") {
+				// Add new output in global files
+				var event = new Event('add_output');
+				event.files = [that.chimeras_value];
+				document.dispatchEvent(event);
+
+				that.chimeras_link.innerHTML = '<a href="' +
+					file_manager.get_download_link(that.chimeras_value) +
+					'"><img src="/imgs/download.png" class="download"></a>';
+			} else {
+				that.chimeras_link.innerHTML = "";
+			}
+		}
+
+		if (this.params.outputs && this.params.outputs.chimeras) {
+			this.chimeras.value = this.params.outputs.chimeras;
+			this.chimeras.onchange();
 		}
 
 		// Load suggestions in the inputs
@@ -92,6 +126,9 @@ class ChimeraModule extends Module {
 		
 		config.inputs.input = this.input.value;
 		config.outputs.nonchimeras = this.filtered.value;
+
+		if (this.chimeras_value != "")
+			config.outputs.chimeras = this.chimeras_value;
 		
 		return config;
 	}
