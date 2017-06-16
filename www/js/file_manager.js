@@ -38,6 +38,8 @@ class FileManager {
 		var link = '/data/' + exec_token + '/' + filename;
 		if (filename.includes('*'))
 			link += '.tar.gz';
+
+		return link;
 	}
 
 	filterFiles (filenames, extentions) {
