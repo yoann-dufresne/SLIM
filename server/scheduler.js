@@ -159,11 +159,9 @@ exports.listen_commands = function (app) {
 		};
 		fs.writeFileSync(logFile, JSON.stringify(exe));
 
+		
 		// Schedule the softwares
 		var order = computeSoftwareOrder(params, token);
-		// Modify the the parameters if there are joken tokens in the inputs
-		let files = getAllFiles(params, token);
-		exe.conf = expand_parameters (params, files, order);
 
 		// If dependencies are not satisfied
 		if (order.length < Object.keys(exe.conf).length) {
@@ -174,6 +172,11 @@ exports.listen_commands = function (app) {
 			return;
 		}
 
+		// Explicit input file names
+		let files = getAllFiles(params, token);
+		exe.conf = expand_parameters(params, files, order)
+
+		// Finalise status
 		exe.status = 'ready';
 		exe.order = order;
 		fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
@@ -261,6 +264,8 @@ var computeSoftwareOrder = function (params, token) {
 		// look for dependencies
 		for (var id in soft.params.inputs) {
 			var file = soft.params.inputs[id];
+			file = file.replace('$', '*');
+
 			if (dependencies[file] == undefined)
 				dependencies[file] = [];
 			dependencies[file].push(key);
@@ -318,90 +323,141 @@ var computeSoftwareOrder = function (params, token) {
 	return order;
 }
 
-
 var expand_parameters = (params, no_joker_files, order) => {
-	console.log('order', order);
 	for (var idx in order) {
 		var soft_id = order[idx];
 
-		var inputs = params[soft_id].params.inputs;
-		var outputs = params[soft_id].params.outputs;
+		// $ expantions
+		var inputs = demux_files(params[soft_id].params.inputs, no_joker_files);
+		params[soft_id].params.inputs = inputs;
 
-		// Store all the files for a common joker subpart
-		var configurations = {};
-
-		// Explore all the inputs
-		for (var in_id in inputs) {
-			var filename = inputs[in_id];
-
-			// Save for 
-			if (filename.includes('*')) {
-				let begin = filename.substring(0, filename.indexOf('*'));
-				let end = filename.substring(filename.indexOf('*')+1);
-
-				// Look for corresponding files
-				for (var idx=0 ; idx<no_joker_files.length ; idx++) {
-					var candidate = no_joker_files[idx];
-
-					if (candidate.includes('*'))
-						continue;
-
-					// If the file correspond, extract the core text
-					if (candidate.startsWith(begin) && candidate.endsWith(end)) {
-						var core = candidate.substring(begin.length);
-						core = core.substring(0, core.indexOf(end));
-
-						// Get the config
-						var config = configurations[core] ? configurations[core] :
-							JSON.parse(JSON.stringify(params[soft_id]));
-						// Update the config
-						config.params.inputs[in_id] = candidate;
-						configurations[core] = config;
-					}
-				}
-			}
+		// * demultiplexing
+		var dev_params = demux_executions(params, soft_id, no_joker_files);
+		// Copy soft parameters
+		params[soft_id] = dev_params[soft_id];
+		// Add jokers
+		for (var id in dev_params.out_jokers)
+			params.out_jokers[id] = dev_params.out_jokers[id];
+		// Add new files to list
+		for (var idx in dev_params.new_files) {
+			var filename = dev_params.new_files[idx];
+			if (!no_joker_files.includes(filename))
+				no_joker_files.push(filename);
 		}
-
-
-		// Explore all the outputs
-		var out_jokers = {};
-		for (var out_id in outputs) {
-			let filename = outputs[out_id];
-			if (filename.includes('*')) {
-				out_jokers[out_id] = filename;
-			}
-		}
-
-
-		var conf_array = [];
-		// Update outputs if * in input
-		for (id in configurations) {
-			let config = configurations[id];
-			for (out_id in config.params.outputs) {
-				let filename = config.params.outputs[out_id];
-
-				if (filename.includes('*')) {
-					// Replace the * by the complete name
-					config.params.outputs[out_id] = filename.replace('\*', id);
-					console.log(config.params.outputs[out_id]);
-					no_joker_files.push(config.params.outputs[out_id]);
-				}
-			}
-			if (Object.keys(out_jokers).length > 0)
-				config.out_jokers = out_jokers;
-
-			conf_array.push(config);
-		}
-		// Update if no joker
-		if (conf_array.length == 0) {
-			conf_array.push(params[soft_id]);
-			if (Object.keys(out_jokers).length > 0)
-				conf_array[0].out_jokers = out_jokers;
-		}
-
-		params[soft_id] = conf_array;
 	}
 
+	return params;
+}
+
+// From one entry, demux entry files
+var demux_files = (inputs, files) => {
+	// Explore all the inputs
+	for (var file_id in inputs) {
+		var filename = inputs[file_id];
+
+		if (filename.includes('$')) {
+			delete inputs[filename];
+			let begin = filename.substring(0, filename.indexOf('$'));
+			let end = filename.substring(filename.indexOf('$')+1);
+
+			// Look for corresponding files
+			for (var idx=0 ; idx<files.length ; idx++) {
+				var candidate = files[idx];
+
+				if (candidate.includes('$'))
+					continue;
+
+				// If the file correspond, extract the core text
+				if (candidate.startsWith(begin) && candidate.endsWith(end)) {
+					inputs[candidate] = candidate;
+				}
+			}
+		}
+	}
+
+	return inputs;
+}
+
+
+// From one entry, generate multiple exactutions
+var demux_executions = (params, soft_id, no_joker_files) => {
+	var inputs = params[soft_id].params.inputs;
+	var outputs = params[soft_id].params.outputs;
+
+	// Store all the files for a common joker subpart
+	var configurations = {};
+
+	// Explore all the inputs
+	for (var in_id in inputs) {
+		var filename = inputs[in_id];
+
+		// Save for 
+		if (filename.includes('*')) {
+			let begin = filename.substring(0, filename.indexOf('*'));
+			let end = filename.substring(filename.indexOf('*')+1);
+
+			// Look for corresponding files
+			for (var idx=0 ; idx<no_joker_files.length ; idx++) {
+				var candidate = no_joker_files[idx];
+
+				if (candidate.includes('*'))
+					continue;
+
+				// If the file correspond, extract the core text
+				if (candidate.startsWith(begin) && candidate.endsWith(end)) {
+					var core = candidate.substring(begin.length);
+					core = core.substring(0, core.indexOf(end));
+
+					// Get the config
+					var config = configurations[core] ? configurations[core] :
+						JSON.parse(JSON.stringify(params[soft_id]));
+					// Update the config
+					config.params.inputs[in_id] = candidate;
+					configurations[core] = config;
+				}
+			}
+		}
+	}
+
+
+	// Explore all the outputs
+	var out_jokers = {};
+	for (var out_id in outputs) {
+		let filename = outputs[out_id];
+		if (filename.includes('*')) {
+			out_jokers[out_id] = filename;
+		}
+	}
+
+
+	var conf_array = [];
+	// Update outputs if * in input
+	for (id in configurations) {
+		let config = configurations[id];
+		config.new_files = {};
+		for (out_id in config.params.outputs) {
+			let filename = config.params.outputs[out_id];
+
+			if (filename.includes('*')) {
+				// Replace the * by the complete name
+				config.params.outputs[out_id] = filename.replace('\*', id);
+				config.new_files[id] = config.params.outputs[out_id];
+				no_joker_files.push(config.params.outputs[out_id]);
+			}
+		}
+		if (Object.keys(out_jokers).length > 0)
+			config.out_jokers = out_jokers;
+
+		conf_array.push(config);
+	}
+	// Update if no joker
+	if (conf_array.length == 0) {
+		conf_array.push(params[soft_id]);
+		if (Object.keys(out_jokers).length > 0)
+			conf_array[0].out_jokers = out_jokers;
+	}
+
+	params[soft_id] = conf_array;
 	return params;
 };
 

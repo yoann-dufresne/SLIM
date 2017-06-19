@@ -5,8 +5,14 @@ const fs = require('fs');
 exports.name = 'toolbox';
 
 exports.run = (token, config, callback) => {
-	if (config.params.params.soft == "merge_fasta")
-		exports.merge_fasta(token, config, callback);
+	if (config.params.params.soft) {
+		if (config.params.params.soft == "fasta-merging")
+			exports.merge_fasta(token, config, callback);
+		else {
+			console.log("No tool called", config.params.params.soft);
+			callback(token, "No tool called " + config.params.params.soft);
+		}
+	}
 };
 
 
@@ -26,6 +32,7 @@ exports.tmp_filename = tmp_filename;
 // --- Merging fasta ---
 
 exports.merge_fasta = (token, config, callback) => {
+	console.log("Merging fastas");
 	var outfile = '/app/data/' + token + '/' + config.params.outputs.merged;
 
 	// Write a new empty file
@@ -33,7 +40,6 @@ exports.merge_fasta = (token, config, callback) => {
 
 	// Process fasta one by one
 	var fastas = Object.values(config.params.inputs);
-
 
 	var merge = () => {
 		var current_fasta = '/app/data/' + token + '/' + fastas.pop();

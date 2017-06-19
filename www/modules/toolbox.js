@@ -36,17 +36,24 @@ class ToolboxModule extends Module {
 						eval(data);
 						that.js = tmp;
 					}).done (() => {
-						that.js.onLoad(that.tool_div);
-						this.onFileChange(file_manager, null);
+						that.js.onLoad(that.tool_div, that.params);
+						that.onFileChange(file_manager, null);
 					});
 				});
 			}
 		};
+
+		// Reload
+		if (this.params.params) {
+			this.select_tool.value = this.params.params.soft;
+			this.select_tool.onchange();
+		}
 	}
 
 	getConfiguration () {
 		var config = super.getConfiguration()
 		config = this.js.getConfiguration(config);
+		config.params.soft = this.select_tool.value;
 		return config;
 	}
 };
