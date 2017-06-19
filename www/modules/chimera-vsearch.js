@@ -71,9 +71,9 @@ class ChimeraModule extends Module {
 			document.dispatchEvent(event);
 
 			// Add new output in global files
-			var event = new Event('add_output');
-			event.files = [that.filtered.value];
-			document.dispatchEvent(event);
+			var event2 = new Event('new_output');
+			event2.files = [that.filtered.value];
+			document.dispatchEvent(event2);
 			that.filtered_value = that.filtered.value;
 
 			// change download link
