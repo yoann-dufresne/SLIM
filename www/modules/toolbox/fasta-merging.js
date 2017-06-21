@@ -28,9 +28,11 @@ var tmp = {
 	onLoad: function(dom, params) {
 		this.div_selection = dom.getElementsByClassName('file_list')[0];
 		this.merged = dom.getElementsByClassName('merged')[0];
-		this.download_link = dom.getElementsByTagName('a')[0];
+		this.merged_link = dom.getElementsByTagName('a')[0];
+		this.origins = dom.getElementsByClassName('origins')[0];
+		this.origins_link = dom.getElementsByTagName('a')[1];
 
-		// Reload
+		// --- Inpuuts ---
 		if (params.inputs) {
 			for (var id in params.inputs) {
 				var filename = params.inputs[id].replace('$','*');
@@ -38,16 +40,31 @@ var tmp = {
 						filename + '" checked>' + filename + '</p>'
 			}
 		}
+
+		// --- Outputs ---
 		if (params.outputs) {
 			this.merged.value = params.outputs.merged;
+			this.origins.value = params.outputs.origins;
 		}
+		this.merged_value = this.merged.value;
+		this.origins_value = this.origins.value;
 
-		// On clics
+		// On clicks
 		var that = this;
+		var mod = new Module(null);
 		this.merged.onchange = () => {
-			that.download_link.href = file_manager.get_download_link(that.merged.value);
+			mod.output_onchange(
+				[that.merged_value], [that.merged.value], [that.merged_link]);
+			that.merged_value = that.merged.value;
 		};
 		this.merged.onchange();
+
+		this.origins.onchange = () => {
+			mod.output_onchange(
+				[that.origins_value], [that.origins.value], [that.origins_link]);
+			that.origins_value = that.origins.value;
+		};
+		this.origins.onchange();
 	},
 
 	getConfiguration: function(config) {
@@ -62,6 +79,7 @@ var tmp = {
 		}
 
 		config.outputs.merged = this.merged.value;
+		config.outputs.origins = this.origins.value;
 
 		return config;
 	}

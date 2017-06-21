@@ -5,6 +5,9 @@
 var __next_id = 0;
 class Module {
 	constructor (name) {
+		if (name == null)
+			return;
+
 		this.name = name;
 		this.id = __next_id++;
 		this.toDOMelement();
@@ -48,6 +51,24 @@ class Module {
 
 		box.appendChild(option);
 		return box;
+	}
+
+	output_onchange (prev_vals, new_vals, down_links) {
+		// Send a remove event for the precedent output value
+		var event = new Event('rmv_output');
+		event.files = prev_vals;
+		document.dispatchEvent(event);
+
+		// Update download links
+		for (var idx in down_links) {
+			var link = down_links[idx];
+			link.href = file_manager.get_download_link(new_vals[idx]);
+		}
+
+		// Update the output value
+		event = new Event('new_output');
+		event.files = new_vals;
+		document.dispatchEvent(event);
 	}
 
 	onLoad () {
@@ -111,6 +132,13 @@ class Module {
 		}
 		this.dom.appendChild(rmv);
 	}
+
+
+	nanVerification (elem) {
+		if (isNaN(elem.value)) {
+			elem.value = 0;
+		}
+	};
 };
 
 

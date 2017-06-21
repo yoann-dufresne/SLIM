@@ -10,13 +10,11 @@ exports.run = function (token, config, callback) {
 		'--nonchimeras', directory + config.params.outputs.nonchimeras,
 		'--sizeout'];
 
-	console.log(JSON.stringify(config.params.outputs));
-
 	if (config.params.outputs.chimeras) {
 		options = options.concat(['--chimeras', directory + config.params.outputs.chimeras]);
 	}
 
-	console.log("Running dtd with the command line:");
+	console.log("Running chimera-vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
 

@@ -42,6 +42,17 @@ class FileManager {
 		return link;
 	}
 
+	get_autocomplete_format (files) {
+		var formated = [];
+
+		for (var idx in files) {
+			var filename = files[idx];
+			formated.push({value:filename, data:filename});
+		}
+
+		return formated;
+	}
+
 	filterFiles (filenames, extentions) {
 		var filtered = [];
 
