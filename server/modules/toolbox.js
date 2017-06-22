@@ -65,7 +65,7 @@ var readFasta = (filename) => {
 	var sequences = [];
 
 	var lines = fs.readFileSync(filename).toString().split('\n');
-	var sequence = {};
+	var sequence = {value:""};
 
 	for (var idx=0 ; idx<lines.length ; idx++) {
 		var line = lines[idx];
@@ -110,7 +110,7 @@ exports.merge_fasta = (token, config, callback) => {
 	var origins_table = [];
 	var save_origins = (outfile, fasta) => {
 		var sequences = readFasta(fasta);
-		for (var idx=1 ; idx<sequences.length ; idx++) {
+		for (var idx=0 ; idx<sequences.length ; idx++) {
 			var seq = sequences[idx];
 			var hash = seq.value;
 			var header = seq.header;
@@ -136,7 +136,7 @@ exports.merge_fasta = (token, config, callback) => {
 		var sample_name = current_fasta.substr(0, current_fasta.indexOf('.fasta'));
 		sample_name = sample_name.substr(sample_name.lastIndexOf('/') + 1);
 		var sequences = readFasta(tmp_current);
-		for (var idx=1 ; idx<sequences.length ; idx+=2) {
+		for (var idx=0 ; idx<sequences.length ; idx++) {
 			var seq = sequences[idx];
 			var hash = seq.value;
 			var header = seq.header;
