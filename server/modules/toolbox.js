@@ -94,7 +94,7 @@ exports.readFasta = readFasta;
 // --- Merging fasta ---
 
 exports.merge_fasta = (token, config, callback) => {
-	console.log("Merging fastas");
+	console.log(token + ": Merging fastas");
 	var merged = '/app/data/' + token + '/' + config.params.outputs.merged;
 	var origins = '/app/data/' + token + '/' + config.params.outputs.origins;
 
@@ -120,7 +120,7 @@ exports.merge_fasta = (token, config, callback) => {
 
 			// save the samples
 			for (var sample in origins_table[hash])
-				fs.appendFileSync(outfile, '\t' + sample + ';size=' + origins_table[hash][sample] +';');
+				fs.appendFileSync(outfile, '\t' + sample + ';size=' + origins_table[hash][sample] + ';');
 			fs.appendFileSync(outfile, '\n');
 		}
 	};
