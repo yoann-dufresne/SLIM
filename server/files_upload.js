@@ -1,6 +1,7 @@
 const fs = require('fs');
 const formidable = require('formidable');
 const path = require('path');
+const exec = require('child_process').spawn;
 
 exports.exposeDir = function (app) {
 	// list data directory
@@ -42,15 +43,22 @@ exports.upload = function (app) {
 		});
 
 		// every time a file has been uploaded successfully,
-		// rename it to it's orignal name
+		// convert and rename it to it's orignal name
 		form.on('file', function(field, file) {
 			if (token == null)
 				fs.unlink(file.path, function(){})
-			else
-				fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
-					if (err)
-						console.log('Error during file upload: ' + err);
+			else {
+				// Transform in unix format
+				exec('dos2unix', [file.path]).on('close', () => {
+					exec('mac2unix', [file.path]).on('close', () => {
+						// Rename
+						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
+							if (err)
+								console.log('Error during file upload: ' + err);
+						});
+					});
 				});
+			}
 		});
 
 		// log any errors that occur

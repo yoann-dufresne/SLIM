@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
 	libbz2-dev \
 	pkg-config \
 	libboost-all-dev \
-	pigz
+	pigz \
+	dos2unix
 
 # install app dependencies
 COPY package.json /app

@@ -14,9 +14,11 @@ exports.run = function (token, config, callback) {
 	var tmp_uc_file = directory + toolbox.tmp_filename() + '.txt';
 	var tsv_otu_file = directory + config.params.outputs.otus_table;
 	var origins_file = directory + config.params.inputs.origins;
+	var in_reads = directory + config.params.inputs.fasta;
+	var out_reads = directory + config.params.outputs.out_reads;
 
 	// Clustering command
-	var options = ['--cluster_fast', directory + config.params.inputs.fasta,
+	var options = ['--cluster_fast', in_reads,
 		'--uc', tmp_uc_file,
 		'--id', config.params.params.similarity];
 
@@ -37,6 +39,8 @@ exports.run = function (token, config, callback) {
 				tmp_uc_file,
 				tsv_otu_file,
 				load_origins(origins_file),
+				in_reads,
+				out_reads,
 				() => {
 					fs.unlink(tmp_uc_file, ()=>{});
 					callback(token, null);
@@ -74,7 +78,7 @@ var load_origins = (origins_file) => {
 };
 
 
-var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, callback) => {
+var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_output, callback) => {
 	console.log('CSV to OTU');
 
 	var parser = csv({
@@ -87,12 +91,21 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, callback) => {
 	// Second dimention: Experiment
 	var otus = [];
 	var maxId = 0;
+	var clusters = [];
+
+	// Prepare the file for output the reads with their cluster assignation
+	fs.closeSync(fs.openSync(seq_output, 'w'));
+
 
 	fs.createReadStream(csv_uc_file)
 	.pipe(parser)
+	// --- Read UC file ---
 	.on('data', function (data) {
 		if (data.type == "S")
 			return;
+
+		// Save cluster
+		clusters[data.name] = data.cluster;
 
 		// Max cluster id
 		if (maxId < data.cluster)
@@ -116,6 +129,7 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, callback) => {
 			otus[data.cluster][origin] = prevSize + size;
 		}
 	})
+	// --- Write OTU table ---
 	.on('end', () => {
 		var exps = sequence_origins.experiments;
 
@@ -142,6 +156,19 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, callback) => {
 			}
 			fs.appendFileSync(tsv_otu_file, '\n');
 		}
+
+		// Write the assignation in the reads file
+		var sequences = toolbox.readFasta(seq_input);
+		while (sequences.length > 0) {
+			var seq = sequences.shift();
+			seq.header += ';cluster=' + clusters[seq.header] + ';';
+
+			fs.appendFileSync(seq_output, seq.header);
+			fs.appendFileSync(seq_output, '\n');
+			fs.appendFileSync(seq_output, seq.value);
+			fs.appendFileSync(seq_output, '\n');
+		}
+
 		callback();
 	});
 };
