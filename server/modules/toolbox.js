@@ -84,7 +84,8 @@ var readFasta = (filename) => {
 		}
 	}
 
-	sequences.push(sequence);
+	if (sequence.header)
+		sequences.push(sequence);
 
 	return sequences;
 };
@@ -136,6 +137,7 @@ exports.merge_fasta = (token, config, callback) => {
 		var sample_name = current_fasta.substr(0, current_fasta.indexOf('.fasta'));
 		sample_name = sample_name.substr(sample_name.lastIndexOf('/') + 1);
 		var sequences = readFasta(tmp_current);
+		console.log ("Nb sequences : " + sequences.length);
 		for (var idx=0 ; idx<sequences.length ; idx++) {
 			var seq = sequences[idx];
 			var hash = seq.value;
@@ -155,15 +157,17 @@ exports.merge_fasta = (token, config, callback) => {
 		}
 
 		// Rereplicate
-		exports.rereplicate(tmp_current, ()=> {
-			// Read the tmp file
-			var data = fs.readFileSync(tmp_current);
+		exports.rereplicate(tmp_current, (err)=> {
+			if (!err) {
+				// Read the tmp file
+				var data = fs.readFileSync(tmp_current);
 
-			// Append at the end and remove tmp files
-			fs.appendFileSync(merged, data);
+				// Append at the end and remove tmp files
+				fs.appendFileSync(merged, data);
 
-			// Delete the tmp file
-			fs.unlinkSync(tmp_current);
+				// Delete the tmp file
+				fs.unlinkSync(tmp_current);
+			}
 
 			if (fastas.length > 0)
 				merge();
@@ -193,11 +197,11 @@ exports.rereplicate = (filename, callback) => {
 	child.on('close', (code) => {
 		if (code != 0) {
 			console.log("Error code " + code + " during rereplication");
-			return;
+			callback("rereplication: " + code);
+		} else {
+			fs.renameSync(intermediate_file, filename);
+			callback();
 		}
-
-		fs.renameSync(intermediate_file, filename);
-		callback();
 	});
 };
 

@@ -81,19 +81,13 @@ var sub_process_start = (token, configs_array) => {
 
 		// Abord the pipeline if an error occur.
 		if (err) {
-			job.status = 'aborted';
-			job.msg = err;
-			fs.writeFile('/app/data/' + token + '/exec.log', JSON.stringify(job), (err) => {});
-			delete running_jobs[token];
-
-			console.log(token + ': aborted');
-			return;
+			console.log(token + ': error in sub exec ' + sub_idx);
+			job.conf[job.running_soft][sub_idx].status = 'aborted';
+		} else {
+			// Add software output to the log file and modify the status.
+			job.conf[job.running_soft][sub_idx].status = "ended";
 		}
-
-		// Add software output to the log file and modify the status.
-		job.conf[job.running_soft][sub_idx].status = "ended";
 		job.sub_running_job += 1;
-
 		// Save the status
 		running_jobs[token] = job;
 		fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
@@ -102,15 +96,30 @@ var sub_process_start = (token, configs_array) => {
 		if (job.sub_running_job < configs_array.length) {
 			sub_process_start (token, configs_array);
 		} else {// Stop the job
-			job.status = 'ready';
+			var nbAborted = 0;
+			for (var idx=0 ; idx<configs_array.length ; idx++)
+				if (job.conf[job.running_soft][idx].status == 'aborted')
+					nbAborted += 1;
 
-			// Compact output if needed
-			if (job.conf[job.running_soft][0].out_jokers) {
-				sub_process.compress_outputs(token, job.conf[job.running_soft][0].out_jokers);
+			// Abort the execution
+			if (nbAborted == configs_array.length) {
+				delete running_jobs[token]
+				job.status = 'aborted';
 			}
-			
+			// Reset the status for next job
+			else {
+				job.status = 'ready';
+
+				// Compact output if needed
+				if (job.conf[job.running_soft][0].out_jokers) {
+					sub_process.compress_outputs(token, job.conf[job.running_soft][0].out_jokers);
+				}
+			}
+
 			delete job.running_soft;
 			delete job.sub_running_job;
+
+			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
 		}
 	});
 };
