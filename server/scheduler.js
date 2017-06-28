@@ -238,7 +238,10 @@ exports.expose_status = function (app) {
 				default:
 					// If aborted
 					if (sub_status['aborted']) {
-						status.jobs[idx] = 'aborted';
+						if (sub_status['aborted'] == exec.conf[idx].length)
+							status.jobs[idx] = 'aborted';
+						else
+							status.jobs[idx] = 'errors';
 						break;
 					}
 
