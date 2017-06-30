@@ -206,7 +206,7 @@ exports.expose_status = function (app) {
 		var execFile = '/app/data/' + token + '/exec.log';
 		// Invalid token
 		if (!fs.existsSync(execFile)) {
-			res.status(403).send('Invalid token');
+			res.send('{}');
 			return ;
 		}
 

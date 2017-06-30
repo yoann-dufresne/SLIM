@@ -12,8 +12,7 @@ add_button.onclick = function () {
 // --- Pipeline execution ---
 var run = document.querySelector('#start');
 
-var status_interval;
-run.onclick = function () {
+var get_config = () => {
 	var config = {token:exec_token};
 	for (var idx in module_manager.modules) {
 		var module = module_manager.modules[idx];
@@ -23,6 +22,13 @@ run.onclick = function () {
 			params: module.getConfiguration()
 		};
 	}
+
+	return config;
+};
+
+var status_interval;
+run.onclick = function () {
+	var config = get_config();
 
 	$.post( "/run", config)
 	.done(function( data ) {
@@ -39,6 +45,9 @@ run.onclick = function () {
 var update_run_status = (token, callback=(status)=>{}) => {
 	$.get('/status?token=' + token).done((data) => {
 		var server_status = JSON.parse(data);
+
+		if (!server_status.global)
+			return;
 
 		// Stop the update when the run is over
 		if (server_status.global == 'ended' || server_status.global == 'aborted') {

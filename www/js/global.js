@@ -47,8 +47,6 @@ var load_modules = (log) => {
 
 
 
-
-
 // --- Token managment ---
 var exec_token = '';
 
@@ -74,5 +72,53 @@ $.get('/token_generation' + (exec_token == '' ? '' : '?token=' + exec_token))
 	history.pushState({urlPath:'/?token=' + data},'', '/?token=' + data);
 	on_token_generated();
 });
+
+
+
+// --- Save/Upload config ---
+var down_conf = document.getElementById("down_conf");
+var up_conf = document.getElementById("up_conf_hidden");
+document.getElementById("up_conf").onclick = () => {
+	up_conf.click();
+};
+
+// Conf download
+down_conf.onclick = () => {
+	var conf = get_config();
+	delete conf.token;
+	var data = new Blob([JSON.stringify(conf)], {type: 'text/plain'});
+	var textFile = window.URL.createObjectURL(data);
+	var link = document.createElement('a');
+	link.href = textFile;
+	link.download = "pipeline.conf";
+	link.click();
+};
+
+// Conf upload
+up_conf.onchange = () => {
+	var file = up_conf.files[0];
+	var reader = new FileReader();
+
+	reader.onload = function(e) {
+		var json = load_modules(JSON.parse(e.target.result));
+	};
+	reader.readAsText(file);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
