@@ -54,7 +54,9 @@ All the input/output file will be present in the directory /data/'token'
 The config object will contain all the information from client formatted as the json presented in the previous part.  
 The callback function is the function that you must call when the execution is over.
 This callback take two arguments.
-The first one must be the token and the second one a message if the execution went wrong
+The first one must be the token and the second one a message if the execution went wrong.
+
+You can use the [pandaseq module](https://github.com/yoann-dufresne/amplicon_pipeline/blob/master/server/modules/pandaseq.js) as example.
 
 # Dependencies
 
