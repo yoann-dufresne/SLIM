@@ -57,5 +57,8 @@ else
 fi
 
 
+# QIIME 2
+docker pull qiime2/core:2017.6
+
 
 

@@ -19,6 +19,7 @@ class PandaseqModule extends Module {
 			lookup: auto,
 			onSelect: function(suggestion) {
 				that.fwd.value = suggestion.data;
+				that.fwd.onchange();
 			}
 		});
 
@@ -26,6 +27,7 @@ class PandaseqModule extends Module {
 			lookup: auto,
 			onSelect: function(suggestion) {
 				that.rev.value = suggestion.data;
+				that.rev.onchange();
 			}
 		});
 	}
@@ -90,6 +92,8 @@ class PandaseqModule extends Module {
 		this.output_file.onchange();
 
 		// --- Parameters ---
+		this.algorithm = this.dom.getElementsByClassName("algorithms")[0];
+
 		var options_div = this.dom.getElementsByClassName('options')[0];
 		var inputs = options_div.getElementsByTagName('input');
 
@@ -135,6 +139,7 @@ class PandaseqModule extends Module {
 		
 		config.outputs.assembly = this.output_file.value;
 
+		config.params.algorithm = this.algorithm.value;
 		config.params.threshold = this.threshold.value;
 		config.params.min_length = this.min_length.value;
 		config.params.max_length = this.max_length.value;

@@ -27,7 +27,13 @@ RUN mkdir /app/lib
 COPY lib/DTD /app/lib/DTD
 COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
+COPY lib/miniconda /app/lib/miniconda
 
+# Install miniconda
+RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/miniconda/install \
+	&& /app/lib/miniconda/install/bin/conda update conda -y
+# Install QIIME 2
+RUN /app/lib/miniconda/install/bin/conda create -n qiime2-2017.6 --file https://data.qiime2.org/distro/core/qiime2-2017.6-conda-linux-64.txt
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
 # Compile pandaseq

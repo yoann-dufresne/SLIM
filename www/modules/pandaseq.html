@@ -9,18 +9,30 @@
 <a class="download_link" href="" download><img src="/imgs/download.png" class="download"/></a>
 
 <div class="options">
-	<div class="pandaQuality">
-		<p>Quality threshold:</p>
-		<input type="text" name="quality" class="quality" value="0.6">
-	</div>
+	<p>
+		Joining algorithm: 
+		<select class="algorithms">
+			<option value="bayesian" selected="selected">Simple bayesian</option>
+			<option value="fastqjoin">FastqJoin</option>
+			<option value="flash">FLASH</option>
+			<option value="pear">PEAR</option>
+			<option value="rdp">RDP</option>
+			<option value="stitch">Stitch software</option>
+			<option value="uparse">uparse</option>
+		</select>
+	</p>
+	<p class="pandaQuality">
+		Quality threshold: 
+		<input type="text" name="quality" class="integer quality" value="0.6">
+	</p>
 	<div class="pandaLength">
 		<p>Out read length:</p>
-		<p>Min: <input type="text" name="minLength" class="minLength" value="-1">
-		Max: <input type="text" name="maxLength" class="maxLength" value="-1"></p>
+		<p>Min: <input type="text" name="minLength" class="integer minLength" value="-1">
+		Max: <input type="text" name="maxLength" class="integer maxLength" value="-1"></p>
 	</div>
 	<div class="pandaOverlap">
 		<p>Reads overlap:</p>
-		<p>Min: <input type="text" name="minOverlap" class="minOverlap" value="-1">
-		Max: <input type="text" name="maxOverlap" class="maxOverlap" value="-1"></p>
+		<p>Min: <input type="text" name="minOverlap" class="integer minOverlap" value="-1">
+		Max: <input type="text" name="maxOverlap" class="integer maxOverlap" value="-1"></p>
 	</div>
 </div>

@@ -5,13 +5,26 @@ const tools = require('./toolbox.js');
 
 exports.name = 'pandaseq';
 
+var algorithms = {
+	bayesian: 'simple_bayesian',
+	fastqjoin: 'ea_util',
+	flash: 'flash',
+	pear: 'pear',
+	rdp: 'rdp_mle',
+	stitch: 'stitch',
+	uparse: 'uparse'
+};
+
 exports.run = function (token, config, callback) {
 	var options = config.params.params;
 	var outfile = '/app/data/' + token + '/' + config.params.outputs.assembly;
+	var algo_name = config.params.params.algorithm;
+
 	var command = ['-f', '/app/data/' + token + '/' + config.params.inputs.fwd,
 		'-r', '/app/data/' + token + '/' + config.params.inputs.rev,
 		'-w', outfile,
-		'-t', options.threshold];
+		'-t', options.threshold,
+		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian'];
 
 	// Length options
 	if (options.min_length != -1) {
