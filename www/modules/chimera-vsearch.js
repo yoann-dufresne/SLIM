@@ -1,7 +1,7 @@
 
 class ChimeraModule extends Module {
 	constructor (params) {
-		super ("chimera-vsearch");
+		super ("chimera-vsearch", "https://github.com/yoann-dufresne/amplicon_pipeline/wiki/Chimera-Vsearch");
 
 		this.params = params;
 		this.filtered_value = "";
@@ -61,7 +61,7 @@ class ChimeraModule extends Module {
 
 		// --- outputs ----
 
-		this.download_nonchimera = links[0];
+		this.download_nonchimera = links[1];
 
 		this.filtered_value = this.filtered.value;
 		this.filtered.onchange = () => {

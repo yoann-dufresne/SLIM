@@ -1,7 +1,7 @@
 
 class PandaseqModule extends Module {
 	constructor (params) {
-		super ("pandaseq");
+		super ("pandaseq", "https://github.com/yoann-dufresne/amplicon_pipeline/wiki/Pandaseq-module");
 
 		this.params = params;
 	}

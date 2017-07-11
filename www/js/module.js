@@ -4,11 +4,12 @@
 
 var __next_id = 0;
 class Module {
-	constructor (name) {
+	constructor (name, doc) {
 		if (name == null)
 			return;
 
 		this.name = name;
+		this.doc = doc;
 		this.id = __next_id++;
 		this.toDOMelement();
 	}
@@ -89,7 +90,9 @@ class Module {
 		header.classList.add('mod_head');
 		// Title
 		var title = document.createElement('h3');
-		title.innerHTML = "Module " + this.name;
+		var doc = this.doc ? (' <a target="_blank" href="' + this.doc + '">' +
+			'<img src="imgs/information.png" alt="help" class="info"></a>') : "";
+		title.innerHTML = "Module " + this.name + doc;
 		header.appendChild(title);
 		// Execution status
 		header.innerHTML += '<img src="imgs/spinner.gif" alt="Spinner" class="spinner" />\

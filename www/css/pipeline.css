@@ -3,7 +3,7 @@
 	text-align: center;
 }
 
-/* Global style */
+/* ------------------------ Global style ------------------------ */
 input[type="text"] {
     width: 400px;
 }
@@ -34,6 +34,10 @@ input[type="text"] {
 
 input[type="text"].integer {
 	width: 50px;
+}
+
+.info {
+	width: 25px;
 }
 
 
