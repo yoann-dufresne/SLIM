@@ -92,7 +92,8 @@ class Module {
 		var title = document.createElement('h3');
 		var doc = this.doc ? (' <a target="_blank" href="' + this.doc + '">' +
 			'<img src="imgs/information.png" alt="help" class="info"></a>') : "";
-		title.innerHTML = "Module " + this.name + doc;
+		var terminal_output = '<img src="imgs/term.png" alt="Soft output" class="term_ico">'
+		title.innerHTML = "Module " + this.name + doc + terminal_output;
 		header.appendChild(title);
 		// Execution status
 		header.innerHTML += '<img src="imgs/spinner.gif" alt="Spinner" class="spinner" />\
@@ -111,6 +112,20 @@ class Module {
 				that.specific.replaceChild(optionBox, clone);
 			}
 		}
+
+		// Output screen
+		this.term = document.createElement("p");
+		this.term.classList.add('out_term');
+		this.term.style.heigh = '0px';
+		var icon = this.dom.getElementsByClassName('term_ico')[0];
+		icon.onclick = () => {
+			that.term.style.height = '200px';
+			that.term.style.visibility = 'visible';
+			$.get('/logs?token=' + exec_token + '&soft_id=' + that.dom.idx, (data) => {
+				that.term.innerHTML = data.replace(/\n/g, '<br>');
+			});
+		};
+		this.dom.appendChild(this.term);
 
 		// Module content
 		this.specificDOMelements(transformOptions);

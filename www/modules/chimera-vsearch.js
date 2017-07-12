@@ -21,6 +21,7 @@ class ChimeraModule extends Module {
 			lookup: fasta,
 			onSelect: function(suggestion) {
 				that.input.value = suggestion.data;
+				that.input.onchange();
 			}
 		});
 	}

@@ -32,6 +32,7 @@ app.use('/data', express.static('/app/data'));
 // app.use('/softwares', express.static("www/pipeline_modules.json"));
 const sub_process = require('./sub_process.js');
 sub_process.expose_modules(app);
+sub_process.expose_logs(app);
 
 
 app.listen(PORT);

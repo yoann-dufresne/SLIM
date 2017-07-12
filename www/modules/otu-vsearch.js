@@ -15,6 +15,7 @@ class OtuVsearchModule extends Module {
 			lookup: auto_fasta,
 			onSelect: function(suggestion) {
 				that.fasta.value = suggestion.data;
+				that.fasta.onchange();
 			}
 		});
 

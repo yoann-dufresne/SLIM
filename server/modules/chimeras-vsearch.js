@@ -16,6 +16,9 @@ exports.run = function (token, config, callback) {
 
 	console.log("Running chimera-vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));
+	fs.appendFileSync(directory + config.log, '--- Command ---\n');
+	fs.appendFileSync(directory + config.log, 'vsearch ' + options.join(' ') + '\n');
+	fs.appendFileSync(directory + config.log, '--- Exec ---\n');
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
 
 

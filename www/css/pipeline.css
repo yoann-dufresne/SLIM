@@ -40,6 +40,24 @@ input[type="text"].integer {
 	width: 25px;
 }
 
+.term_ico {
+	width: 25px;
+}
+.term_ico:hover {
+	cursor: pointer;
+}
+.out_term {
+	margin: 0px;
+	margin: auto;
+	width: 90%;
+	background-color: black;
+	color: white;
+	overflow: scroll;
+	visibility: hidden;
+	padding: 5px;
+	text-align: left;
+}
+
 
 /* ------------------------ Upload module ------------------------ */
 
@@ -83,13 +101,9 @@ input[type="text"].integer {
 
 /* ------------------------ Status obects aspect ------------------------ */
 
-.spinner {
+.spinner, .status, .term_ico {
 	width:0px;
 	visibility: hidden;
-}
-.status {
-	visibility: hidden;
-	width: 0px;
 }
 
 .running .spinner {
@@ -112,6 +126,10 @@ input[type="text"].integer {
 	color: green;
 	visibility: visible;
 	width: auto;
+}
+.ended .term_ico, .aborted .term_ico, .errors .term_ico {
+	visibility: visible;
+	width: 25px;
 }
 .aborted .status, .errors .status {
 	color: red;

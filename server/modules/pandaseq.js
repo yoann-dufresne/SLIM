@@ -45,6 +45,9 @@ exports.run = function (token, config, callback) {
 	// Joining
 	console.log('Running pandaseq');
 	console.log('/app/lib/pandaseq/pandaseq', command.join(' '));
+	fs.appendFileSync(directory + config.log, '--- Command ---\n');
+	fs.appendFileSync(directory + config.log, 'pandaseq ' + command.join(' ') + '\n');
+	fs.appendFileSync(directory + config.log, '--- Exec ---\n');
 	var child = exec('/app/lib/pandaseq/pandaseq', command);
 
 

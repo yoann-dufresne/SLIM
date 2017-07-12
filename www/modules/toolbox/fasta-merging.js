@@ -32,7 +32,8 @@ var tmp = {
 		this.origins = dom.getElementsByClassName('origins')[0];
 		this.origins_link = dom.getElementsByTagName('a')[1];
 
-		// --- Inpuuts ---
+		// --- Inputs ---
+		// TODO : changer merged if 1 clic
 		if (params.inputs) {
 			for (var id in params.inputs) {
 				var filename = params.inputs[id].replace('$','*');
