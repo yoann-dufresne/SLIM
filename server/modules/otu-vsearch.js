@@ -166,7 +166,7 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 			var seq = sequences.shift();
 			seq.header += ';cluster=' + clusters[seq.header] + ';';
 
-			fs.appendFileSync(seq_output, seq.header);
+			fs.appendFileSync(seq_output, '>' + seq.header);
 			fs.appendFileSync(seq_output, '\n');
 			fs.appendFileSync(seq_output, seq.value);
 			fs.appendFileSync(seq_output, '\n');
