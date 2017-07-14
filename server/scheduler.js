@@ -175,7 +175,9 @@ exports.listen_commands = function (app) {
 		// If dependencies are not satisfied
 		if (order.length < Object.keys(exe.conf).length) {
 			exe.status = 'aborted';
-			exe.msg = "dependencies not satisfied";
+			exe.msg = "dependencies not satisfied: " +
+				JSON.stringify(Object.keys(global_dependencies[token]));
+			console.log("dependencies not satisfied:\n", global_dependencies[token]);
 
 			fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
 			return;
@@ -263,9 +265,10 @@ exports.expose_status = function (app) {
 }
 
 
+var global_dependencies = {};
 var computeSoftwareOrder = function (params, token) {
 	// Compute the dependenciess
-	dependencies = {};
+	var dependencies = {};
 	for (var key in params) {
 		var soft = params[key];
 
@@ -332,6 +335,7 @@ var computeSoftwareOrder = function (params, token) {
 		}
 	}
 
+	global_dependencies[token] = dependencies;
 	return order;
 }
 

@@ -1,6 +1,6 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
-const readline = require('readline');
+var lineReader = require('line-reader');
 
 
 exports.name = 'toolbox';
@@ -61,35 +61,78 @@ var sequence_hash = (dna) => {
 };
 exports.sequence_hash = sequence_hash;
 
-var readFasta = (filename) => {
-	var sequences = [];
+class fastaReader {
+	constructor (filename) {
+		var that = this;
 
-	var lines = fs.readFileSync(filename).toString().split('\n');
-	var sequence = {value:""};
-
-	for (var idx=0 ; idx<lines.length ; idx++) {
-		var line = lines[idx];
-
-		if (line[0] == '>') {
-			// New sequence
-			if (sequence.header) {
-				sequences.push(sequence);
-				sequence = {value:""};
-			}
-
-			// Fill header
-			sequence.header = line.substr(1);
-		} else {
-			sequence.value += line;
-		}
+		lineReader.open(filename, function(err, reader) {
+			if (err)
+				console.log(err);
+			else
+				that.reader = reader;
+		});
 	}
 
-	if (sequence.header)
-		sequences.push(sequence);
+	read_sequences (sequence_processor) {
+		var that = this;
 
-	return sequences;
-};
-exports.readFasta = readFasta;
+		// Wait until file is ready
+		if (!this.reader) {
+			setTimeout(()=>{that.read_sequences(sequence_processor);}, 100);
+			return;
+		}
+
+		// Create new sequence
+		if (!this.seq)
+			this.seq = {value:""};
+
+		// Close the file
+		if (!this.reader.hasNextLine()) {
+			this.reader.close(()=>{});
+
+			if (this.callback) 
+				this.callback();
+			return;
+		}
+
+		// Add a new line
+		var read_next_line = function () {
+			that.reader.nextLine(function(err, line) {
+				// EOF
+				if (!line)
+					that.callback();
+
+				// Read header
+				if (line.length > 0 && line[0] == '>') {
+					var seq = that.seq;
+					that.seq = {header:line.substr(1), value:""};
+
+					if (seq.header)
+						sequence_processor(seq);
+					that.read_sequences(sequence_processor)
+				// Read sequence value
+				} else {
+					that.seq.value += line;
+
+					if (that.reader.hasNextLine())
+						read_next_line ();
+					else {
+						if (that.seq.header)
+							sequence_processor(that.seq)
+
+						that.callback();
+					}
+				}
+			});
+		}
+		read_next_line();
+	}
+
+	onEnd (callback) {
+		this.callback = callback;
+	}
+}
+exports.fastaReader = (file) => {return new fastaReader(file)};
 
 
 // --- Merging fasta ---
@@ -109,10 +152,13 @@ exports.merge_fasta = (token, config, callback) => {
 	//  * first dimention : sequence hash
 	//  * second dimention : provenance
 	var origins_table = [];
-	var save_origins = (outfile, fasta) => {
-		var sequences = readFasta(fasta);
-		for (var idx=0 ; idx<sequences.length ; idx++) {
-			var seq = sequences[idx];
+	var save_origins = (outfile, fasta, callback) => {
+		// Prepare the buffered file reader
+		var reader = new fastaReader(fasta);
+		reader.onEnd (callback);
+
+		// Process sequences asynchoneously
+		reader.read_sequences((seq) => {
 			var hash = seq.value;
 			var header = seq.header;
 
@@ -123,23 +169,30 @@ exports.merge_fasta = (token, config, callback) => {
 			for (var sample in origins_table[hash])
 				fs.appendFileSync(outfile, '\t' + sample + ';size=' + origins_table[hash][sample] + ';');
 			fs.appendFileSync(outfile, '\n');
-		}
+		});
 	};
 
 	var merge = () => {
 		var current_fasta = '/app/data/' + token + '/' + fastas.pop();
-		
-		// Copy the file
-		var tmp_current = tmp_filename() + '.fasta';
-		fs.linkSync(current_fasta, tmp_current);
 
 		// save reads provenance
 		var sample_name = current_fasta.substr(0, current_fasta.indexOf('.fasta'));
 		sample_name = sample_name.substr(sample_name.lastIndexOf('/') + 1);
-		var sequences = readFasta(tmp_current);
-		console.log ("Nb sequences : " + sequences.length);
-		for (var idx=0 ; idx<sequences.length ; idx++) {
-			var seq = sequences[idx];
+		
+		var reader = new fastaReader(current_fasta);// TODO
+		
+		// When the reading is over
+		reader.onEnd (() => {
+			if (fastas.length > 0)
+				merge();
+			else
+				exports.dereplicate(merged, ()=>{
+					save_origins(origins, merged, () => {callback(token, null);});
+				});
+		});
+
+		// Read all the sequences
+		reader.read_sequences((seq) => {
 			var hash = seq.value;
 			var header = seq.header;
 
@@ -154,28 +207,10 @@ exports.merge_fasta = (token, config, callback) => {
 			if (!origins_table[hash])
 				origins_table[hash] = [];
 			origins_table[hash][sample_name] = size;
-		}
 
-		// Rereplicate
-		exports.rereplicate(tmp_current, (err)=> {
-			if (!err) {
-				// Read the tmp file
-				var data = fs.readFileSync(tmp_current);
-
-				// Append at the end and remove tmp files
-				fs.appendFileSync(merged, data);
-
-				// Delete the tmp file
-				fs.unlinkSync(tmp_current);
-			}
-
-			if (fastas.length > 0)
-				merge();
-			else
-				exports.dereplicate(merged, ()=>{
-					save_origins(origins, merged);
-					callback(token, null);
-				});
+			// Fill the merged file
+			fs.appendFileSync(merged, '>' + seq.header + '\n');
+			fs.appendFileSync(merged, seq.value + '\n');
 		});
 	};
 	merge();
@@ -191,6 +226,7 @@ exports.rereplicate = (filename, callback) => {
 
 	var options = ['--rereplicate', filename,
 		'--sizeout',
+		'--minseqlength', '1',
 		'--output', intermediate_file];
 
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
@@ -212,7 +248,8 @@ exports.dereplicate = (filename, callback) => {
 	var intermediate_file = tmp_filename() + '.fasta';
 
 	var options = ['--derep_fulllength', filename,
-		'--sizeout',
+		'--sizeout', '--sizein',
+		'--minseqlength', '1',
 		'--output', intermediate_file];
 
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
@@ -235,6 +272,7 @@ exports.sort = (filename, callback) => {
 
 	var options = ['--sortbysize', filename,
 		'--sizeout',
+		'--minseqlength', '1',
 		'--output', intermediate_file];
 
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);

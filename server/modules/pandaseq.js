@@ -17,11 +17,12 @@ var algorithms = {
 
 exports.run = function (token, config, callback) {
 	var options = config.params.params;
-	var outfile = '/app/data/' + token + '/' + config.params.outputs.assembly;
+	var directory = '/app/data/' + token + '/';
+	var outfile = directory + config.params.outputs.assembly;
 	var algo_name = config.params.params.algorithm;
 
-	var command = ['-f', '/app/data/' + token + '/' + config.params.inputs.fwd,
-		'-r', '/app/data/' + token + '/' + config.params.inputs.rev,
+	var command = ['-f', directory + config.params.inputs.fwd,
+		'-r', directory + config.params.inputs.rev,
 		'-w', outfile,
 		'-t', options.threshold,
 		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian'];
@@ -52,10 +53,10 @@ exports.run = function (token, config, callback) {
 
 
 	child.stdout.on('data', function(data) {
-		fs.appendFileSync('/app/data/' + token + '/' + config.log, data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.stderr.on('data', function(data) {
-		fs.appendFileSync('/app/data/' + token + '/' + config.log, data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
 		if (code == 0) {

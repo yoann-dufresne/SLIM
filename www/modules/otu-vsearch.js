@@ -76,7 +76,7 @@ class OtuVsearchModule extends Module {
 
 		// Reload outputs
 		if (this.params.outputs) {
-			this.otus.value = this.params.outputs.otus;
+			this.otus.value = this.params.outputs.otus_table;
 			this.out_reads.value = this.params.outputs.out_reads;
 		}
 		

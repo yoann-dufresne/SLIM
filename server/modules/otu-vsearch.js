@@ -161,17 +161,17 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 		}
 
 		// Write the assignation in the reads file
-		var sequences = toolbox.readFasta(seq_input);
-		while (sequences.length > 0) {
-			var seq = sequences.shift();
+		var reader = toolbox.fastaReader(seq_input);
+
+		reader.onEnd(callback);
+
+		reader.read_sequences ((seq) => {
 			seq.header += ';cluster=' + clusters[seq.header] + ';';
 
 			fs.appendFileSync(seq_output, '>' + seq.header);
 			fs.appendFileSync(seq_output, '\n');
 			fs.appendFileSync(seq_output, seq.value);
 			fs.appendFileSync(seq_output, '\n');
-		}
-
-		callback();
+		});
 	});
 };
