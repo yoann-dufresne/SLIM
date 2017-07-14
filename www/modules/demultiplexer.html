@@ -1,4 +1,4 @@
-<h4>Reads</h4>
+<!--h4>Reads</h4>
 
 <p>Illumina R1 file</p>
 <input type="text" name="r1" class="demux_r1" value="">
@@ -6,13 +6,18 @@
 <p>Illumina R2 file</p>
 <input type="text" name="r2" class="demux_r2" value="">
 
-<h4>Metadata</h4>
+<h4>Metadata</h4-->
 
-<p>Tags by sample CSV</p>
+<p>Tags by libraries/sample</p>
 <input type="text" name="demux_t2s" class="demux_t2s" value="">
 
-<p>Primers FASTA</p>
-<input type="text" name="demux_t2s" class="demux_t2s" value="">
+<p>Inputs R1/R2 by library</p>
+<div class="illumina_reads">
+
+</div>
+
+<p>Primers</p>
+<input type="text" name="demux_t2s" class="demux_primers" value="">
 
 <h4>Outputs</h4>
 
@@ -22,5 +27,5 @@ They will be named run_sample_fwd.fastq and run_sample_rev.fastq.</p>
 <div class="file_list" readonly></div>
 
 <div class="options">
-	<p><input type="checkbox" class="mistag"> Output unassigned reads<a href=""><img src="/imgs/download.png" class="download"></a><a href=""><img src="/imgs/download.png" class="download"></a></p>
+	<p><input type="checkbox" class="demux_mistag"> Output unassigned reads<a href=""><img src="/imgs/download.png" class="download"></a><a href=""><img src="/imgs/download.png" class="download"></a></p>
 </div>

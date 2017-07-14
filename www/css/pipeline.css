@@ -86,6 +86,24 @@ input[type="text"].integer {
 
 
 
+/* ------------------------ DTD module ------------------------ */
+
+.illumina_reads {
+	border: solid 1px;
+	min-height: 20px;
+	width: 80%;
+	margin: auto;
+	padding: 5px;
+}
+
+.illumina_read {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+
+
+
 /* ------------------------ Autocomplete style ------------------------ */
 .autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
 .autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }

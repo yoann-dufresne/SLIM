@@ -24,18 +24,27 @@ class DemultiplexerModule extends Module {
 		/* Change the autocomplete field */
 		// Input fastq
 		var that = this;
-		$(this.r1_text).autocomplete({
-			lookup: fastq,
-			onSelect: function(suggestion) {
-				that.r1_text.value = suggestion.data;
-			}
-		});
-		$(this.r2_text).autocomplete({
-			lookup: fastq,
-			onSelect: function(suggestion) {
-				that.r2_text.value = suggestion.data;
-			}
-		});
+		var lib_divs = this.illumina_div.getElementsByClassName('lib_div');
+		for (let idx=0 ; idx<lib_divs.length ; idx++) {
+			let lib_div = lib_divs[idx];
+
+			let read_inputs = lib_div.getElementsByClassName('reads_file');
+
+			let r1 = read_inputs[0];
+			let r2 = read_inputs[1];
+			$(r1).autocomplete({
+				lookup: fastq,
+				onSelect: function(suggestion) {
+					r1.value = suggestion.data;
+				}
+			});
+			$(r2).autocomplete({
+				lookup: fastq,
+				onSelect: function(suggestion) {
+					r2.value = suggestion.data;
+				}
+			});
+		}
 
 		// Input tags
 		$(this.tags_text).autocomplete({
@@ -71,19 +80,32 @@ class DemultiplexerModule extends Module {
 		this.defineIO();
 	}
 
+	create_R1R2_pair (library_name) {
+		var pair_div = document.createElement('div');
+		pair_div.classList.add('lib_div');
+		pair_div.innerHTML = '<p>' + library_name + '</p>' +
+			'<p class="illumina_read R1">R1 <input type="text" class="reads_file"></p>' +
+			'<p class="illumina_read R2">R2 <input type="text" class="reads_file"></p>';
+
+		return pair_div;
+	}
+
 	defineIO () {
 		// Save inputs
-		var inputs = this.dom.getElementsByTagName('input');
-		this.r1_text = inputs[0];
-		this.r2_text = inputs[1];
-		this.tags_text = inputs[2];
-		this.primers_text = inputs[3];
-		this.mistags = inputs[4];
+		this.illumina_div = this.dom.getElementsByClassName('illumina_reads')[0];
+		this.tags_text = this.dom.getElementsByClassName('demux_t2s')[0];
+		this.primers_text = this.dom.getElementsByClassName('demux_primers')[0];
+		this.mistags = this.dom.getElementsByClassName('demux_mistag')[0];
 
 		// Reload inputs
 		if (this.params.inputs) {
-			this.r1_text.value = this.params.inputs.r1;
-			this.r2_text.value = this.params.inputs.r2;
+			var read_files = this.params.inputs.reads;
+			for (var name in read_files) {
+				var pair = read_files[name];
+				
+				this.illumina_div.appendChild(pair_div);
+			}
+
 			this.tags_text.value = this.params.inputs.tags;
 			this.primers_text.value = this.params.inputs.primers;
 		}
@@ -112,11 +134,13 @@ class DemultiplexerModule extends Module {
 
 			// Get the file content
 			var data = file_manager.contents[that.tags_text.value].data;
+			var libraries = [];
 			for (var idx=0 ; idx<data.length ; idx++) {
 				var sample = data[idx];
 
 				// Add the run with joker
-				if (that.out_files.indexOf(sample.run + "*_fwd.fastq") == -1) {
+				if (!libraries.includes(sample.run)) {
+					libraries.push(sample.run);
 					that.out_files.push(sample.run + "*_fwd.fastq");
 					that.out_files.push(sample.run + "*_rev.fastq");
 				}
@@ -124,6 +148,15 @@ class DemultiplexerModule extends Module {
 				// Add the sample outfiles
 				that.out_files.push(sample.run + "_" + sample.sample + "_fwd.fastq");
 				that.out_files.push(sample.run + "_" + sample.sample + "_rev.fastq");
+			}
+
+			// Create inputs for each library
+			that.illumina_div.innerHTML = "";
+			console.log (libraries);
+			for (var l_idx in libraries) {
+				var lib = libraries[l_idx];
+				var lib_div = that.create_R1R2_pair(lib);
+				that.illumina_div.appendChild(lib_div);
 			}
 
 			// Add the files in the output text area
@@ -147,8 +180,20 @@ class DemultiplexerModule extends Module {
 	getConfiguration () {
 		var config = super.getConfiguration()
 		
-		config.inputs.r1 = this.r1_text.value;
-		config.inputs.r2 = this.r2_text.value;
+		var read_pairs = {};
+		var lib_divs = this.illumina_div.getElementsByClassName('lib_div');
+		for (let idx=0 ; idx<lib_divs.length ; idx++) {
+			let lib_div = lib_divs[idx];
+			let read_inputs = lib_div.getElementsByClassName('reads_file');
+
+			let lib_name = lib_div.firstChild.innerText;
+			read_pairs[lib_name] = {
+				r1: read_inputs[0].value,
+				r2: read_inputs[1].value
+			};
+		}
+		config.inputs.reads = read_pairs;
+
 		config.inputs.tags = this.tags_text.value;
 		config.inputs.primers = this.primers_text.value;
 
