@@ -99,7 +99,7 @@ class DemultiplexerModule extends Module {
 
 		// Reload inputs
 		if (this.params.inputs) {
-			var read_files = this.params.inputs.reads;
+			var read_files = this.params.params.reads;
 			for (var name in read_files) {
 				var pair = read_files[name];
 				
@@ -174,7 +174,7 @@ class DemultiplexerModule extends Module {
 	format_output(filename) {
 		return '<p>' + filename +
 		'  <a href="' + file_manager.get_download_link(filename) +
-		'"><img src="/imgs/download.png" class="download"></a></p>';
+		'" download><img src="/imgs/download.png" class="download"></a></p>';
 	}
 
 	getConfiguration () {
@@ -191,8 +191,10 @@ class DemultiplexerModule extends Module {
 				r1: read_inputs[0].value,
 				r2: read_inputs[1].value
 			};
+			config.inputs[read_inputs[0].value] = read_inputs[0].value;
+			config.inputs[read_inputs[1].value] = read_inputs[1].value;
 		}
-		config.inputs.reads = read_pairs;
+		config.params.reads = read_pairs;
 
 		config.inputs.tags = this.tags_text.value;
 		config.inputs.primers = this.primers_text.value;
