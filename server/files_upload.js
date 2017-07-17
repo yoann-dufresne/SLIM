@@ -20,7 +20,18 @@ exports.exposeDir = function (app) {
 }
 
 
+var files_to_convert = {};
+
 exports.upload = function (app) {
+	app.get('/convertion', function(req, res) {
+		var token = req.query.token;
+
+		if (files_to_convert[token])
+			res.send(JSON.stringify(files_to_convert[token]));
+		else
+			res.send('[]');
+	});
+
 	// Uploading files service
 	app.post('/upload', function(req, res) {
 		// create an incoming form object
@@ -48,6 +59,11 @@ exports.upload = function (app) {
 			if (token == null)
 				fs.unlink(file.path, function(){})
 			else {
+				// Add files to convertion array
+				if (!files_to_convert[token])
+					files_to_convert[token] = [];
+				files_to_convert[token].push(file.name);
+
 				// Transform in unix format
 				exec('dos2unix', [file.path]).on('close', () => {
 					exec('mac2unix', [file.path]).on('close', () => {
@@ -55,6 +71,8 @@ exports.upload = function (app) {
 						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
 							if (err)
 								console.log('Error during file upload: ' + err);
+
+							files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
 						});
 					});
 				});

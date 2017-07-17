@@ -55,6 +55,7 @@ document.querySelector("#up_submit").onclick = function (event) {
 	}
 
 	// Upload the file
+	document.querySelector('#start').disabled = true;
 	$.ajax({
 		url: '/upload',
 		type: 'POST',
@@ -92,12 +93,31 @@ document.querySelector("#up_submit").onclick = function (event) {
 					percentComplete = parseInt(percentComplete * 100);
 
 					// update the Bootstrap progress bar with the new percentage
-					$('.progress-bar').text(percentComplete + '%');
-					$('.progress-bar').width(percentComplete + '%');
+					$('.progress-bar').text('uploading: ' + percentComplete + '%');
+					// $('.progress-bar').width(percentComplete + '%');
 
 					// once the upload reaches 100%, set the progress bar text to done
 					if (percentComplete === 100) {
-						$('.progress-bar').html('Done');
+						$('.progress-bar').html('Processing file(s)');
+
+						// Verify files that have been converted to linux format
+						var interval = setInterval(
+							// Get the file list to process
+							()=>{$.get('/convertion?token=' + exec_token).done((data) => {
+								data = JSON.parse(data);
+
+								// Update the status
+								if (data.length > 0)
+									$('.progress-bar').html('Processing file(s): ' +
+										(up_filenames.length - data.length) + '/' + up_filenames.length);
+								else {
+									clearInterval (interval);
+									$('.progress-bar').html('Done');
+									document.querySelector('#start').disabled = false;
+								}
+							})}
+							, 1000
+						);
 					}
 				}
 
