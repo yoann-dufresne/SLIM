@@ -255,7 +255,7 @@ exports.rereplicate = (filename, callback) => {
 
 
 // --- Dereplication ---
-exports.dereplicate = (filename, callback, config) => {
+exports.dereplicate = (filename, config, callback) => {
 	console.log ('Dereplication for file ' + filename);
 	var intermediate_file = tmp_filename() + '.fasta';
 
@@ -270,6 +270,10 @@ exports.dereplicate = (filename, callback, config) => {
 		'--minseqlength', '1',
 		'--minuniquesize', threshold,
 		'--output', intermediate_file];
+
+
+	if (config.params.params.rename)
+		options = options.concat(['--relabel', config.params.params.rename + '_']);
 
 	console.log('Command:\nvsearch', options.join(' '));
 

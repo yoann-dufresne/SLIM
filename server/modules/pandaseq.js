@@ -21,6 +21,13 @@ exports.run = function (token, config, callback) {
 	var outfile = directory + config.params.outputs.assembly;
 	var algo_name = config.params.params.algorithm;
 
+	// Define the project name regarding the output filename
+	var project = config.params.outputs.assembly;
+	if (project.lastIndexOf('_panda') == -1)
+		project = project.substr(0, project.lastIndexOf('.'));
+	else
+		project = project.substr(0, project.lastIndexOf('_panda'));
+
 	var command = ['-f', directory + config.params.inputs.fwd,
 		'-r', directory + config.params.inputs.rev,
 		'-w', outfile,
@@ -61,11 +68,16 @@ exports.run = function (token, config, callback) {
 	child.on('close', function(code) {
 		if (code == 0) {
 			// Dereplicate and sort
-			tools.dereplicate(outfile, () => {
-				tools.sort(outfile, () => {
-					callback(token, null);
-				});
-			});
+			tools.dereplicate(
+				outfile,
+				//config.params.params.rename
+				{params:{params:{rename:project}}},
+				() => {
+					tools.sort(outfile, () => {
+						callback(token, null);
+					});
+				}
+			);
 		} else
 			callback(token, "pandaseq terminate on code " + code);
 	});
