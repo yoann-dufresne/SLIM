@@ -80,12 +80,14 @@ class DemultiplexerModule extends Module {
 		this.defineIO();
 	}
 
-	create_R1R2_pair (library_name) {
+	create_R1R2_pair (library_name, pair) {
+		if (!pair)
+			pair = {r1:"", r2:""};
 		var pair_div = document.createElement('div');
 		pair_div.classList.add('lib_div');
 		pair_div.innerHTML = '<p>' + library_name + '</p>' +
-			'<p class="illumina_read R1">R1 <input type="text" class="reads_file"></p>' +
-			'<p class="illumina_read R2">R2 <input type="text" class="reads_file"></p>';
+			'<p class="illumina_read R1">R1 <input type="text" class="reads_file" value="' + pair.r1 + '"></p>' +
+			'<p class="illumina_read R2">R2 <input type="text" class="reads_file" value="' + pair.r2 + '"></p>';
 
 		return pair_div;
 	}
@@ -102,7 +104,8 @@ class DemultiplexerModule extends Module {
 			var read_files = this.params.params.reads;
 			for (var name in read_files) {
 				var pair = read_files[name];
-				
+				var pair_div = this.create_R1R2_pair(name, pair);
+
 				this.illumina_div.appendChild(pair_div);
 			}
 

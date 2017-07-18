@@ -2,6 +2,7 @@ const exec = require('child_process').spawn;
 const fs = require('fs');
 
 const csv = require('csv-parser');
+var lineReader = require('line-reader');
 
 const toolbox = require('./toolbox.js');
 
@@ -14,13 +15,15 @@ exports.run = function (token, config, callback) {
 	var tmp_uc_file = directory + toolbox.tmp_filename() + '.txt';
 	var tsv_otu_file = directory + config.params.outputs.otus_table;
 	var origins_file = directory + config.params.inputs.origins;
+	var centroids_file = directory + config.params.outputs.centroids;
 	var in_reads = directory + config.params.inputs.fasta;
 	var out_reads = directory + config.params.outputs.out_reads;
 
 	// Clustering command
 	var options = ['--cluster_fast', in_reads,
 		'--uc', tmp_uc_file,
-		'--id', config.params.params.similarity];
+		'--id', config.params.params.similarity,
+		'--centroids', centroids_file];
 
 	console.log("Running otu-vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));
@@ -38,29 +41,32 @@ exports.run = function (token, config, callback) {
 	});
 	child.on('close', function(code) {
 		if (code == 0) {
-			uc_to_otu(
-				tmp_uc_file,
-				tsv_otu_file,
-				load_origins(origins_file),
-				in_reads,
-				out_reads,
-				() => {
-					fs.unlink(tmp_uc_file, ()=>{});
-					callback(token, null);
-				}
-			);
+			// Load origins
+			load_origins(origins_file, (origins) => {
+				// Transform uc to otu
+				uc_to_otu(
+					tmp_uc_file,
+					tsv_otu_file,
+					origins,
+					in_reads,
+					out_reads,
+					() => {
+						fs.unlink(tmp_uc_file, ()=>{});
+						callback(token, null);
+					}
+				);
+			});
 		} else
 			callback(token, "vsearch " + options[0] + " terminate on code " + code);
 	});
 };
 
 
-var load_origins = (origins_file) => {
+var load_origins = (origins_file, callback) => {
 	origins = {experiments:[]};
 
-	var lines = fs.readFileSync(origins_file).toString().split('\n');
-	for (var idx=0 ; idx<lines.length ; idx++) {
-		var line = lines[idx].split('\t');
+	lineReader.eachLine(origins_file, function(line, last) {
+		line = line.split('\t');
 
 		origins[line[0]] = [];
 		for (var exIdx=1 ; exIdx<line.length ; exIdx++) {
@@ -75,9 +81,10 @@ var load_origins = (origins_file) => {
 				origins.experiments.push(origin);
 			}
 		}
-	}
 
-	return origins;
+		if (last)
+			callback(origins);
+	});
 };
 
 
@@ -110,10 +117,6 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 		// Save cluster
 		clusters[data.name] = data.cluster;
 
-		// Max cluster id
-		if (maxId < data.cluster)
-			maxId = data.cluster;
-
 		// Create second dimention
 		if (!otus[data.cluster])
 			otus[data.cluster] = [];
@@ -144,7 +147,7 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 		fs.appendFileSync(tsv_otu_file, '\n');
 
 		// Write the otu table
-		for (var cIdx=0 ; cIdx<=maxId ; cIdx++) {
+		for (var cIdx in otus) {
 			fs.appendFileSync(tsv_otu_file, cIdx);
 
 			for (var eIdx=0 ; eIdx<exps.length ; eIdx++) {

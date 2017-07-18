@@ -9,7 +9,19 @@ exports.run = (token, config, callback) => {
 	if (config.params.params.soft) {
 		if (config.params.params.soft == "fasta-merging")
 			exports.merge_fasta(token, config, callback);
-		else {
+		else if (config.params.params.soft == "fasta-quantity") {
+			// Copy the file
+			fs.linkSync(
+				'/app/data/' + token + '/' + config.params.inputs.to_filter,
+				'/app/data/' + token + '/' + config.params.outputs.filtered
+			);
+			// Dereplicate with minimum number of reads
+			exports.dereplicate(
+				'/app/data/' + token + '/' + config.params.outputs.filtered,
+				()=>{callback(token, null);},
+				config
+			);
+		} else {
 			console.log("No tool called", config.params.params.soft);
 			callback(token, "No tool called " + config.params.params.soft);
 		}
@@ -243,15 +255,25 @@ exports.rereplicate = (filename, callback) => {
 
 
 // --- Dereplication ---
-exports.dereplicate = (filename, callback) => {
+exports.dereplicate = (filename, callback, config) => {
 	console.log ('Dereplication for file ' + filename);
 	var intermediate_file = tmp_filename() + '.fasta';
 
+	// Minimum quantity for the presence of a read
+	var threshold = 0;
+	if (config && config.params.params.threshold)
+		threshold = parseInt(config.params.params.threshold);
+
+	// Command line
 	var options = ['--derep_fulllength', filename,
 		'--sizeout', '--sizein',
 		'--minseqlength', '1',
+		'--minuniquesize', threshold,
 		'--output', intermediate_file];
 
+	console.log('Command:\nvsearch', options.join(' '));
+
+	// Execution
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
 	child.on('close', (code) => {
 		if (code != 0) {

@@ -45,7 +45,7 @@ class OtuVsearchModule extends Module {
 		var that = this;
 
 		// --- Inputs ---
-		var inputs = this.dom.getElementsByTagName('input');
+		var inputs = this.dom.getElementsByClassName('file_selector');
 		this.fasta = inputs[0];
 		this.origins = inputs[1];
 
@@ -61,23 +61,28 @@ class OtuVsearchModule extends Module {
 			value = value.substr(0, value.indexOf('.fasta'));
 			that.otus.value = value + '_otus.tsv';
 			that.out_reads.value = value + '_clustered.fasta';
+			that.centroids.value = value + '_abundance.fasta';
 			
 			that.otus.onchange();
 			that.out_reads.onchange();
+			that.centroids.onchange();
 		}
 		
 		// --- Outputs ---
 		var links = this.dom.getElementsByClassName('download_link');
-
-		this.otus = inputs[2];
+		var outputs = this.dom.getElementsByClassName('output_filename');
+		this.otus = outputs[0];
 		this.otus_link = links[0];
-		this.out_reads = inputs[3];
+		this.out_reads = outputs[1];
 		this.out_reads_link = links[1];
+		this.centroids = outputs[2];
+		this.centroids_link = links[2];
 
 		// Reload outputs
 		if (this.params.outputs) {
 			this.otus.value = this.params.outputs.otus_table;
 			this.out_reads.value = this.params.outputs.out_reads;
+			this.centroids.value = this.params.outputs.centroids;
 		}
 		
 		// Update output values
@@ -95,6 +100,13 @@ class OtuVsearchModule extends Module {
 		};
 		this.out_reads.onchange();
 
+		this.centroids_val = this.centroids.value;
+		this.centroids.onchange = () => {
+			that.output_onchange ([that.centroids_val], [that.centroids.value], [that.centroids_link]);
+			that.centroids_val = that.centroids.value;
+		};
+		this.centroids.onchange();
+
 
 		// --- Parameters ---
 		this.similarity = this.dom.getElementsByClassName('similarity')[0];
@@ -109,6 +121,7 @@ class OtuVsearchModule extends Module {
 		
 		config.outputs.otus_table = this.otus.value;
 		config.outputs.out_reads = this.out_reads.value;
+		config.outputs.centroids = this.centroids.value;
 
 		config.params.similarity = this.similarity.value;
 

@@ -7,6 +7,13 @@ exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
 		fs.readdir("/app/data/" + req.query.token, function(err, items) {
+			// If token incorrect
+			if (!items) {
+				res.status(403).send("bad token");
+				console.log('/list bad call');
+				return;
+			}
+
 			for (var idx=0 ; idx<items.length ; idx++) {
 				if (items[idx].endsWith('.log') || items[idx].endsWith('.conf')) {
 					items.splice(idx, 1);
