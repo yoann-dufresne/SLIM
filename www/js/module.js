@@ -190,8 +190,8 @@ class ModuleManager {
 		}
 
 		// Load each module
-		for (var idx=0 ; idx<this.available_modules.length ; idx++) {
-			var name = this.available_modules[idx];
+		for (let idx=0 ; idx<this.available_modules.length ; idx++) {
+			let name = this.available_modules[idx];
 
 			$.get('/modules/' + name + '.js', (data) => {
 				eval(data);

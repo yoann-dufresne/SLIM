@@ -137,33 +137,41 @@ class DemultiplexerModule extends Module {
 
 			// Get the file content
 			var data = file_manager.contents[that.tags_text.value].data;
+			var csv_name = that.tags_text.value;
+			csv_name = csv_name.substr(0, csv_name.lastIndexOf('.'));
 			var libraries = [];
-			for (var idx=0 ; idx<data.length ; idx++) {
-				var sample = data[idx];
+			var nbLibs = 0;
+			for (let idx=0 ; idx<data.length ; idx++) {
+				let sample = data[idx];
 
 				// Add the run with joker
 				if (!libraries.includes(sample.run)) {
 					libraries.push(sample.run);
-					that.out_files.push(sample.run + "*_fwd.fastq");
-					that.out_files.push(sample.run + "*_rev.fastq");
+					that.out_files.push(csv_name + '_' + sample.run + "*_fwd.fastq");
+					that.out_files.push(csv_name + '_' + sample.run + "*_rev.fastq");
+					nbLibs++;
 				}
 
 				// Add the sample outfiles
-				that.out_files.push(sample.run + "_" + sample.sample + "_fwd.fastq");
-				that.out_files.push(sample.run + "_" + sample.sample + "_rev.fastq");
+				that.out_files.push(csv_name + '_' + sample.run + "_" + sample.sample + "_fwd.fastq");
+				that.out_files.push(csv_name + '_' + sample.run + "_" + sample.sample + "_rev.fastq");
+			}
+			// Add general file if there are multiple libraries
+			if (nbLibs > 1) {
+				that.out_files.push(csv_name + "*_fwd.fastq");
+				that.out_files.push(csv_name + "*_rev.fastq");
 			}
 
 			// Create inputs for each library
 			that.illumina_div.innerHTML = "";
-			console.log (libraries);
-			for (var l_idx in libraries) {
-				var lib = libraries[l_idx];
-				var lib_div = that.create_R1R2_pair(lib);
+			for (let l_idx in libraries) {
+				let lib = libraries[l_idx];
+				let lib_div = that.create_R1R2_pair(lib);
 				that.illumina_div.appendChild(lib_div);
 			}
 
 			// Add the files in the output text area
-			for (var idx=0 ; idx<that.out_files.length ; idx++) {
+			for (let idx=0 ; idx<that.out_files.length ; idx++) {
 				that.out_area.innerHTML += that.format_output(that.out_files[idx]);
 			}
 
