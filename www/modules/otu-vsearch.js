@@ -7,18 +7,31 @@ class OtuVsearchModule extends Module {
 	}
 
 	onFileChange (file_manager, event) {
+		var filenames = file_manager.getFiles(['fasta']);
+
+		// Save checked
+		var checked = {};
+		var inputs = this.fasta_div.getElementsByTagName('input');
+		for (let id in inputs) {
+			let input = inputs[id];
+
+			if (input.checked)
+				checked[input.name] = input.name;
+		}
+
+		// Reset list
+		this.fasta_div.innerHTML = "";
+
+		// Recreate list
+		for (let id in filenames) {
+			let filename = filenames[id];
+
+			this.fasta_div.innerHTML += '<p><input type="checkbox" name="' +
+					filename + '"' + (checked[filename] ? ' checked' : '') +
+					'>' + filename + '</p>';
+		}
+
 		var that = this;
-
-		var fasta = file_manager.getFiles(['.fasta']);
-		var auto_fasta = file_manager.get_autocomplete_format(fasta);
-		$(this.fasta).autocomplete({
-			lookup: auto_fasta,
-			onSelect: function(suggestion) {
-				that.fasta.value = suggestion.data;
-				that.fasta.onchange();
-			}
-		});
-
 		var tsv = file_manager.getFiles(['.tsv']);
 		var auto_tsv = file_manager.get_autocomplete_format(tsv);
 		$(this.origins).autocomplete({
@@ -45,28 +58,17 @@ class OtuVsearchModule extends Module {
 		var that = this;
 
 		// --- Inputs ---
-		var inputs = this.dom.getElementsByClassName('file_selector');
-		this.fasta = inputs[0];
-		this.origins = inputs[1];
+		this.fasta_div = this.dom.getElementsByClassName('file_list')[0];
 
 		// Reload inputs
 		if (this.params.inputs) {
-			this.fasta.value = this.params.inputs.fasta;
-			this.origins.value = this.params.inputs.origins;
+			for (let idx in this.params.inputs) {
+				let filename = this.params.inputs[idx];
+				this.fasta_div.innerHTML += '<p><input type="checkbox" name="' +
+						filename + '" checked>' + filename + '</p>'
+			}
 		}
 		this.onFileChange(file_manager, {});
-		// Create output regarding input
-		this.fasta.onchange = () => {
-			let value = that.fasta.value;
-			value = value.substr(0, value.indexOf('.fasta'));
-			that.otus.value = value + '_otus.tsv';
-			that.out_reads.value = value + '_clustered.fasta';
-			that.centroids.value = value + '_abundance.fasta';
-			
-			that.otus.onchange();
-			that.out_reads.onchange();
-			that.centroids.onchange();
-		}
 		
 		// --- Outputs ---
 		var links = this.dom.getElementsByClassName('download_link');
@@ -116,8 +118,15 @@ class OtuVsearchModule extends Module {
 	getConfiguration () {
 		var config = super.getConfiguration()
 		
-		config.inputs.origins = this.origins.value;
-		config.inputs.fasta = this.fasta.value;
+		var inputs = this.fasta_div.getElementsByTagName('input');
+		for (let id in inputs) {
+			let input = inputs[id];
+
+			if (input.checked) {
+				let name = input.name.replace('*', '$');
+				config.inputs[name] = name;
+			}
+		}
 		
 		config.outputs.otus_table = this.otus.value;
 		config.outputs.out_reads = this.out_reads.value;

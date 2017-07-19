@@ -9,7 +9,36 @@ const toolbox = require('./toolbox.js');
 
 exports.name = 'otu-vsearch';
 
+
 exports.run = function (token, config, callback) {
+	// var merged = '/app/data/' + token + '/' + config.params.outputs.merged;
+	// var origins = '/app/data/' + token + '/' + config.params.outputs.origins;
+	let directory = '/app/data/' + token + '/';
+	let tmp_merged = toolbox.tmp_filename() + '.fasta';
+	let tmp_origins = toolbox.tmp_filename() + '.tsv';
+	let config_merging = {params:{
+		inputs: config.params.inputs,
+		outputs: {
+			merged: tmp_merged,
+			origins: tmp_origins
+		},
+		params: {}
+	}};
+
+	toolbox.merge_fasta (token, config_merging, () => {
+		config.params.inputs = {
+			origins: tmp_origins,
+			fasta: tmp_merged
+		};
+		otu_vsearch (token, config, (token, msg) => {
+			fs.unlink(directory + tmp_merged, ()=>{});
+			fs.unlink(directory + tmp_origins, ()=>{});
+			callback(token, msg);
+		});
+	});
+}
+
+var otu_vsearch = function (token, config, callback) {
 	// Real filenames
 	var directory = '/app/data/' + token + '/';
 	var tmp_uc_file = directory + toolbox.tmp_filename() + '.txt';

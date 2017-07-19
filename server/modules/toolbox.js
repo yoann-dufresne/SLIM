@@ -197,10 +197,11 @@ exports.merge_fasta = (token, config, callback) => {
 		reader.onEnd (() => {
 			if (fastas.length > 0)
 				merge();
-			else
-				exports.dereplicate(merged, ()=>{
+			else {
+				exports.dereplicate(merged, null, ()=>{
 					save_origins(origins, merged, () => {callback(token, null);});
 				});
+			}
 		});
 
 		// Read all the sequences
@@ -237,7 +238,7 @@ exports.rereplicate = (filename, callback) => {
 	var intermediate_file = tmp_filename() + '.fasta';
 
 	var options = ['--rereplicate', filename,
-		'--sizeout',
+		'--sizeout', '--quiet',
 		'--minseqlength', '1',
 		'--output', intermediate_file];
 
@@ -266,13 +267,13 @@ exports.dereplicate = (filename, config, callback) => {
 
 	// Command line
 	var options = ['--derep_fulllength', filename,
-		'--sizeout', '--sizein',
+		'--sizeout', '--sizein', '--quiet',
 		'--minseqlength', '1',
 		'--minuniquesize', threshold,
 		'--output', intermediate_file];
 
 
-	if (config.params.params.rename)
+	if (config && config.params.params.rename)
 		options = options.concat(['--relabel', config.params.params.rename + '_']);
 
 	console.log('Command:\nvsearch', options.join(' '));
@@ -297,7 +298,7 @@ exports.sort = (filename, callback) => {
 	var intermediate_file = tmp_filename() + '.fasta';
 
 	var options = ['--sortbysize', filename,
-		'--sizeout',
+		'--sizeout', '--quiet',
 		'--minseqlength', '1',
 		'--output', intermediate_file];
 

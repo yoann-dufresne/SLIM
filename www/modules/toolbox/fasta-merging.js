@@ -5,8 +5,8 @@ var tmp = {
 		// Save checked
 		var checked = {};
 		var inputs = this.div_selection.getElementsByTagName('input');
-		for (var id in inputs) {
-			input = inputs[id];
+		for (let id in inputs) {
+			let input = inputs[id];
 
 			if (input.checked)
 				checked[input.name] = input.name;
@@ -33,7 +33,7 @@ var tmp = {
 		this.origins_link = dom.getElementsByTagName('a')[1];
 
 		// --- Inputs ---
-		// TODO : changer merged if 1 clic
+		// TODO : change merged if 1 clic
 		if (params.inputs) {
 			for (var id in params.inputs) {
 				var filename = params.inputs[id].replace('$','*');
