@@ -346,8 +346,6 @@ var expand_parameters = (params, no_joker_files, order) => {
 		// $ expantions
 		var inputs = demux_files(params[soft_id].params.inputs, no_joker_files);
 		params[soft_id].params.inputs = inputs;
-		console.log(soft_id, JSON.stringify(inputs));
-		console.log();
 
 		// * demultiplexing
 		var dev_params = demux_executions(params, soft_id, no_joker_files);
