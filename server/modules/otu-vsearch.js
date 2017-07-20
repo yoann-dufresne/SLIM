@@ -47,6 +47,8 @@ var otu_vsearch = function (token, config, callback) {
 	var centroids_file = directory + config.params.outputs.centroids;
 	var in_reads = directory + config.params.inputs.fasta;
 	var out_reads = directory + config.params.outputs.out_reads;
+	var ordered = config.params.params.sorted != "";
+	var t2s = directory + config.params.params.sorted;
 
 	// Clustering command
 	var options = ['--cluster_fast', in_reads,
@@ -82,7 +84,8 @@ var otu_vsearch = function (token, config, callback) {
 					() => {
 						fs.unlink(tmp_uc_file, ()=>{});
 						callback(token, null);
-					}
+					},
+					ordered ? t2s : null
 				);
 			});
 		} else
@@ -117,7 +120,7 @@ var load_origins = (origins_file, callback) => {
 };
 
 
-var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_output, callback) => {
+var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_output, callback, t2s) => {
 	console.log('CSV to OTU');
 
 	var parser = csv({
@@ -168,29 +171,38 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 	.on('end', () => {
 		var exps = sequence_origins.experiments;
 
-		// Write header
-		fs.closeSync(fs.openSync(tsv_otu_file, 'w'));
-		fs.appendFileSync(tsv_otu_file, 'OTU');
-		for (var eIdx=0 ; eIdx<exps.length ; eIdx++)
-			fs.appendFileSync(tsv_otu_file, '\t' + exps[eIdx]);
-		fs.appendFileSync(tsv_otu_file, '\n');
-
-		// Write the otu table
-		for (var cIdx in otus) {
-			fs.appendFileSync(tsv_otu_file, cIdx);
-
-			for (var eIdx=0 ; eIdx<exps.length ; eIdx++) {
-				var exp = exps[eIdx];
-
-				// Write the value if present, else 0
-				if (otus[cIdx][exp]) {
-					fs.appendFileSync(tsv_otu_file, '\t' + otus[cIdx][exp]);
-				} else {
-					fs.appendFileSync(tsv_otu_file, '\t0');
-				}
-			}
+		var write_otus = (exps) => {
+			// Write header
+			fs.closeSync(fs.openSync(tsv_otu_file, 'w'));
+			fs.appendFileSync(tsv_otu_file, 'OTU');
+			for (var eIdx=0 ; eIdx<exps.length ; eIdx++)
+				fs.appendFileSync(tsv_otu_file, '\t' + exps[eIdx]);
 			fs.appendFileSync(tsv_otu_file, '\n');
+
+			// Write the otu table
+			for (var cIdx in otus) {
+				fs.appendFileSync(tsv_otu_file, cIdx);
+
+				for (var eIdx=0 ; eIdx<exps.length ; eIdx++) {
+					var exp = exps[eIdx];
+
+					// Write the value if present, else 0
+					if (otus[cIdx][exp]) {
+						fs.appendFileSync(tsv_otu_file, '\t' + otus[cIdx][exp]);
+					} else {
+						fs.appendFileSync(tsv_otu_file, '\t0');
+					}
+				}
+				fs.appendFileSync(tsv_otu_file, '\n');
+			}
 		}
+
+		// Lanch the OTU writing
+		if (t2s != null)
+			read_t2s (t2s, exps, write_otus);
+		else
+			write_otus(exps);
+
 
 		// Write the assignation in the reads file
 		var reader = toolbox.fastaReader(seq_input);
@@ -207,3 +219,37 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 		});
 	});
 };
+
+var read_t2s = (filename, exps, callback) => {
+	let lines = fs.readFileSync(filename, 'utf8').split('\n');
+
+	// Get the csv lines
+	let header_idxs = {};
+	let split = lines[0].split(',');
+	for (let idx=0 ; idx<split.length ; idx++)
+		header_idxs[split[idx]] = idx;
+
+	// Get the short filename ad identifyer
+	filename = filename.substr(0, filename.lastIndexOf('.'));
+	if (filename.includes('/'))
+		filename = filename.substr(filename.lastIndexOf('/')+1);
+
+	// Compute the order
+	var order = [];
+	for (let idx=1 ; idx<lines.length ; idx++) {
+		split = lines[idx].split(',');
+
+		if (split.length < 4)
+			continue;
+
+		let exp_name = filename + '_' + split[header_idxs.run] + '_' + split[header_idxs.sample];
+		for (let e_idx in exps) {
+			if (exps[e_idx].startsWith(exp_name)) {
+				order.push(exps[e_idx]);
+				break;
+			}
+		}
+	}
+
+	callback (order);
+}

@@ -40,6 +40,15 @@ class OtuVsearchModule extends Module {
 				that.origins.value = suggestion.data;
 			}
 		});
+
+		var csv = file_manager.getFiles(['csv']);
+		var auto_csv = file_manager.get_autocomplete_format(csv);
+		$(this.t2s).autocomplete({
+			lookup: auto_csv,
+			onSelect: function(suggestion) {
+				that.t2s.value = suggestion.data;
+			}
+		});
 	}
 
 	onLoad () {
@@ -68,7 +77,6 @@ class OtuVsearchModule extends Module {
 						filename + '" checked>' + filename + '</p>'
 			}
 		}
-		this.onFileChange(file_manager, {});
 		
 		// --- Outputs ---
 		var links = this.dom.getElementsByClassName('download_link');
@@ -113,6 +121,21 @@ class OtuVsearchModule extends Module {
 		// --- Parameters ---
 		this.similarity = this.dom.getElementsByClassName('similarity')[0];
 		this.similarity.onchange = ()=>{that.nanVerification(that.similarity)};
+
+		this.sorted = this.dom.getElementsByClassName('t2s_usage')[0];
+		this.t2s = this.dom.getElementsByClassName('t2s_value')[0];
+
+		this.sorted.onchange = () => {
+			if (that.sorted.checked) {
+				that.t2s.style.display = "inline-block";
+			} else {
+				that.t2s.style.display = "none";
+			}
+		}
+		this.sorted.onchange();
+
+		// Load autosuggestions
+		this.onFileChange(file_manager, {});
 	}
 
 	getConfiguration () {
@@ -133,6 +156,7 @@ class OtuVsearchModule extends Module {
 		config.outputs.centroids = this.centroids.value;
 
 		config.params.similarity = this.similarity.value;
+		config.params.sorted = this.sorted.checked ? this.t2s.value : "";
 
 		return config;
 	}

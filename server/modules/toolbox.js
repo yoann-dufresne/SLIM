@@ -18,8 +18,8 @@ exports.run = (token, config, callback) => {
 			// Dereplicate with minimum number of reads
 			exports.dereplicate(
 				'/app/data/' + token + '/' + config.params.outputs.filtered,
-				()=>{callback(token, null);},
-				config
+				config,
+				()=>{callback(token, null);}
 			);
 		} else {
 			console.log("No tool called", config.params.params.soft);

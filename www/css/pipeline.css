@@ -15,6 +15,11 @@ input[type="text"] {
 	margin-bottom: 150px;
 }
 
+.no_vertical_margins {
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+
 /* ------------------------ General Module ------------------------ */
 
 .module {
