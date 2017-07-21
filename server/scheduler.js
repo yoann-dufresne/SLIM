@@ -1,32 +1,51 @@
 
 const fs = require('fs');
 const sub_process = require('./sub_process.js');
+const si = require('systeminformation');
 
 
 var waiting_jobs = [];
 var running_jobs = {};
 
-const MAX_JOBS = 1;
+
+// --- Parametric values ---
+var NB_CORES = 1;
+var MAX_JOBS = 1;
+const SCHEDULE_TIME = 10000;
+
 
 exports.start = function () {
-	setInterval (scheduler, 10000);
+	si.cpu((data) => {
+		NB_CORES = data.cores;
+		MAX_JOBS = Math.ceil(NB_CORES/4)
+
+		console.log('Scheduler started on an ' + NB_CORES + ' cores cpu');
+		console.log(MAX_JOBS + ' executions can be done simultaneously');
+		setInterval (scheduler, SCHEDULE_TIME);
+	});
 };
 
 var scheduler = function () {
+	console.log('waiting', waiting_jobs);
+
 	// Add a new job if not so busy
 	if (Object.keys(running_jobs).length < MAX_JOBS && waiting_jobs.length > 0) {
-		var token = waiting_jobs.shift();
+		let token = waiting_jobs.shift();
 		fs.readFile ('/app/data/' + token + '/exec.log', (err, data) => {
 			if (err) throw err;
 			
 			// Load the configuration file.
 			running_jobs[token] = JSON.parse(data);
+
+			console.log(running_jobs);
 		});
 	}
+
+	console.log('waiting', waiting_jobs);
 	
 	// Update the software executions
-	for (var token in running_jobs) {
-		var job = running_jobs[token];
+	for (let token in running_jobs) {
+		let job = running_jobs[token];
 		if (job.status == "ready") {
 			// Verify if ended
 			if (job.order == null || job.order.length == 0) {
@@ -40,7 +59,7 @@ var scheduler = function () {
 			}
 
 			// Lanch the next software for the current job
-			var nextId = job.order.shift();
+			let nextId = job.order.shift();
 
 			// Update the software status
 			job.status = "running";
@@ -48,8 +67,8 @@ var scheduler = function () {
 
 			// Define output log files and status for all the sub-jobs in the current job
 			// Sub-jobs are input/output variations on the same software
-			var configs_array = job.conf[nextId];
-			for (var sub_idx=0 ; sub_idx<configs_array.length ; sub_idx++) {
+			let configs_array = job.conf[nextId];
+			for (let sub_idx=0 ; sub_idx<configs_array.length ; sub_idx++) {
 				configs_array[sub_idx].status = "waiting";
 				configs_array[sub_idx].log = 'out_' + nextId + '_' + sub_idx + '.log';
 			}

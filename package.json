@@ -14,6 +14,7 @@
     "formidable": "^1.1.1",
     "body-parser": "^1.17.1",
     "csv-parser": "^1.11.0",
-    "line-reader": "^0.4.0"
+    "line-reader": "^0.4.0",
+    "systeminformation": "^3.23.7"
   }
 }

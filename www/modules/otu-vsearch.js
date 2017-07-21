@@ -137,6 +137,13 @@ class OtuVsearchModule extends Module {
 		this.sorted = this.dom.getElementsByClassName('t2s_usage')[0];
 		this.t2s = this.dom.getElementsByClassName('t2s_value')[0];
 
+		// Reload params
+		// config.params.sorted = this.sorted.checked ? this.t2s.value : "";
+		if (this.params.params && this.params.params.sorted && this.params.params.sorted != "") {
+			this.sorted.checked = true;
+			this.t2s.value = this.params.params.sorted;
+		}
+
 		this.sorted.onchange = () => {
 			if (that.sorted.checked) {
 				that.t2s.style.display = "inline-block";
