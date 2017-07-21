@@ -1,9 +1,22 @@
 var tmp = {
 	onFileChange: function(file_manager, event) {
 		var filenames = file_manager.getFiles(['fasta']);
+		var checked = {};
+
+		// add reloaded
+		if (event && event.params)
+			for (let id in event.params.inputs) {
+				let name = event.params.inputs[id].replace('$', '*');
+				
+				if (!filenames.includes(name)) {
+					filenames.push(name);
+				}
+
+				checked[name] = checked;
+				delete event.params.inputs[id];
+			}
 
 		// Save checked
-		var checked = {};
 		var inputs = this.div_selection.getElementsByTagName('input');
 		for (let id in inputs) {
 			let input = inputs[id];
@@ -74,7 +87,7 @@ var tmp = {
 			input = inputs[id];
 
 			if (input.checked) {
-				var name = input.name.replace('*', '$');
+				var name = input.name;
 				config.inputs[name] = name;
 			}
 		}

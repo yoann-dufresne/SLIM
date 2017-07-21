@@ -5,6 +5,7 @@ class ToolboxModule extends Module {
 		super ("toolbox");
 
 		this.params = params;
+		console.log(params);
 	}
 
 	onFileChange (file_manager, event) {
@@ -37,7 +38,7 @@ class ToolboxModule extends Module {
 						that.js = tmp;
 					}).done (() => {
 						that.js.onLoad(that.tool_div, that.params);
-						that.onFileChange(file_manager, null);
+						that.onFileChange(file_manager, {params: this.params});
 					});
 				});
 			}

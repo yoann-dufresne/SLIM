@@ -100,7 +100,9 @@ up_conf.onchange = () => {
 	var reader = new FileReader();
 
 	reader.onload = function(e) {
-		var json = load_modules(JSON.parse(e.target.result));
+		var json = JSON.parse(e.target.result);
+
+		load_modules(json);
 	};
 	reader.readAsText(file);
 };

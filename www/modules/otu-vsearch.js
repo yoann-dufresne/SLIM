@@ -8,9 +8,21 @@ class OtuVsearchModule extends Module {
 
 	onFileChange (file_manager, event) {
 		var filenames = file_manager.getFiles(['fasta']);
+		var checked = {};
+
+		// add reloaded
+		for (let id in this.params.inputs) {
+			let name = this.params.inputs[id].replace('$', '*');
+			
+			if (!filenames.includes(name)) {
+				filenames.push(name);
+			}
+
+			checked[name] = checked;
+			delete this.params.inputs[id];
+		}
 
 		// Save checked
-		var checked = {};
 		var inputs = this.fasta_div.getElementsByTagName('input');
 		for (let id in inputs) {
 			let input = inputs[id];
