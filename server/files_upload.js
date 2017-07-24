@@ -72,8 +72,8 @@ exports.upload = function (app) {
 				files_to_convert[token].push(file.name);
 
 				// Transform in unix format
-				exec('dos2unix', [file.path]).on('close', () => {
-					exec('mac2unix', [file.path]).on('close', () => {
+				exec('dos2unix', [file.path, '-q']).on('close', () => {
+					exec('mac2unix', [file.path, '-q']).on('close', () => {
 						// Rename
 						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
 							if (err)

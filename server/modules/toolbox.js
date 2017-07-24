@@ -4,8 +4,10 @@ var lineReader = require('line-reader');
 
 
 exports.name = 'toolbox';
+exports.multicore = true;
 
-exports.run = (token, config, callback) => {
+exports.run = (os, config, callback) => {
+	let token = os.token;
 	if (config.params.params.soft) {
 		if (config.params.params.soft == "fasta-merging")
 			exports.merge_fasta(token, config, callback);

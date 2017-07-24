@@ -15,7 +15,8 @@ var algorithms = {
 	uparse: 'uparse'
 };
 
-exports.run = function (token, config, callback) {
+exports.run = function (os, config, callback) {
+	let token = os.token;
 	var options = config.params.params;
 	var directory = '/app/data/' + token + '/';
 	var outfile = directory + config.params.outputs.assembly;
@@ -32,7 +33,8 @@ exports.run = function (token, config, callback) {
 		'-r', directory + config.params.inputs.rev,
 		'-w', outfile,
 		'-t', options.threshold,
-		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian'];
+		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian',
+		'-T', os.cores];
 
 	// Length options
 	if (options.min_length != -1) {

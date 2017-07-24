@@ -3,8 +3,10 @@ const fs = require('fs');
 
 
 exports.name = 'chimera-vsearch';
+exports.multicore = false;
 
-exports.run = function (token, config, callback) {
+exports.run = function (os, config, callback) {
+	let token = os.token;
 	var directory = '/app/data/' + token + '/';
 	var options = ['--uchime_denovo', directory + config.params.inputs.input,
 		'--nonchimeras', directory + config.params.outputs.nonchimeras,

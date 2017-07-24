@@ -11,13 +11,14 @@ var running_jobs = {};
 // --- Parametric values ---
 var NB_CORES = 1;
 var MAX_JOBS = 1;
+const CORES_BY_RUN = 4;
 const SCHEDULE_TIME = 10000;
 
 
 exports.start = function () {
 	si.cpu((data) => {
 		NB_CORES = data.cores;
-		MAX_JOBS = Math.ceil(NB_CORES/4)
+		MAX_JOBS = Math.ceil(NB_CORES/CORES_BY_RUN);
 
 		console.log('Scheduler started on an ' + NB_CORES + ' cores cpu');
 		console.log(MAX_JOBS + ' executions can be done simultaneously');
@@ -86,7 +87,8 @@ var scheduler = function () {
 };
 
 
-var sub_process_start = (token, configs_array) => {
+var sub_process_start = (tok, configs_array) => {
+	let token = tok;
 	let job = running_jobs[token];
 	let sub_idx = job.sub_running_job ? job.sub_running_job : 0;
 	job.sub_running_job = sub_idx;
@@ -95,7 +97,7 @@ var sub_process_start = (token, configs_array) => {
 	job.conf[job.running_soft][sub_idx].status = 'running';
 	fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
 
-	sub_process.run(token, current_params, (token, err) => {
+	sub_process.run({token:token, cores:CORES_BY_RUN}, current_params, (token, err) => {
 		let job = running_jobs[token];
 
 		// Abord the pipeline if an error occur.

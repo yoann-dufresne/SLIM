@@ -3,8 +3,10 @@ const fs = require('fs');
 
 
 exports.name = 'demultiplexer';
+exports.multicore = true;
 
-exports.run = function (token, config, callback) {
+exports.run = function (os, config, callback) {
+	let token = os.token;
 	var directory = '/app/data/' + token + '/';
 	var options = ['-l', directory + config.params.inputs.tags,
 		'-p', directory + config.params.inputs.primers,

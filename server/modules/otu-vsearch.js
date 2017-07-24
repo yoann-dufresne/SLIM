@@ -8,9 +8,10 @@ const toolbox = require('./toolbox.js');
 
 
 exports.name = 'otu-vsearch';
+exports.multicore = true;
 
-
-exports.run = function (token, config, callback) {
+exports.run = function (os, config, callback) {
+	let token = os.token;
 	// var merged = '/app/data/' + token + '/' + config.params.outputs.merged;
 	// var origins = '/app/data/' + token + '/' + config.params.outputs.origins;
 	let directory = '/app/data/' + token + '/';
@@ -30,7 +31,7 @@ exports.run = function (token, config, callback) {
 			origins: tmp_origins,
 			fasta: tmp_merged
 		};
-		otu_vsearch (token, config, (token, msg) => {
+		otu_vsearch (os, config, (token, msg) => {
 			fs.unlink(directory + tmp_merged, ()=>{});
 			fs.unlink(directory + tmp_origins, ()=>{});
 			callback(token, msg);
@@ -38,7 +39,8 @@ exports.run = function (token, config, callback) {
 	});
 }
 
-var otu_vsearch = function (token, config, callback) {
+var otu_vsearch = function (os, config, callback) {
+	let token = os.token;
 	// Real filenames
 	var directory = '/app/data/' + token + '/';
 	var tmp_uc_file = directory + toolbox.tmp_filename() + '.txt';
@@ -54,7 +56,8 @@ var otu_vsearch = function (token, config, callback) {
 	var options = ['--cluster_fast', in_reads,
 		'--uc', tmp_uc_file,
 		'--id', config.params.params.similarity,
-		'--centroids', centroids_file];
+		'--centroids', centroids_file,
+		'--threads', os.cores];
 
 	console.log("Running otu-vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));

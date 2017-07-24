@@ -87,7 +87,7 @@ var tmp = {
 			input = inputs[id];
 
 			if (input.checked) {
-				var name = input.name;
+				var name = input.name.replace('*', '$');
 				config.inputs[name] = name;
 			}
 		}
