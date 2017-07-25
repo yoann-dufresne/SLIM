@@ -32,9 +32,9 @@ exports.run = function (os, config, callback) {
 	});
 	child.on('close', function(code) {
 		if (code == 0) {
-			callback(token, null);
+			callback(os, null);
 		}
 		else
-			callback(token, "vsearch --uchime_denovo terminate on code " + code);
+			callback(os, "vsearch --uchime_denovo terminate on code " + code);
 	});
 };

@@ -26,7 +26,7 @@ exports.run = function (os, config, callback) {
 		params: {}
 	}};
 
-	toolbox.merge_fasta (token, config_merging, () => {
+	toolbox.merge_fasta (os, config_merging, () => {
 		config.params.inputs = {
 			origins: tmp_origins,
 			fasta: tmp_merged
@@ -34,7 +34,7 @@ exports.run = function (os, config, callback) {
 		otu_vsearch (os, config, (token, msg) => {
 			fs.unlink(directory + tmp_merged, ()=>{});
 			fs.unlink(directory + tmp_origins, ()=>{});
-			callback(token, msg);
+			callback(os, msg);
 		});
 	});
 }
@@ -86,13 +86,13 @@ var otu_vsearch = function (os, config, callback) {
 					out_reads,
 					() => {
 						fs.unlink(tmp_uc_file, ()=>{});
-						callback(token, null);
+						callback(os, null);
 					},
 					ordered ? t2s : null
 				);
 			});
 		} else
-			callback(token, "vsearch " + options[0] + " terminate on code " + code);
+			callback(os, "vsearch " + options[0] + " terminate on code " + code);
 	});
 };
 

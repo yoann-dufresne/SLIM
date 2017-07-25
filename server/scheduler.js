@@ -90,35 +90,39 @@ var scheduler = function () {
 var sub_process_start = (tok, configs_array) => {
 	let token = tok;
 	let job = running_jobs[token];
-	let sub_idx = job.sub_running_job ? job.sub_running_job : 0;
-	job.sub_running_job = sub_idx;
+	job.next_sub_idx = 0;
+	job.sub_ended = 0;
 
-	let current_params = configs_array[sub_idx];
-	job.conf[job.running_soft][sub_idx].status = 'running';
+	job.conf[job.running_soft][0].status = 'running';
 	fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
 
-	sub_process.run({token:token, cores:CORES_BY_RUN}, current_params, (token, err) => {
-		let job = running_jobs[token];
+	var sub_process_callback = (os, err) => {
+		let my_sub_idx = os.idx;
 
 		// Abord the pipeline if an error occur.
 		if (err) {
-			console.log(token + ': error in sub exec ' + sub_idx);
-			job.conf[job.running_soft][sub_idx].status = 'aborted';
+			console.log(token + ': error in sub exec ' + my_sub_idx);
+			job.conf[job.running_soft][my_sub_idx].status = 'aborted';
 		} else {
 			// Add software output to the log file and modify the status.
-			job.conf[job.running_soft][sub_idx].status = "ended";
+			job.conf[job.running_soft][my_sub_idx].status = "ended";
 		}
-		job.sub_running_job += 1;
+		
 		// Save the status
+		job.sub_ended += 1;
 		running_jobs[token] = job;
-		fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
 
 		// recursively call sub_process_start
-		if (job.sub_running_job < configs_array.length) {
-			sub_process_start (token, configs_array);
-		} else {// Stop the job
-			var nbAborted = 0;
-			for (var idx=0 ; idx<configs_array.length ; idx++)
+		if (job.next_sub_idx < configs_array.length) {
+			sub_process.run(
+				{token:token, cores:CORES_BY_RUN, idx:job.next_sub_idx},
+				configs_array[job.next_sub_idx],
+				sub_process_callback
+			);
+			job.next_sub_idx += 1;
+		} else if (job.sub_ended == configs_array.length) {// Stop the job
+			let nbAborted = 0;
+			for (let idx=0 ; idx<configs_array.length ; idx++)
 				if (job.conf[job.running_soft][idx].status == 'aborted')
 					nbAborted += 1;
 
@@ -138,11 +142,21 @@ var sub_process_start = (tok, configs_array) => {
 			}
 
 			delete job.running_soft;
-			delete job.sub_running_job;
-
-			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			delete job.next_sub_idx;
+			delete job.sub_ended;
 		}
-	});
+		fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+	}
+
+	// Define limit of multiple similar software lanch.
+	var limit = 1;
+	if (!sub_process.multicore)
+		limit = Math.min(configs_array.length, CORES_BY_RUN);
+
+	// Lanch initial sub-softwares
+	job.next_sub_idx = limit;
+	for (let lanch_idx=0 ; lanch_idx<limit ; lanch_idx++)
+		sub_process.run({token:token, cores:CORES_BY_RUN, idx:lanch_idx}, configs_array[lanch_idx], sub_process_callback);
 };
 
 

@@ -43,12 +43,12 @@ exports.run = function (os, config, callback) {
 		child.on('close', function(code) {
 			if (code == 0) {
 				if (exe_left.length == 0)
-					callback(token, null);
+					callback(os, null);
 				else
 					run_demux();
 			}
 			else
-				callback(token, "DTD terminate on code " + code);
+				callback(os, "DTD terminate on code " + code);
 		});
 	}
 	run_demux();

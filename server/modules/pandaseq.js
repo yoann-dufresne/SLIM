@@ -76,11 +76,11 @@ exports.run = function (os, config, callback) {
 				{params:{params:{rename:project}}},
 				() => {
 					tools.sort(outfile, () => {
-						callback(token, null);
+						callback(os, null);
 					});
 				}
 			);
 		} else
-			callback(token, "pandaseq terminate on code " + code);
+			callback(os, "pandaseq terminate on code " + code);
 	});
 };

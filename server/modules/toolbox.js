@@ -10,7 +10,7 @@ exports.run = (os, config, callback) => {
 	let token = os.token;
 	if (config.params.params.soft) {
 		if (config.params.params.soft == "fasta-merging")
-			exports.merge_fasta(token, config, callback);
+			exports.merge_fasta(os, config, callback);
 		else if (config.params.params.soft == "fasta-quantity") {
 			// Copy the file
 			fs.linkSync(
@@ -21,11 +21,11 @@ exports.run = (os, config, callback) => {
 			exports.dereplicate(
 				'/app/data/' + token + '/' + config.params.outputs.filtered,
 				config,
-				()=>{callback(token, null);}
+				()=>{callback(os, null);}
 			);
 		} else {
 			console.log("No tool called", config.params.params.soft);
-			callback(token, "No tool called " + config.params.params.soft);
+			callback(os, "No tool called " + config.params.params.soft);
 		}
 	}
 };
@@ -151,7 +151,9 @@ exports.fastaReader = (file) => {return new fastaReader(file)};
 
 // --- Merging fasta ---
 
-exports.merge_fasta = (token, config, callback) => {
+exports.merge_fasta = (os, config, callback) => {
+	let token = os.token;
+
 	console.log(token + ": Merging fastas");
 	var merged = '/app/data/' + token + '/' + config.params.outputs.merged;
 	var origins = '/app/data/' + token + '/' + config.params.outputs.origins;
@@ -201,7 +203,7 @@ exports.merge_fasta = (token, config, callback) => {
 				merge();
 			else {
 				exports.dereplicate(merged, null, ()=>{
-					save_origins(origins, merged, () => {callback(token, null);});
+					save_origins(origins, merged, () => {callback(os, null);});
 				});
 			}
 		});
