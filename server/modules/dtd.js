@@ -4,6 +4,7 @@ const fs = require('fs');
 
 exports.name = 'demultiplexer';
 exports.multicore = true;
+exports.category = 'Demultiplexing';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;

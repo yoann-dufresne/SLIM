@@ -5,7 +5,7 @@ const tools = require('./toolbox.js');
 
 exports.name = 'casper';
 exports.multicore = true;
-exports.category = 'paired-end joiner';
+exports.category = 'Paired-end joiner';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;

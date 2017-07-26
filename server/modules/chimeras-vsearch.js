@@ -4,6 +4,7 @@ const fs = require('fs');
 
 exports.name = 'chimera-vsearch';
 exports.multicore = false;
+exports.category = 'Chimeras';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;

@@ -9,6 +9,7 @@ const toolbox = require('./toolbox.js');
 
 exports.name = 'otu-vsearch';
 exports.multicore = true;
+exports.category = 'Clustering';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;
