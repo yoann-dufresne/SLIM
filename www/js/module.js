@@ -167,14 +167,27 @@ class ModuleManager {
 
 		$.get("/softwares", function( data ) {
 			data = JSON.parse(data);
-			that.available_modules = data;
+			that.available_modules = [];
 
 			var modules_list = document.querySelector('#module_list');
-			for (var idx in data) {
-				var opt = document.createElement('option');
-				opt.innerHTML = data[idx];
-				opt.value = data[idx];
-				modules_list.appendChild(opt);
+			for (var category in data) {
+				// Create categories in the select options
+				var opt_grp = document.createElement('optgroup');
+				opt_grp.label = category;
+				var modules = data[category];
+
+				for (var idx in modules) {
+					// Add the module to the available ones
+					that.available_modules.push(modules[idx]);
+
+					// Add the option in the select
+					var opt = document.createElement('option');
+					opt.innerHTML = modules[idx];
+					opt.value = modules[idx];
+					opt_grp.appendChild(opt);
+				}
+				
+				modules_list.appendChild(opt_grp);
 			}
 		});
 

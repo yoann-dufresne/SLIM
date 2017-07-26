@@ -32,7 +32,24 @@ fs.readdir('/app/modules/', (err, items) => {
 // Return the list of softwares available
 exports.expose_modules = (app) => {
 	app.get('/softwares', (req, res) => {
-		res.send(JSON.stringify(Object.keys(modules)));
+		var menu = {other:[]};
+		
+		var names = Object.keys(modules);
+		for (let id in names) {
+			let name = names[id];
+
+			// Identify the software category
+			let category = modules[name].category ? modules[name].category : 'other';
+
+			// Create the category in the menu if it doesn't exist
+			if (!menu[category])
+				menu[category] = [];
+			// Add the module in the menu
+			menu[category].push(name);
+		}
+
+		// Send back the software menu
+		res.send(JSON.stringify(menu));
 	});
 };
 
