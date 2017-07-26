@@ -28,6 +28,7 @@ COPY lib/DTD /app/lib/DTD
 COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
 COPY lib/miniconda /app/lib/miniconda
+COPY lib/casper /app/lib/casper
 
 # Install miniconda
 RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/miniconda/install \
@@ -40,6 +41,8 @@ RUN cd /app/lib/DTD && make && cd /app
 RUN cd /app/lib/pandaseq && ./autogen.sh && ./configure && make && cd /app
 # Compile vsearch
 RUN cd /app/lib/vsearch && ./autogen.sh && ./configure && make && cd /app
+# Compile casper
+RUN cd /app/lib/casper/casper_v0.8.2 && make && cd /app
 
 
 # prepare the web server

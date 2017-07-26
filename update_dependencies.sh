@@ -17,7 +17,7 @@ else
 fi
 
 
-# 
+# Papaparser
 if [ ! -d "papa" ]; then
 	git clone https://github.com/mholt/PapaParse.git papa
 else
@@ -59,6 +59,14 @@ fi
 
 # QIIME 2
 docker pull qiime2/core:2017.6
+
+
+# Casper
+cd casper
+if [ ! -d "casper_v0.8.2" ]; then
+	tar -xzvf casper_v0.8.2.tar.gz
+fi
+cd ..
 
 
 

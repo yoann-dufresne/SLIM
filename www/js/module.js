@@ -200,8 +200,10 @@ class ModuleManager {
 	}
 
 	createModule (name, params, status) {
-		if (!this.moduleCreators[name])
+		if (!this.moduleCreators[name]) {
+			console.log('Missing module ' + name);
 			return;
+		}
 
 		// Create the module
 		var module = this.moduleCreators[name](params);

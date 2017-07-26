@@ -4,6 +4,7 @@ const tools = require('./toolbox.js');
 
 
 exports.name = 'pandaseq';
+exports.multicore = true;
 
 var algorithms = {
 	bayesian: 'simple_bayesian',

@@ -20,6 +20,10 @@ input[type="text"] {
 	margin-top: 0px;
 }
 
+select {
+	text-align: left;
+}
+
 /* ------------------------ General Module ------------------------ */
 
 .module {
