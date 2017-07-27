@@ -54,17 +54,11 @@ class Module {
 		return box;
 	}
 
-	output_onchange (prev_vals, new_vals, down_links) {
+	output_onchange (prev_vals, new_vals) {
 		// Send a remove event for the precedent output value
 		var event = new Event('rmv_output');
 		event.files = prev_vals;
 		document.dispatchEvent(event);
-
-		// Update download links
-		for (var idx in down_links) {
-			var link = down_links[idx];
-			link.href = file_manager.get_download_link(new_vals[idx]);
-		}
 
 		// Update the output value
 		event = new Event('new_output');
@@ -73,11 +67,55 @@ class Module {
 	}
 
 	onLoad () {
+		// Save output values and trigger changes
+		var out_zones = this.dom.getElementsByClassName('output_zone');
 
+		for (let zone_id=0 ; zone_id<out_zones.length ; zone_id++) {
+			let out_zone = out_zones[zone_id];
+			let out_input = out_zone.getElementsByTagName('input')[0];
+			let link = out_zone.getElementsByTagName('a')[0];
+
+			// Reload outputs
+			if (this.params.outputs)
+				out_input.value = this.params.outputs[out_input.name];
+			out_input.old_value = out_input.value;
+
+			// On change events
+			var that = this;
+			out_input.onchange = function () {
+				that.output_onchange ([out_input.old_value], [out_input.value]);
+				out_input.old_value = out_input.value;
+				link.href = '/data/' + exec_token + '/' + out_input.value;
+			}
+			out_input.onchange();
+		}
 	}
 
 	getConfiguration () {
-		return {inputs:{}, outputs:{}, params:{}};
+		var config = {inputs:{}, outputs:{}, params:{}};
+
+		// Complete inputs on file lists
+		var in_lists = this.dom.getElementsByClassName('input_list');
+		for (let list_id=0 ; list_id<in_lists.length ; list_id++) {
+			let inputs = in_lists[list_id].getElementsByClassName('checklist');
+
+			for (let in_id=0 ; in_id<inputs.length ; in_id++) {
+				let input = inputs[in_id];
+				if (input.checked)
+					config.inputs['list_' + list_id + '_' + in_id] = input.name;
+			}
+		}
+
+
+		// Complete outputs on output zones
+		var out_zones = this.dom.getElementsByClassName('output_zone');
+		for (let zone_id=0 ; zone_id<out_zones.length ; zone_id++) {
+			let out_input = out_zones[zone_id].getElementsByTagName('input')[0];
+			
+			config.outputs[out_input.name] = out_input.value;
+		}
+
+		return config;
 	}
 
 	toDOMelement () {

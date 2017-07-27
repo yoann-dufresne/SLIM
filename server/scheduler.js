@@ -27,8 +27,6 @@ exports.start = function () {
 };
 
 var scheduler = function () {
-	console.log('waiting', waiting_jobs);
-
 	// Add a new job if not so busy
 	if (Object.keys(running_jobs).length < MAX_JOBS && waiting_jobs.length > 0) {
 		let token = waiting_jobs.shift();
@@ -37,12 +35,8 @@ var scheduler = function () {
 			
 			// Load the configuration file.
 			running_jobs[token] = JSON.parse(data);
-
-			console.log(running_jobs);
 		});
 	}
-
-	console.log('waiting', waiting_jobs);
 	
 	// Update the software executions
 	for (let token in running_jobs) {
@@ -304,16 +298,16 @@ var global_dependencies = {};
 var computeSoftwareOrder = function (params, token) {
 	// Compute the dependenciess
 	var dependencies = {};
-	for (var key in params) {
-		var soft = params[key];
+	for (let key in params) {
+		let soft = params[key];
 
 		// Unique identifier for an execution (Needed if the are multiple executions
 		// of the same tool in one run).
 		soft.params.id = key;
 
 		// look for dependencies
-		for (var id in soft.params.inputs) {
-			var file = soft.params.inputs[id];
+		for (let id in soft.params.inputs) {
+			let file = soft.params.inputs[id];
 			file = file.replace('$', '*');
 
 			if (dependencies[file] == undefined)

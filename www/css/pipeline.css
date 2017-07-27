@@ -176,7 +176,7 @@ input[type="text"].integer {
 
 /* ------------------------ File lists ---------------------------- */
 
-.file_list {
+.file_list, .input_list {
 	height: 200px;
 	overflow: auto;
 	border: solid black 1px;
@@ -184,6 +184,6 @@ input[type="text"].integer {
 	margin-left: 50px;
 }
 
-.file_list p {
+.file_list p, .input_list p {
 	margin: 0px;
 }

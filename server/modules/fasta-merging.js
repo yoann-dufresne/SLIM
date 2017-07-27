@@ -21,6 +21,7 @@ exports.run = function (os, config, callback) {
 		inputs.push(directory + config.params.inputs[id]);
 
 	// Merge FASTAs
+	console.log(os.token + ': Concat fasta files');
 	concat(inputs, outfile, (err) =>{
 		if (err)
 			callback(os, err);
@@ -32,10 +33,7 @@ exports.run = function (os, config, callback) {
 			}};
 
 			// Dereplication
-			derep.run(os, derep_params)
-			callback(os, null);
+			derep.run(os, derep_params, callback);
 		}
 	});
-
-	// Dereplication
 };
