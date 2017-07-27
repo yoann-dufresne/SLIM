@@ -14,7 +14,6 @@ exports.run = (os, config, callback) => {
 	var out_file = directory + config.params.outputs.derep;
 
 	console.log ('Dereplication for file ' + filename);
-	var intermediate_file = tools.tmp_filename() + '.fasta';
 
 	// Minimum quantity for the presence of a read
 	var threshold = 0;
@@ -26,7 +25,7 @@ exports.run = (os, config, callback) => {
 		'--sizeout', '--sizein',
 		'--minseqlength', '1',
 		'--minuniquesize', threshold,
-		'--output', intermediate_file];
+		'--output', out_file];
 
 
 	if (config && config.params.params && config.params.params.rename)
@@ -41,7 +40,6 @@ exports.run = (os, config, callback) => {
 			console.log("Error code " + code + " during dereplication");
 			callback(os, code);
 		} else {
-			fs.renameSync(intermediate_file, out_file);
 			callback(os, null);
 		}
 	});

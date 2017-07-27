@@ -67,6 +67,36 @@ class Module {
 	}
 
 	onLoad () {
+		// --- Reloading ---
+		if (this.params.inputs) {
+			// Reload input files
+			var in_files = this.dom.getElementsByClassName('input_file');
+			for (let in_id=0 ; in_id<in_files.length ; in_id++) {
+				let input = in_files[in_id];
+
+				input.value = this.params.inputs[input.name];
+			}
+
+			// Reload input lists
+			var in_lists = this.dom.getElementsByClassName('input_list');
+			for (let list_id=0 ; list_id<in_lists.length ; list_id++) {
+				let in_list = in_lists[list_id];
+
+				for (let in_id in this.params.inputs) {
+					// Detect list items
+					if (!in_id.startsWith('list_'))
+						continue;
+
+					// Detect list id
+					let loaded_list_id = in_id.split('_')[1];
+					if (loaded_list_id == list_id) {
+						in_list.innerHTML += '<p><input type="checkbox" name="' + this.params.inputs[in_id]
+							+ '" class="checklist" checked> ' + this.params.inputs[in_id] + '</p>';
+					}
+				}
+			}
+		}
+
 		// Save output values and trigger changes
 		var out_zones = this.dom.getElementsByClassName('output_zone');
 
@@ -93,6 +123,15 @@ class Module {
 
 	getConfiguration () {
 		var config = {inputs:{}, outputs:{}, params:{}};
+
+		// Simple file inputs
+		var in_files = this.dom.getElementsByClassName('input_file');
+		for (let in_id=0 ; in_id<in_files.length ; in_id++) {
+			let input = in_files[in_id];
+
+			config.inputs[input.name] = input.value;
+		}
+
 
 		// Complete inputs on file lists
 		var in_lists = this.dom.getElementsByClassName('input_list');

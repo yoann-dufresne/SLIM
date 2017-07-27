@@ -2,6 +2,7 @@ const exec = require('child_process').spawn;
 const fs = require('fs');
 const concat = require('concat-files');
 
+const tools = require('../toolbox.js');
 const derep = require('./dereplication.js');
 
 
@@ -13,6 +14,7 @@ exports.run = function (os, config, callback) {
 	let token = os.token;
 	var options = config.params.params;
 	var directory = '/app/data/' + token + '/';
+	var tmp = tools.tmp_filename() + '.fasta';
 	var outfile = directory + config.params.outputs.merged;
 
 	// Get the files to merge
@@ -21,19 +23,25 @@ exports.run = function (os, config, callback) {
 		inputs.push(directory + config.params.inputs[id]);
 
 	// Merge FASTAs
-	console.log(os.token + ': Concat fasta files');
-	concat(inputs, outfile, (err) =>{
+	console.log(os.token + ': Fasta merging');
+	console.log('merge from: ', inputs.join(' '));
+	console.log('merge to', outfile, 'using', directory + tmp);
+
+	concat(inputs, directory + tmp, (err) =>{
 		if (err)
 			callback(os, err);
 		else {
 			var derep_params = {params: {
-				inputs: {fasta: config.params.outputs.merged},
-				outputs: {},
+				inputs: {fasta: tmp},
+				outputs: {derep: config.params.outputs.merged},
 				params: {}
 			}};
 
 			// Dereplication
-			derep.run(os, derep_params, callback);
+			derep.run(os, derep_params, (os, msg) => {
+				fs.unlink(directory + tmp, ()=>{});
+				callback (os, msg);
+			});
 		}
 	});
 };
