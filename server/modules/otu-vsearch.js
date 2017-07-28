@@ -50,7 +50,7 @@ var otu_vsearch = function (os, config, callback) {
 	var centroids_file = directory + config.params.outputs.centroids;
 	var in_reads = directory + config.params.inputs.fasta;
 	var out_reads = directory + config.params.outputs.out_reads;
-	var ordered = config.params.params.sorted != "";
+	var ordered = config.params.params.sorted == "true";
 	var t2s = directory + config.params.params.sorted;
 
 	// Clustering command
