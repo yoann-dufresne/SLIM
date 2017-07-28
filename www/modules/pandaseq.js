@@ -6,113 +6,14 @@ class PandaseqModule extends Module {
 		this.params = params;
 	}
 
-	onFileChange (file_manager, event) {
-		var that = this;
-		var fastq = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
-		var auto = [];
-		for (var idx=0 ; idx<fastq.length ; idx++) {
-			var filename = fastq[idx];
-			auto.push({value:filename, data:filename});
-		}
-
-		$(this.fwd).autocomplete({
-			lookup: auto,
-			onSelect: function(suggestion) {
-				that.fwd.value = suggestion.data;
-				that.fwd.onchange();
-			}
-		});
-
-		$(this.rev).autocomplete({
-			lookup: auto,
-			onSelect: function(suggestion) {
-				that.rev.value = suggestion.data;
-				that.rev.onchange();
-			}
-		});
-	}
-
 	onLoad () {
-		var that = this;
-
-		// Register to the file manager
-		file_manager.register_observer(function (man, event) {
-			that.onFileChange(man, event);
-		});
-
-		// Define things
-		this.defineIO();
-	}
-
-	defineIO () {
+		super.onLoad();
 		var that = this;
 
 		// --- Inputs ---
-		var inputs = this.dom.getElementsByTagName('input');
-		this.fwd = inputs[0];
-		this.rev = inputs[1];
-
-		this.fwd.onchange = () => {that.input_change()};
-		this.rev.onchange = () => {that.input_change()};
-
-		// Reload inputs
-		if (this.params.inputs) {
-			this.fwd.value = this.params.inputs.fwd;
-			this.rev.value = this.params.inputs.rev;
-		}
-
-		var filenames = file_manager.getFiles();
-		this.onFileChange(file_manager, {files:filenames});
-		
-		// --- Outputs ---
-		this.output_file = inputs[2];
-		this.down_link = this.dom.getElementsByClassName('download_link')[0];
-
-		// Reload outputs
-		if (this.params.outputs) {
-			this.output_file.value = this.params.outputs.assembly;
-		}
-		
-		this.out_val = this.output_file.value;
-		this.down_link.href = file_manager.get_download_link(this.out_val);
-
-		this.output_file.onchange = function () {
-			// Send a remove event for the precedent output value
-			var event = new Event('rmv_output');
-			event.files = [that.out_val];
-			document.dispatchEvent(event);
-
-			// Update the output value
-			that.out_val = that.output_file.value;
-			that.down_link.href = file_manager.get_download_link(that.out_val);
-			event = new Event('new_output');
-			event.files = [that.out_val];
-			document.dispatchEvent(event);
-		}
-		this.output_file.onchange();
-
-		// --- Parameters ---
-		this.algorithm = this.dom.getElementsByClassName("algorithms")[0];
-
-		var options_div = this.dom.getElementsByClassName('options')[0];
-		var inputs = options_div.getElementsByTagName('input');
-
-		var nanVerification = (elem) => {
-			if (isNaN(elem.value)) {
-				elem.value = 0;
-			}
-		};
-
-		this.threshold = inputs[0];
-		this.threshold.onchange = ()=>{nanVerification(that.threshold)};
-		this.min_length = inputs[1];
-		this.min_length.onchange = ()=>{nanVerification(that.min_length)};
-		this.max_length = inputs[2];
-		this.max_length.onchange = ()=>{nanVerification(that.max_length)};
-		this.min_overlap = inputs[3];
-		this.min_overlap.onchange = ()=>{nanVerification(that.min_overlap)};
-		this.max_overlap = inputs[4];
-		this.max_overlap.onchange = ()=>{nanVerification(that.max_overlap)};
+		var inputs = this.dom.getElementsByClassName('input_file');
+		this.fwd = inputs[0]; this.rev = inputs[1];
+		this.fwd.onchange = this.rev.onchange = () => {that.input_change()};
 	}
 
 	input_change () {
@@ -125,28 +26,12 @@ class PandaseqModule extends Module {
 			var sub2 = this.rev.value.substring(0, i2);
 
 			if (sub2 == sub1) {
-				this.output_file.value = sub1 + '_panda.fasta';
-				this.output_file.onchange();
+				let output_file = this.dom.getElementsByClassName('output_zone')[0];
+				output_file = output_file.getElementsByTagName('input')[0];
+				output_file.value = sub1 + '_panda.fasta';
+				output_file.onchange();
 			}
 		}
-	}
-
-	getConfiguration () {
-		var config = super.getConfiguration()
-		
-		config.inputs.fwd = this.fwd.value;
-		config.inputs.rev = this.rev.value;
-		
-		config.outputs.assembly = this.output_file.value;
-
-		config.params.algorithm = this.algorithm.value;
-		config.params.threshold = this.threshold.value;
-		config.params.min_length = this.min_length.value;
-		config.params.max_length = this.max_length.value;
-		config.params.min_overlap = this.min_overlap.value;
-		config.params.max_overlap = this.max_overlap.value;
-		
-		return config;
 	}
 };
 

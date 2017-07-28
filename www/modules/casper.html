@@ -1,28 +1,30 @@
 <p>Forward reads</p>
-<input type="text" class='file_selector'>
+<input type="text" name="fwd" class='input_file fastq'>
 
 <p>Reverse reads</p>
-<input type="text" class='file_selector'>
+<input type="text" name="rev" class='input_file fastq'>
 
 <p>Output file</p>
-<input type="text" name="output" class="output_filename" value='casper.fastq' />
-<a class="download_link" href="" download><img src="/imgs/download.png" class="download"/></a>
+<span class="output_zone">
+	<input type="text" name="assembly" value='casper.fastq' />
+	<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
 
 <div class="options">
 	<p class="casperKmer">
 		k-mer size: 
-		<input type="text" name="kmer" class="integer kmer" value="17">
+		<input type="text" name="kmer" class="integer number param_value" value="17">
 	</p>
 	<p class="casperQuality">
 		Quality difference threshold: 
-		<input type="text" name="quality" class="integer quality" value="19">
+		<input type="text" name="quality" class="integer number param_value" value="19">
 	</p>
 	<p class="casperMismatches">
 		Mismatch ratio threshold: 
-		<input type="text" name="mismatch" class="integer mismatch" value="0.5">
+		<input type="text" name="mismatch" class="integer number param_value" value="0.5">
 	</p>
 	<div class="casperLength">
 		<p>Out read min length: 
-		<input type="text" name="minLength" class="integer minLength" value="10"></p>
+		<input type="text" name="min_length" class="integer number param_value" value="10"></p>
 	</div>
 </div>

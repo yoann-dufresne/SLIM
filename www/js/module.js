@@ -67,7 +67,23 @@ class Module {
 	}
 
 	onLoad () {
-		// --- Reloading ---
+		var that = this;
+
+		// --- Parameters ---
+		var params = this.dom.getElementsByClassName('param_value');
+		for (let par_id=0 ; par_id<params.length ; par_id++) {
+			let param = params[par_id];
+
+			// Add number verifications for parameters
+			if (param.classList.contains('number'))
+				param.onchange = () => {that.nanVerification(param);};
+
+			// Reload parameters
+			if (this.params.params)
+				param.value = this.params.params[param.name];
+		}
+
+		// --- Inputs ---
 		if (this.params.inputs) {
 			// Reload input files
 			var in_files = this.dom.getElementsByClassName('input_file');
@@ -97,7 +113,7 @@ class Module {
 			}
 		}
 
-		// Save output values and trigger changes
+		// --- Outputs ---
 		var out_zones = this.dom.getElementsByClassName('output_zone');
 
 		for (let zone_id=0 ; zone_id<out_zones.length ; zone_id++) {
@@ -111,7 +127,6 @@ class Module {
 			out_input.old_value = out_input.value;
 
 			// On change events
-			var that = this;
 			out_input.onchange = function () {
 				that.output_onchange ([out_input.old_value], [out_input.value]);
 				out_input.old_value = out_input.value;
@@ -153,6 +168,16 @@ class Module {
 			
 			config.outputs[out_input.name] = out_input.value;
 		}
+
+
+		// Adding parameters
+		var params = this.dom.getElementsByClassName('param_value');
+		for (let par_id=0 ; par_id<params.length ; par_id++) {
+			let param = params[par_id];
+
+			config.params[param.name] = param.value;
+		}
+
 
 		return config;
 	}

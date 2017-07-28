@@ -1,17 +1,19 @@
 <p>Forward reads</p>
-<input type="text" class='file_selector'>
+<input type="text" name="fwd" class='input_file fastq'>
 
 <p>Reverse reads</p>
-<input type="text" class='file_selector'>
+<input type="text" name="rev" class='input_file fastq'>
 
 <p>Output file</p>
-<input type="text" name="output" class="output_filename" value='panda.fasta' />
-<a class="download_link" href="" download><img src="/imgs/download.png" class="download"/></a>
+<span class="output_zone">
+	<input type="text" name="assembly" value='panda.fasta' />
+	<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
 
 <div class="options">
 	<p>
 		Joining algorithm: 
-		<select class="algorithms">
+		<select name="algorithm" class="algorithms param_value">
 			<option value="bayesian" selected="selected">Simple bayesian</option>
 			<option value="fastqjoin">FastqJoin</option>
 			<option value="flash">FLASH</option>
@@ -23,16 +25,16 @@
 	</p>
 	<p class="pandaQuality">
 		Quality threshold: 
-		<input type="text" name="quality" class="integer quality" value="0.6">
+		<input type="text" name="threshold" class="integer number param_value" value="0.6">
 	</p>
 	<div class="pandaLength">
 		<p>Out read length:</p>
-		<p>Min: <input type="text" name="minLength" class="integer minLength" value="-1">
-		Max: <input type="text" name="maxLength" class="integer maxLength" value="-1"></p>
+		<p>Min: <input type="text" name="min_length" class="integer number param_value" value="-1">
+		Max: <input type="text" name="max_length" class="integer number param_value" value="-1"></p>
 	</div>
 	<div class="pandaOverlap">
 		<p>Reads overlap:</p>
-		<p>Min: <input type="text" name="minOverlap" class="integer minOverlap" value="-1">
-		Max: <input type="text" name="maxOverlap" class="integer maxOverlap" value="-1"></p>
+		<p>Min: <input type="text" name="min_overlap" class="integer number param_value" value="-1">
+		Max: <input type="text" name="max_overlap" class="integer number param_value" value="-1"></p>
 	</div>
 </div>
