@@ -40,7 +40,8 @@ class FileUpdater {
 				lookup: autocomplete,
 				onSelect: function(suggestion) {
 					input_file.value = suggestion.data;
-					input_file.onchange();
+					if (input_file.onchange)
+						input_file.onchange();
 				}
 			});
 		}

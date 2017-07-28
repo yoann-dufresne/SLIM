@@ -15,7 +15,7 @@ exports.run = function (os, config, callback) {
 		'-t',
 		(config.params.params.mistags ? '-m' : '')];
 
-	executions = config.params.params.reads;
+	executions = parse_inputs(config.params.inputs);
 	exe_left = Object.keys(executions);
 
 	var run_demux = () => {
@@ -53,4 +53,23 @@ exports.run = function (os, config, callback) {
 		});
 	}
 	run_demux();
+};
+
+var parse_inputs = (inputs) => {
+	var pairs = {};
+	for (let id in inputs) {
+		// Detect inputs from pairs
+		if (id.endsWith('_R1') || id.endsWith('_R2')) {
+			let split = id.split('_');
+
+			// Add new library
+			if (!pairs[split[0]])
+				pairs[split[0]] = {};
+
+			// Add file
+			pairs[split[0]][split[1].toLowerCase()] = inputs[id];
+		}
+	}
+
+	return pairs;
 };
