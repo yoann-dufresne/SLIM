@@ -7,48 +7,7 @@ class DemultiplexerModule extends Module {
 		this.params = params;
 	}
 
-	onFileChange (file_manager, event) {
-		/* Select elements for autocomplete fields */
-		var elements = file_manager.getFiles();
-		var fastq  = file_manager.getFiles(['.fastq', '.fastq.gz', '.fastq.bz2']);
-		for (var idx=0 ; idx<fastq.length ; idx++)
-			fastq[idx] = {value:fastq[idx], data:fastq[idx]};
-
-
-		/* Change the autocomplete field */
-		// Input fastq
-		var that = this;
-		var lib_divs = this.illumina_div.getElementsByClassName('lib_div');
-		for (let idx=0 ; idx<lib_divs.length ; idx++) {
-			let lib_div = lib_divs[idx];
-
-			let read_inputs = lib_div.getElementsByClassName('reads_file');
-
-			let r1 = read_inputs[0];
-			let r2 = read_inputs[1];
-			$(r1).autocomplete({
-				lookup: fastq,
-				onSelect: function(suggestion) {
-					r1.value = suggestion.data;
-				}
-			});
-			$(r2).autocomplete({
-				lookup: fastq,
-				onSelect: function(suggestion) {
-					r2.value = suggestion.data;
-				}
-			});
-		}
-	}
-
 	onLoad () {
-		var that = this;
-
-		// Register to the file manager
-		file_manager.register_observer(function (man, event) {
-			that.onFileChange(man, event);
-		});
-
 		let as = this.dom.getElementsByClassName('options')[0].getElementsByTagName('a');
 		as[0].href = file_manager.get_download_link('mistag_R1.fastq');
 		as[1].href = file_manager.get_download_link('mistag_R2.fastq');
@@ -78,9 +37,8 @@ class DemultiplexerModule extends Module {
 	defineIO () {
 		// Save inputs
 		this.illumina_div = this.dom.getElementsByClassName('illumina_reads')[0];
-		this.mistags = this.dom.getElementsByClassName('demux_mistag')[0];
 
-		// Reload inputs
+		// --- Reload inputs ---
 		if (this.params.inputs) {
 			// Reconstruct pair
 			var pairs = {};
@@ -113,9 +71,6 @@ class DemultiplexerModule extends Module {
 				this.out_area.innerHTML += this.format_output(filename);
 			}
 		}
-
-		// Load suggestions in the inputs
-		this.onFileChange(file_manager, {});
 		
 		// Change the output files using the tags file
 		var that = this;
@@ -189,7 +144,7 @@ class DemultiplexerModule extends Module {
 			config.outputs[filename] = filename;
 		}
 
-		config.params.mistags = this.mistags.checked;
+		config.params.mistags = this.dom.getElementsByClassName('demux_mistag')[0].checked;
 		
 		return config;
 	}
