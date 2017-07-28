@@ -1,6 +1,5 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
-const concat = require('concat-files');
 
 const tools = require('../toolbox.js');
 const derep = require('./dereplication.js');
@@ -10,38 +9,94 @@ exports.name = 'fasta-merging';
 exports.multicore = true;
 exports.category = 'FASTA/FASTQ';
 
-exports.run = function (os, config, callback) {
+exports.run = (os, config, callback) => {
 	let token = os.token;
-	var options = config.params.params;
+
+	console.log(token + ": Merging fastas");
 	var directory = '/app/data/' + token + '/';
-	var tmp = tools.tmp_filename() + '.fasta';
-	var outfile = directory + config.params.outputs.merged;
+	var tmp_merged = tools.tmp_filename() + '.fasta';
+	var merged = config.params.outputs.merged;
+	var origins = directory + config.params.outputs.origins;
 
-	// Get the files to merge
-	var inputs = [];
-	for (let id in config.params.inputs)
-		inputs.push(directory + config.params.inputs[id]);
+	// Write a new empty file
+	fs.closeSync(fs.openSync(directory + tmp_merged, 'w'));
 
-	// Merge FASTAs
-	console.log(os.token + ': Fasta merging');
-	console.log('merge from: ', inputs.join(' '));
-	console.log('merge to', outfile, 'using', directory + tmp);
+	// Process fasta one by one
+	var fastas = Object.values(config.params.inputs);
 
-	concat(inputs, directory + tmp, (err) =>{
-		if (err)
-			callback(os, err);
-		else {
-			var derep_params = {params: {
-				inputs: {fasta: tmp},
-				outputs: {derep: config.params.outputs.merged},
-				params: {}
-			}};
+	// Origins of the reads
+	//  * first dimention : sequence hash
+	//  * second dimention : provenance
+	var origins_table = [];
+	var save_origins = (outfile, fasta, callback) => {
+		// Prepare the buffered file reader
+		var reader = tools.fastaReader(fasta);
+		reader.onEnd (callback);
 
-			// Dereplication
-			derep.run(os, derep_params, (os, msg) => {
-				fs.unlink(directory + tmp, ()=>{});
-				callback (os, msg);
-			});
-		}
-	});
+		// Process sequences asynchoneously
+		reader.read_sequences((seq) => {
+			var hash = seq.value;
+			var header = seq.header;
+
+			// Save header
+			fs.appendFileSync(outfile, header);
+
+			// save the samples
+			for (var sample in origins_table[hash])
+				fs.appendFileSync(outfile, '\t' + sample + ';size=' + origins_table[hash][sample] + ';');
+			fs.appendFileSync(outfile, '\n');
+		});
+	};
+
+	var merge = () => {
+		var current_fasta = '/app/data/' + token + '/' + fastas.pop();
+		console.log('Merging', current_fasta)
+
+		// save reads provenance
+		var sample_name = current_fasta.substr(0, current_fasta.indexOf('.fasta'));
+		sample_name = sample_name.substr(sample_name.lastIndexOf('/') + 1);
+		
+		var reader = tools.fastaReader(current_fasta);
+		
+		// When the reading is over
+		reader.onEnd (() => {
+			if (fastas.length > 0)
+				merge();
+			else {
+				// Dereplicate
+				let derep_config = {params: {
+					inputs: {fasta: tmp_merged},
+					outputs: {derep: merged},
+					params: {}
+				}};
+				derep.run(os, derep_config, (os, msg)=>{
+					fs.unlink(directory + tmp_merged, ()=>{});
+					save_origins(origins, directory + merged, () => {callback(os, msg);});
+				});
+			}
+		});
+
+		// Read all the sequences
+		reader.read_sequences((seq) => {
+			var hash = seq.value;
+			var header = seq.header;
+
+			// Compute the size
+			var size = 1;
+			if (header.includes(';size=')) {
+				var tmp = header.substr(header.indexOf(';size=') + 6);
+				size = parseInt(tmp.substr(0, tmp.indexOf(';')));
+			}
+
+			// fill the origins
+			if (!origins_table[hash])
+				origins_table[hash] = [];
+			origins_table[hash][sample_name] = size;
+
+			// Fill the merged file
+			fs.appendFileSync(directory + tmp_merged, '>' + seq.header + '\n');
+			fs.appendFileSync(directory + tmp_merged, seq.value + '\n');
+		});
+	};
+	merge();
 };

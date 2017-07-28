@@ -219,11 +219,10 @@ class Module {
 		// Output screen
 		this.term = document.createElement("p");
 		this.term.classList.add('out_term');
-		this.term.style.heigh = '0px';
 		var icon = this.dom.getElementsByClassName('term_ico')[0];
 		icon.onclick = () => {
 			that.term.style.height = '200px';
-			that.term.style.visibility = 'visible';
+			that.term.style.display = 'inline-block';
 			$.get('/logs?token=' + exec_token + '&soft_id=' + that.dom.idx, (data) => {
 				that.term.innerHTML = data.replace(/\n/g, '<br>');
 			});

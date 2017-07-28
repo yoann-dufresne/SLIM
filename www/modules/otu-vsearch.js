@@ -7,6 +7,7 @@ class OtuVsearchModule extends Module {
 	}
 
 	onFileChange (file_manager, event) {
+		var that = this;
 		var csv = file_manager.getFiles(['csv']);
 		var auto_csv = file_manager.get_autocomplete_format(csv);
 		$(this.t2s).autocomplete({

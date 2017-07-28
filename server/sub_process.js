@@ -32,7 +32,7 @@ fs.readdir('/app/modules/', (err, items) => {
 // Return the list of softwares available
 exports.expose_modules = (app) => {
 	app.get('/softwares', (req, res) => {
-		var menu = {Other:[]};
+		var menu = {};
 		
 		var names = Object.keys(modules);
 		for (let id in names) {

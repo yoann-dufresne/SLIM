@@ -4,6 +4,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 var lineReader = require('line-reader');
 
+const merging = require('./fasta-merging.js');
 const toolbox = require('../toolbox.js');
 
 
@@ -13,8 +14,6 @@ exports.category = 'Clustering';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;
-	// var merged = '/app/data/' + token + '/' + config.params.outputs.merged;
-	// var origins = '/app/data/' + token + '/' + config.params.outputs.origins;
 	let directory = '/app/data/' + token + '/';
 	let tmp_merged = toolbox.tmp_filename() + '.fasta';
 	let tmp_origins = toolbox.tmp_filename() + '.tsv';
@@ -27,7 +26,7 @@ exports.run = function (os, config, callback) {
 		params: {}
 	}};
 
-	toolbox.merge_fasta (os, config_merging, () => {
+	merging.run (os, config_merging, () => {
 		config.params.inputs = {
 			origins: tmp_origins,
 			fasta: tmp_merged
