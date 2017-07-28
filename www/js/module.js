@@ -166,7 +166,8 @@ class Module {
 		for (let zone_id=0 ; zone_id<out_zones.length ; zone_id++) {
 			let out_input = out_zones[zone_id].getElementsByTagName('input')[0];
 			
-			config.outputs[out_input.name] = out_input.value;
+			if (out_input.value != '')
+				config.outputs[out_input.name] = out_input.value;
 		}
 
 

@@ -1,11 +1,17 @@
 
 <p>Input file</p>
-<input type="text" class='file_selector'>
+<input type="text" name="input" class='input_file fasta'>
 
 <p>Filtered file</p>
-<input type="text" class='file_selector' value="filtered.fasta"><a href=""><img src="/imgs/download.png" class="download"></a>
+<span class="output_zone">
+	<input type="text" name="nonchimeras" value="filtered.fasta">
+	<a href="" download><img src="/imgs/download.png" class="download"></a>
+</span>
 
 <div class="options">
 	<p>Chimeras</p>
-	<input type="text" class='file_selector' value=""><span class="chimeras_link"></span>
+	<span class="output_zone">
+		<input type="text" name="chimeras" value="">
+		<a href="" download><img src="/imgs/download.png" class="download"></a>
+	</span>
 </div>
