@@ -4,7 +4,7 @@ const tools = require('../toolbox.js');
 
 
 exports.name = 'fasta-dereplication';
-exports.multicore = true;
+exports.multicore = false;
 exports.category = 'FASTA/FASTQ';
 
 exports.run = (os, config, callback) => {

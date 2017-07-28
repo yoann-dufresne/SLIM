@@ -42,7 +42,7 @@ select {
 }
 
 input[type="text"].integer {
-	width: 50px;
+	width: 80px;
 }
 
 .info {

@@ -1,6 +1,5 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
-const tools = require('./toolbox.js');
 
 
 exports.name = 'casper';

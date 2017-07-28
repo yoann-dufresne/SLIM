@@ -1,6 +1,8 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
-const tools = require('./toolbox.js');
+
+const derep = require('./dereplication.js');
+const tools = require('../toolbox.js');
 
 
 exports.name = 'pandaseq';
@@ -21,7 +23,7 @@ exports.run = function (os, config, callback) {
 	let token = os.token;
 	var options = config.params.params;
 	var directory = '/app/data/' + token + '/';
-	var outfile = directory + config.params.outputs.assembly;
+	var tmp_outfile = tools.tmp_filename() + '.fasta';
 	var algo_name = config.params.params.algorithm;
 
 	// Define the project name regarding the output filename
@@ -33,7 +35,7 @@ exports.run = function (os, config, callback) {
 
 	var command = ['-f', directory + config.params.inputs.fwd,
 		'-r', directory + config.params.inputs.rev,
-		'-w', outfile,
+		'-w', directory + tmp_outfile,
 		'-t', options.threshold,
 		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian',
 		'-T', os.cores];
@@ -71,17 +73,28 @@ exports.run = function (os, config, callback) {
 	});
 	child.on('close', function(code) {
 		if (code == 0) {
+			// Params definition for dereplication
+			let derep_params = {params: {
+				inputs: {fasta: tmp_outfile},
+				outputs: {derep: config.params.outputs.assembly},
+				params: {}
+			}};
+
 			// Dereplicate and sort
-			tools.dereplicate(
-				outfile,
-				//config.params.params.rename
-				{params:{params:{rename:project}}},
-				() => {
-					tools.sort(outfile, () => {
-						callback(os, null);
-					});
+			derep.run(os, derep_params, (os, msg) => {
+				fs.unlink(directory + tmp_outfile, ()=>{});
+				
+				// Error case
+				if (msg != null) {
+					callback(os, msg);
+					return;
 				}
-			);
+
+				// Normal case
+				tools.sort(directory + config.params.outputs.assembly, () => {
+					callback(os, msg);
+				});
+			});
 		} else
 			callback(os, "pandaseq terminate on code " + code);
 	});

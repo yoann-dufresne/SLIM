@@ -4,7 +4,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 var lineReader = require('line-reader');
 
-const toolbox = require('./toolbox.js');
+const toolbox = require('../toolbox.js');
 
 
 exports.name = 'otu-vsearch';
