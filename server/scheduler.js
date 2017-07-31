@@ -397,17 +397,17 @@ var expand_parameters = (params, no_joker_files, order) => {
 // From one entry, demux entry files
 var demux_files = (inputs, files) => {
 	// Explore all the inputs
-	for (var file_id in inputs) {
-		var filename = inputs[file_id];
+	for (let file_id in inputs) {
+		let filename = inputs[file_id];
 
 		if (filename.includes('$')) {
-			delete inputs[filename];
+			delete inputs[file_id];
 			let begin = filename.substring(0, filename.indexOf('$'));
 			let end = filename.substring(filename.indexOf('$')+1);
 
 			// Look for corresponding files
-			for (var idx=0 ; idx<files.length ; idx++) {
-				var candidate = files[idx];
+			for (let idx=0 ; idx<files.length ; idx++) {
+				let candidate = files[idx];
 
 				if (candidate.includes('$'))
 					continue;

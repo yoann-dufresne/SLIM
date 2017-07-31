@@ -122,15 +122,25 @@ class Module {
 			let link = out_zone.getElementsByTagName('a')[0];
 
 			// Reload outputs
-			if (this.params.outputs)
+			if (this.params.outputs && this.params.outputs[out_input.name]){
 				out_input.value = this.params.outputs[out_input.name];
-			out_input.old_value = out_input.value;
+				out_input.old_value = out_input.value;
+			}
 
 			// On change events
 			out_input.onchange = function () {
 				that.output_onchange ([out_input.old_value], [out_input.value]);
 				out_input.old_value = out_input.value;
-				link.href = '/data/' + exec_token + '/' + out_input.value;
+				
+				// Joker case
+				let val = out_input.value;
+				while (val.includes('*'))
+					val = val.replace('*', '');
+				if (val != out_input.value)
+					val += '.tar.gz';
+				
+				// Create the download link
+				link.href = '/data/' + exec_token + '/' + val;
 			}
 			out_input.onchange();
 		}
@@ -151,12 +161,17 @@ class Module {
 		// Complete inputs on file lists
 		var in_lists = this.dom.getElementsByClassName('input_list');
 		for (let list_id=0 ; list_id<in_lists.length ; list_id++) {
-			let inputs = in_lists[list_id].getElementsByClassName('checklist');
+			let in_list = in_lists[list_id];
+			let inputs = in_list.getElementsByClassName('checklist');
 
 			for (let in_id=0 ; in_id<inputs.length ; in_id++) {
 				let input = inputs[in_id];
-				if (input.checked)
-					config.inputs['list_' + list_id + '_' + in_id] = input.name;
+				if (input.checked) {
+					if (in_list.classList.contains('agregate'))
+						config.inputs['list_' + list_id + '_' + in_id] = input.name.replace('*', '$');
+					else
+						config.inputs['list_' + list_id + '_' + in_id] = input.name;
+				}
 			}
 		}
 

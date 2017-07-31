@@ -35,6 +35,12 @@ exports.run = (os, config, callback) => {
 
 	// Execution
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
+	child.stdout.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
+	child.stderr.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
 	child.on('close', (code) => {
 		if (code != 0) {
 			console.log("Error code " + code + " during dereplication");

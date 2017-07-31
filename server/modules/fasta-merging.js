@@ -50,7 +50,7 @@ exports.run = (os, config, callback) => {
 
 	var merge = () => {
 		var current_fasta = '/app/data/' + token + '/' + fastas.pop();
-		console.log('Merging', current_fasta)
+		fs.appendFileSync(directory + config.log, "Concatenation of " + current_fasta);
 
 		// save reads provenance
 		var sample_name = current_fasta.substr(0, current_fasta.indexOf('.fasta'));
@@ -63,12 +63,15 @@ exports.run = (os, config, callback) => {
 			if (fastas.length > 0)
 				merge();
 			else {
+				console.log(os.token + ": Fasta concatenation ended, now dereplicate");
+				fs.appendFileSync(directory + config.log, "Fasta concatenation ended, now dereplicate");
+
 				// Dereplicate
 				let derep_config = {params: {
 					inputs: {fasta: tmp_merged},
 					outputs: {derep: merged},
 					params: {}
-				}};
+				},log:config.log};
 				derep.run(os, derep_config, (os, msg)=>{
 					fs.unlink(directory + tmp_merged, ()=>{});
 					save_origins(origins, directory + merged, () => {callback(os, msg);});
@@ -98,5 +101,6 @@ exports.run = (os, config, callback) => {
 			fs.appendFileSync(directory + tmp_merged, seq.value + '\n');
 		});
 	};
+	console.log(os.token + ": Fasta concatenation started");
 	merge();
 };

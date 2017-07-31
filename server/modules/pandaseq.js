@@ -78,7 +78,7 @@ exports.run = function (os, config, callback) {
 				inputs: {fasta: tmp_outfile},
 				outputs: {derep: config.params.outputs.assembly},
 				params: {}
-			}};
+			},log:config.log};
 
 			// Dereplicate and sort
 			derep.run(os, derep_params, (os, msg) => {

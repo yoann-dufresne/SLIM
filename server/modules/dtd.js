@@ -12,8 +12,10 @@ exports.run = function (os, config, callback) {
 	var options = ['-l', directory + config.params.inputs.tags,
 		'-p', directory + config.params.inputs.primers,
 		'-d', directory,
-		'-t',
-		(config.params.params.mistags ? '-m' : '')];
+		'-t'];
+
+	if (config.params.params.mistags == 'true')
+		options = options.concat(['-m']);
 
 	executions = parse_inputs(config.params.inputs);
 	exe_left = Object.keys(executions);

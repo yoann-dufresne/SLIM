@@ -24,7 +24,7 @@ exports.run = function (os, config, callback) {
 			origins: tmp_origins
 		},
 		params: {}
-	}};
+	}, log:config.log};
 
 	merging.run (os, config_merging, () => {
 		config.params.inputs = {
@@ -160,15 +160,16 @@ var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, seq_input, seq_out
 		var origins = sequence_origins[data.name];
 
 		// save the value in the right otu
-		for (var oidx=0 ; oidx<origins.length ; oidx++) {
-			var origin = origins[oidx];
-			var size = parseInt(origin.substr(origin.indexOf(";size=")+6).split(';')[0]);
-			origin = origin.substr(0, origin.indexOf(';size='));
+		if (origins)
+			for (var oidx=0 ; oidx<origins.length ; oidx++) {
+				var origin = origins[oidx];
+				var size = parseInt(origin.substr(origin.indexOf(";size=")+6).split(';')[0]);
+				origin = origin.substr(0, origin.indexOf(';size='));
 
-			// Update otu size
-			var prevSize = otus[data.cluster][origin] ? otus[data.cluster][origin] : 0;
-			otus[data.cluster][origin] = prevSize + size;
-		}
+				// Update otu size
+				var prevSize = otus[data.cluster][origin] ? otus[data.cluster][origin] : 0;
+				otus[data.cluster][origin] = prevSize + size;
+			}
 	})
 	// --- Write OTU table ---
 	.on('end', () => {
