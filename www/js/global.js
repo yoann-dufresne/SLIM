@@ -21,18 +21,19 @@ var load_modules = (log) => {
 	}
 
 	// For each module in the log file
-	for (var idx in log) {
-		var soft = log[idx];
+	for (let idx in log) {
+		let soft = log[idx];
+		soft.params.idx = idx;
 
 		// Create the module
-		var module = module_manager.createModule (soft.name, soft.params, soft.status);
+		let module = module_manager.createModule (soft.name, soft.params, soft.status);
 	}
 
 	// Update status
 	update_run_status(exec_token, (status)=> {
 		if (['ready', 'running', 'waiting'].includes(status.global)) {
 			// Set update interval
-			var inter = setInterval(()=>{
+			let inter = setInterval(()=>{
 				update_run_status(exec_token, (status) =>{
 					if (['ended', 'aborted'].includes(status.global))
 						clearInterval(inter);

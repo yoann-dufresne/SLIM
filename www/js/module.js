@@ -134,9 +134,7 @@ class Module {
 				
 				// Joker case
 				let val = out_input.value;
-				while (val.includes('*'))
-					val = val.replace('*', '');
-				if (val != out_input.value)
+				if (val.includes('*'))
 					val += '.tar.gz';
 				
 				// Create the download link
@@ -252,10 +250,7 @@ class Module {
 		rmv.innerHTML = 'Remove this module';
 		rmv.onclick = function () {
 			// remove from modules list
-			var idx = module_manager.modules.indexOf(that);
-			if (idx > -1) {
-				module_manager.modules.splice(idx, 1);
-			}
+			delete module_manager.modules[that.id];
 			// remove from dom
 			modules_div.removeChild(that.dom);
 			// remove outputs from the accessible files
@@ -280,7 +275,7 @@ class Module {
 class ModuleManager {
 	constructor() {
 		var that = this;
-		this.modules = [];
+		this.modules = {};
 
 		$.get("/softwares", function( data ) {
 			data = JSON.parse(data);
@@ -336,8 +331,10 @@ class ModuleManager {
 		}
 
 		// Create the module
+		if (params.idx)
+			__next_id = params.idx;
 		var module = this.moduleCreators[name](params);
-		this.modules.push(module);
+		this.modules[module.id] = module;
 
 		// Add the module to the dom
 		var div = document.querySelector('#modules');

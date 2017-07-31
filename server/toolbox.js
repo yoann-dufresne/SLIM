@@ -39,8 +39,86 @@ exports.sort = (filename, callback) => {
 };
 
 
+
+
 // --- Fasta reader ---
 class fastaReader {
+	constructor (filename) {
+		var that = this;
+
+		lineReader.open(filename, function(err, reader) {
+			if (err)
+				console.log(err);
+			else
+				that.reader = reader;
+		});
+	}
+
+	read_sequences (sequence_processor) {
+		var that = this;
+
+		// Wait until file is ready
+		if (!this.reader) {
+			setTimeout(()=>{that.read_sequences(sequence_processor);}, 100);
+			return;
+		}
+
+		// Create new sequence
+		if (!this.seq)
+			this.seq = {value:""};
+
+		// Close the file
+		if (!this.reader.hasNextLine()) {
+			this.reader.close(()=>{});
+
+			if (this.callback) 
+				this.callback();
+			return;
+		}
+
+		// Add a new line
+		var read_next_line = function () {
+			that.reader.nextLine(function(err, line) {
+				// EOF
+				if (!line)
+					that.callback();
+
+				// Read header
+				if (line.length > 0 && line[0] == '>') {
+					var seq = that.seq;
+					that.seq = {header:line.substr(1), value:""};
+
+					if (seq.header)
+						sequence_processor(seq);
+					that.read_sequences(sequence_processor)
+				// Read sequence value
+				} else {
+					that.seq.value += line;
+
+					if (that.reader.hasNextLine())
+						read_next_line ();
+					else {
+						if (that.seq.header)
+							sequence_processor(that.seq)
+
+						that.callback();
+					}
+				}
+			});
+		}
+		read_next_line();
+	}
+
+	onEnd (callback) {
+		this.callback = callback;
+	}
+}
+exports.fastaReader = (file) => {return new fastaReader(file)};
+
+
+
+// --- Fasta reader ---
+class fastqReader {
 	constructor (filename) {
 		var that = this;
 
