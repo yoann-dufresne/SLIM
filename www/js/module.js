@@ -90,7 +90,7 @@ class Module {
 			for (let in_id=0 ; in_id<in_files.length ; in_id++) {
 				let input = in_files[in_id];
 
-				input.value = this.params.inputs[input.name];
+				input.value = this.params.inputs[input.name].replace('$', '*');
 			}
 
 			// Reload input lists
@@ -106,8 +106,8 @@ class Module {
 					// Detect list id
 					let loaded_list_id = in_id.split('_')[1];
 					if (loaded_list_id == list_id) {
-						in_list.innerHTML += '<p><input type="checkbox" name="' + this.params.inputs[in_id]
-							+ '" class="checklist" checked> ' + this.params.inputs[in_id] + '</p>';
+						in_list.innerHTML += '<p><input type="checkbox" name="' + this.params.inputs[in_id].replace('$', '*')
+							+ '" class="checklist" checked> ' + this.params.inputs[in_id].replace('$', '*') + '</p>';
 					}
 				}
 			}

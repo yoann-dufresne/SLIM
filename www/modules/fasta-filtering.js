@@ -10,8 +10,10 @@ class FastaFilteringModule extends Module {
 		super.onLoad();
 
 		let fasta = this.dom.getElementsByClassName('input_file')[0];
+		let out = this.dom.getElementsByClassName('output_zone')[0];
 		fasta.onchange = () => {
-			let name = fasta.substr(0, fasta.lastIndexOf('.'));
+			let name = fasta.value.substr(0, fasta.value.lastIndexOf('.'));
+			out.value = name + '_filtered.fasta';
 		};
 	}
 };
