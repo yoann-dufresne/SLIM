@@ -96,7 +96,7 @@ class fastaReader {
 					that.seq.value += line;
 
 					if (that.reader.hasNextLine())
-						read_next_line ();
+						return read_next_line ();
 					else {
 						if (that.seq.header)
 							sequence_processor(that.seq)
@@ -139,20 +139,9 @@ class fastqReader {
 			return;
 		}
 
-		// Create new sequence
-		if (!this.seq)
-			this.seq = {value:""};
-
-		// Close the file
-		if (!this.reader.hasNextLine()) {
-			this.reader.close(()=>{});
-
-			if (this.callback) 
-				this.callback();
-			return;
-		}
-
 		// Add a new line
+		var line_idx = 0;
+		var seq;
 		var read_next_line = function () {
 			that.reader.nextLine(function(err, line) {
 				// EOF
@@ -160,25 +149,32 @@ class fastqReader {
 					that.callback();
 
 				// Read header
-				if (line.length > 0 && line[0] == '>') {
-					var seq = that.seq;
-					that.seq = {header:line.substr(1), value:""};
-
-					if (seq.header)
+				if (line.length > 0) {
+					if (line_idx == 0) {
+						seq = {header:line.substr(1), value:"", quality:""};
+					} else if (line_idx == 1) {
+						seq.value = line;
+					} else if (line_idx == 3) {
+						seq.quality = line;
+						line_idx = -1;
 						sequence_processor(seq);
-					that.read_sequences(sequence_processor)
+					}
+
+					line_idx += 1;
+
+					// Next lines
+					// Close the file
+					if (!that.reader.hasNextLine()) {
+						that.reader.close(()=>{});
+
+						if (that.callback) 
+							that.callback();
+						return;
+					} else
+						read_next_line();
 				// Read sequence value
 				} else {
-					that.seq.value += line;
-
-					if (that.reader.hasNextLine())
-						read_next_line ();
-					else {
-						if (that.seq.header)
-							sequence_processor(that.seq)
-
-						that.callback();
-					}
+					that.callback();
 				}
 			});
 		}
@@ -189,4 +185,4 @@ class fastqReader {
 		this.callback = callback;
 	}
 }
-exports.fastaReader = (file) => {return new fastaReader(file)};
+exports.fastqReader = (file) => {return new fastqReader(file)};
