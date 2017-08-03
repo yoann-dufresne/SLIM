@@ -24,6 +24,7 @@ exports.sort = (filename, callback) => {
 	var options = ['--sortbysize', filename,
 		'--sizeout', '--quiet',
 		'--minseqlength', '1',
+		'--fasta_width', '0',
 		'--output', intermediate_file];
 
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
@@ -36,6 +37,47 @@ exports.sort = (filename, callback) => {
 		fs.renameSync(intermediate_file, filename);
 		callback();
 	});
+};
+
+
+exports.read_tags2sample = (t2s_filename, callback) => {
+	let lines = fs.readFileSync(t2s_filename, 'utf8').split('\n');
+
+	// Get the csv lines
+	let header_idxs = {};
+	let split = lines[0].split(',');
+	let csv_len = split.length();
+	for (let idx=0 ; idx<csv_len ; idx++)
+		header_idxs[split[idx]] = idx;
+
+	// Wrong t2s
+	if ((!header_idxs.run) || (!header_idxs.sample))
+		callback({});
+
+	// Read line by line
+	var libraries = {};
+	for (let idx=1 ; idx<lines.length ; idx++) {
+		split = lines[idx].split(',');
+
+		if (split.length != csv_len) {
+			console.log('Wrong format at line ' + idx + ' of file ' + t2s_filename);
+			callback();
+		}
+
+		// Library creation
+		let libname = split[header_idxs.run];
+		if (!libraries[libname])
+			libraries[libname] = [];
+
+		// Filling sample
+		libraries[libname].push({
+			name: split[header_idxs.sample],
+			forward: split[header_idxs.forward],
+			reverse: split[header_idxs.reverse]
+		});
+	}
+
+	callback (libraries);
 };
 
 

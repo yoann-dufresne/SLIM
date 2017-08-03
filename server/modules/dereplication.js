@@ -25,6 +25,7 @@ exports.run = (os, config, callback) => {
 		'--sizeout', '--sizein',
 		'--minseqlength', '1',
 		'--minuniquesize', threshold,
+		'--fasta_width', '0',
 		'--output', out_file];
 
 

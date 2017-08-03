@@ -18,23 +18,30 @@ RUN apt-get update && apt-get install -y \
 	pigz \
 	dos2unix
 
-# install app dependencies
-COPY package.json /app
-RUN npm install
-
-# Copy libraries
 RUN mkdir /app/lib
-COPY lib/DTD /app/lib/DTD
-COPY lib/pandaseq /app/lib/pandaseq
-COPY lib/vsearch /app/lib/vsearch
-COPY lib/miniconda /app/lib/miniconda
-COPY lib/casper /app/lib/casper
 
+# --- Very long updates ---
+COPY lib/miniconda /app/lib/miniconda
 # Install miniconda
 RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/miniconda/install \
 	&& /app/lib/miniconda/install/bin/conda update conda -y
 # Install QIIME 2
 RUN /app/lib/miniconda/install/bin/conda create -n qiime2-2017.6 --file https://data.qiime2.org/distro/core/qiime2-2017.6-conda-linux-64.txt
+
+# -------------------------
+
+
+# install app dependencies
+COPY package.json /app
+RUN npm install
+
+# Copy libraries
+COPY lib/DTD /app/lib/DTD
+COPY lib/pandaseq /app/lib/pandaseq
+COPY lib/vsearch /app/lib/vsearch
+COPY lib/casper /app/lib/casper
+COPY lib/swarm /app/lib/swarm
+
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
 # Compile pandaseq
@@ -43,6 +50,8 @@ RUN cd /app/lib/pandaseq && ./autogen.sh && ./configure && make && cd /app
 RUN cd /app/lib/vsearch && ./autogen.sh && ./configure && make && cd /app
 # Compile casper
 RUN cd /app/lib/casper/casper_v0.8.2 && make && cd /app
+# Compile swarm
+RUN cd /app/lib/swarm/src && make && cd /app
 
 
 # prepare the web server

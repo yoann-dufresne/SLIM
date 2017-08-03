@@ -6,7 +6,6 @@ fi
 cd lib/
 
 
-
 # jquery autocomplete
 if [ ! -d "jquery-autocomplete" ]; then
 	git clone https://github.com/devbridge/jQuery-Autocomplete.git jquery-autocomplete
@@ -67,6 +66,16 @@ if [ ! -d "casper_v0.8.2" ]; then
 	tar -xzvf casper_v0.8.2.tar.gz
 fi
 cd ..
+
+
+# Swarm
+if [ ! -d "swarm" ]; then
+	git clone https://github.com/torognes/swarm.git swarm/
+else
+	cd swarm
+	git pull
+	cd ..
+fi
 
 
 
