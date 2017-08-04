@@ -37,28 +37,29 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 
 
 	// --- Write OTU table to file ---
+	let stream = fs.createWriteStream(table_file, {'flags': 'a'});
 	// Header
 	fs.closeSync(fs.openSync(table_file, 'w'));
-	fs.appendFileSync(table_file, 'OTU');
+	stream.write('OTU');
 	for (let exp_idx=0 ; exp_idx<header.length ; exp_idx++)
-		fs.appendFileSync(table_file, '\t' + header[exp_idx]);
-	fs.appendFileSync(table_file, '\n');
+		stream.write('\t' + header[exp_idx]);
+	stream.write('\n');
 
 	// Content
 	for (let cluster_idx in otu_matrix) {
-		fs.appendFileSync(table_file, cluster_idx);
+		stream.write(cluster_idx);
 
 		for (let exp_idx=0 ; exp_idx<order.length ; exp_idx++) {
 			let exp = order[exp_idx];
 
 			// Write the value if present, else 0
 			if (otu_matrix[cluster_idx][exp]) {
-				fs.appendFileSync(table_file, '\t' + otu_matrix[cluster_idx][exp]);
+				stream.write('\t' + otu_matrix[cluster_idx][exp]);
 			} else {
-				fs.appendFileSync(table_file, '\t0');
+				stream.write('\t0');
 			}
 		}
-		fs.appendFileSync(table_file, '\n');
+		stream.write('\n');
 	}
 
 	callback();
