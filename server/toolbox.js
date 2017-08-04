@@ -46,13 +46,15 @@ exports.read_tags2sample = (t2s_filename, callback) => {
 	// Get the csv lines
 	let header_idxs = {};
 	let split = lines[0].split(',');
-	let csv_len = split.length();
+	let csv_len = split.length;
 	for (let idx=0 ; idx<csv_len ; idx++)
 		header_idxs[split[idx]] = idx;
 
 	// Wrong t2s
-	if ((!header_idxs.run) || (!header_idxs.sample))
+	if ((header_idxs.run == undefined) || (header_idxs.sample == undefined)) {
 		callback({});
+		return;
+	}
 
 	// Read line by line
 	var libraries = {};
@@ -62,6 +64,7 @@ exports.read_tags2sample = (t2s_filename, callback) => {
 		if (split.length != csv_len) {
 			console.log('Wrong format at line ' + idx + ' of file ' + t2s_filename);
 			callback();
+			return;
 		}
 
 		// Library creation

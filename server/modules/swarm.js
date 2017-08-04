@@ -49,8 +49,10 @@ exports.run = function (os, config, callback) {
 				if (err) {
 					console.log(token + ': ' + err);
 					callback(os, err);
+					return;
 				} else {
 					callback(os, null);
+					return;
 				}
 			};
 
@@ -62,8 +64,7 @@ exports.run = function (os, config, callback) {
 					// Compute order
 					let order = [];
 					for (let libname in libs) {
-						order = libs[libname].map((elem) => {return libname + '_' + elem.name});
-						// TODO !!!
+						order = order.concat(libs[libname].map((elem) => {return libname + '_' + elem.name}));
 					}
 
 					// Write OTU

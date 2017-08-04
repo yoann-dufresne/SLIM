@@ -3,24 +3,45 @@ const fs = require('fs');
 
 
 
-exports.write_otu_table = (otu_matrix, table_file, order, callback) => {
+exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 	console.log('Write OTU matrix');
-	// Computer an order if absent
-	if (order == null) {
-		// Get the experiments objects
-		order = Object.values(otu_matrix);
-		// Transform arrays into arguments for Object.assign
-		order = [{}].concat(order);
-		// Get unique keys by merging the objects
-		order = Object.keys(Object.assign.apply(this, order));
+
+	// --- file order from matrix ---
+	// Get the experiments objects
+	let fileOrder = Object.values(otu_matrix);
+	// Transform arrays into arguments for Object.assign
+	fileOrder = [{}].concat(fileOrder);
+	// Get unique keys by merging the objects
+	fileOrder = Object.keys(Object.assign.apply(this, fileOrder));
+
+	// Final order
+	let order = [];
+	let header = [];
+	if (t2sOrder == null) {
+		order = fileOrder;
+		header = fileOrder;
+	} else {
+		for (let o_idx=0 ; o_idx<t2sOrder.length ; o_idx++) {
+			let t2s_name = t2sOrder[o_idx];
+
+			for (let f_idx=0 ; f_idx<fileOrder.length ; f_idx++) {
+				let filename = fileOrder[f_idx];
+
+				if (filename.includes(t2s_name)) {
+					order.push(filename);
+					header.push(t2s_name);
+				}
+			}
+		}
 	}
+
 
 	// --- Write OTU table to file ---
 	// Header
 	fs.closeSync(fs.openSync(table_file, 'w'));
 	fs.appendFileSync(table_file, 'OTU');
-	for (let exp_idx=0 ; exp_idx<order.length ; exp_idx++)
-		fs.appendFileSync(table_file, '\t' + order[exp_idx]);
+	for (let exp_idx=0 ; exp_idx<header.length ; exp_idx++)
+		fs.appendFileSync(table_file, '\t' + header[exp_idx]);
 	fs.appendFileSync(table_file, '\n');
 
 	// Content
