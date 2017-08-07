@@ -1,5 +1,6 @@
 const lineReader = require('line-reader');
 const fs = require('fs');
+const csv = require('csv-parser');
 
 
 
@@ -89,6 +90,57 @@ exports.load_origins_matrix = (origins_file, callback) => {
 
 		if (last)
 			callback(origins);
+	});
+};
+
+
+
+// var uc_to_otu = (csv_uc_file, tsv_otu_file, sequence_origins, callback) => {
+exports.uc_to_matrix = (os, config, callback) => {
+	console.log("Read the UC file");
+
+	var directory = '/app/data/' + os.token + '/';
+	var uc_file = config.params.inputs.uc;
+	var origins_file = config.params.inputs.origins;
+
+	exports.load_origins_matrix(directory + origins_file, (origins) => {
+		let exps = origins.experiments;
+		var matrix = [];
+
+
+		var parser = csv({
+			separator: '\t',
+			headers: ['type', 'cluster', 'length', 'similarity', 'orientation',
+					'nuy1', 'nuy2', 'compact', 'name', 'centroid']
+		});
+
+
+		fs.createReadStream(directory + uc_file)
+		.pipe(parser)
+		// --- Read UC file ---
+		.on('data', function (data) {
+			if (data.type == "C")
+				return;
+
+			let clust_id = data.cluster;
+			// Create cluster if undefined
+			if (!matrix[clust_id])
+				matrix[clust_id] = {};
+
+			// Read name from uc file
+			let read_name = data.name;
+			for (let exp in origins[read_name]) {
+				// Init value if not previously initialized
+				if (!matrix[clust_id][exp])
+					matrix[clust_id][exp] = 0;
+
+				// Fill the matrix
+				matrix[clust_id][exp] += origins[read_name][exp];
+			}
+		})
+		.on('end', () => {
+			callback(matrix);
+		});
 	});
 };
 

@@ -1,6 +1,5 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
-var lineReader = require('line-reader');
 
 const toolbox = require('../toolbox.js');
 const otu_manager = require('../otu_manager.js');
@@ -79,11 +78,13 @@ exports.run = function (os, config, callback) {
 
 var otu_search = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
-	let tmp_output = toolbox.tmp_filename() + '.txt';
+	// let tmp_output = toolbox.tmp_filename() + '.txt';
+	let tmp_output = toolbox.tmp_filename() + '.uc';
 
 	// Swarm options
 	var options = [directory + config.params.inputs.merged,
-	'-o', directory + tmp_output,
+	'-o', '/dev/null', //directory + tmp_output,
+	'-u', directory + tmp_output,
 	'-f', '-z',
 	'-w', directory + config.params.outputs.centroids,
 	'-t', os.cores];
@@ -103,54 +104,53 @@ var otu_search = (os, config, callback) => {
 		if (code != 0)
 			callback();
 		else {
-			config.params.inputs.swarm_out = tmp_output;
-			parse_swarm_file(os, config, (matrix) => {
+			config.params.inputs.uc = tmp_output;
+			otu_manager.uc_to_matrix(os, config, (matrix) => {
 				fs.unlink(directory+tmp_output, ()=>{});
-
 				callback(matrix);
 			});
 		}
 	});
 };
 
-var parse_swarm_file = (os, config, callback) => {
-	let directory = '/app/data/' + os.token + '/';
-	let swarm_file = directory + config.params.inputs.swarm_out;
-	let origins_file = directory + config.params.inputs.origins;
+// var parse_swarm_file = (os, config, callback) => {
+// 	let directory = '/app/data/' + os.token + '/';
+// 	let swarm_file = directory + config.params.inputs.swarm_out;
+// 	let origins_file = directory + config.params.inputs.origins;
 
-	otu_manager.load_origins_matrix(origins_file, (origins) => {
-		let exps = origins.experiments;
-		let line_id = 0;
-		var matrix = [];
+// 	otu_manager.load_origins_matrix(origins_file, (origins) => {
+// 		let exps = origins.experiments;
+// 		let line_id = 0;
+// 		var matrix = [];
 
-		// For each line
-		lineReader.eachLine(swarm_file, function(line, last) {
-			// Define cluster and init values at 0
-			clust_id = line_id++;
-			matrix[clust_id] = {};
+// 		// For each line
+// 		lineReader.eachLine(swarm_file, function(line, last) {
+// 			// Define cluster and init values at 0
+// 			let clust_id = line_id++;
+// 			matrix[clust_id] = {};
 			
-			// Add values from origins to matrix
-			let read_names = line.split(' ');
-			for (let r_idx=0 ; r_idx<read_names.length ; r_idx++) {
-				// Read name from swarm
-				let read_name = read_names[r_idx];
+// 			// Add values from origins to matrix
+// 			let read_names = line.split(' ');
+// 			for (let r_idx=0 ; r_idx<read_names.length ; r_idx++) {
+// 				// Read name from swarm
+// 				let read_name = read_names[r_idx];
 
-				for (let exp in origins[read_name]) {
-					// Init value if not previously initialized
-					if (!matrix[clust_id][exp])
-						matrix[clust_id][exp] = 0;
+// 				for (let exp in origins[read_name]) {
+// 					// Init value if not previously initialized
+// 					if (!matrix[clust_id][exp])
+// 						matrix[clust_id][exp] = 0;
 
-					// Fill the matrix
-					matrix[clust_id][exp] += origins[read_name][exp];
-				}
-			}
+// 					// Fill the matrix
+// 					matrix[clust_id][exp] += origins[read_name][exp];
+// 				}
+// 			}
 			
-			if (last) {
-				callback(matrix);
-			}
-		});
-	});
-};
+// 			if (last) {
+// 				callback(matrix);
+// 			}
+// 		});
+// 	});
+// };
 
 
 
