@@ -47,8 +47,9 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 	stream.write('\n');
 
 	// Content
+	let local_cluster_id = 0;
 	for (let cluster_idx in otu_matrix) {
-		stream.write(cluster_idx);
+		stream.write('' + local_cluster_id++);
 
 		for (let exp_idx=0 ; exp_idx<order.length ; exp_idx++) {
 			let exp = order[exp_idx];
@@ -106,7 +107,7 @@ exports.uc_to_matrix = (os, config, callback) => {
 	exports.load_origins_matrix(directory + origins_file, (origins) => {
 		let exps = origins.experiments;
 		var matrix = [];
-
+		var true_clusters = [];
 
 		var parser = csv({
 			separator: '\t',
@@ -119,8 +120,10 @@ exports.uc_to_matrix = (os, config, callback) => {
 		.pipe(parser)
 		// --- Read UC file ---
 		.on('data', function (data) {
-			if (data.type == "C")
+			if (data.type == "C") {
+				true_clusters.push(data.cluster);
 				return;
+			}
 
 			let clust_id = data.cluster;
 			// Create cluster if undefined
@@ -139,7 +142,13 @@ exports.uc_to_matrix = (os, config, callback) => {
 			}
 		})
 		.on('end', () => {
-			callback(matrix);
+			var filtered_matrix = [];
+			for (var t_idx=0 ; t_idx<true_clusters.length ; t_idx++) {
+				mat_idx = true_clusters[t_idx];
+				filtered_matrix.push(matrix[mat_idx]); 
+			}
+			
+			callback(filtered_matrix);
 		});
 	});
 };

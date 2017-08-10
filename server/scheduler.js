@@ -11,7 +11,7 @@ var running_jobs = {};
 // --- Parametric values ---
 var NB_CORES = 1;
 var MAX_JOBS = 1;
-const CORES_BY_RUN = 4;
+const CORES_BY_RUN = 8;
 const SCHEDULE_TIME = 10000;
 
 

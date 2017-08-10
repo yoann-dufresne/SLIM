@@ -1,0 +1,21 @@
+
+<p>Representative fasta</p>
+<input type="text" name="fasta" class='input_file fasta'>
+
+<p>Database</p>
+<input type="text" name="db" class='input_file fasta'>
+
+<p>Input OTU table</p>
+<input type="text" name="otu_table" class='input_file tsv'>
+
+<p>Assigned OTU table</p>
+<span class="output_zone">
+	<input type="text" name="assigned" value="assigned_vsearch.tsv">
+	<a href="" download><img src="/imgs/download.png" class="download"></a>
+</span>
+
+<div class="options">
+	<p>Min similarity: <input type="text" name="similarity" class="integer number param_value" value="0.9"></p>
+	<p>Direct acceptance threshold: <input type="text" name="acceptance" class="integer number param_value" value="0.99"></p>
+	<p>Number of matches to create consensus: <input type="text" name="cons_num" class="integer number param_value" value="3"></p>
+</div>
