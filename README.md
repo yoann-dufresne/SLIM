@@ -1,79 +1,45 @@
 
-Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis.
+Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
+All the pipeline is wrapped in a docker to easaly run it.
 
 # Install and run the pipeline
 
-# Create a module
-
-## Web interface, create a module
-
-To create a GUI for your module, you need to create 2 files in www/modules/.
-If your module is named "mymodule", the two files must be named "mymodule.html" and "mymodule.js".
-
-## Parameters format, send the request
-
-To trigger the software on the server, you have to send the parameters in json format.
-When the user push the button start analysis, the client side application ask to each module their configurations. Each module will correspond to a json object in the json request. This json object must be created and returned by the function `getConfiguration` of the module class.  
+The software can be setup by using the two scripts "update_dependencies.sh" and "update_webserver.sh".
+* update_dependencies.sh get all the bioinformatics tools needed from their respective repositories.
+* update_webserver.sh destroy the current running webserver to replace it with a new one updated.
+**/!\\** All the files previously uploaded on the webserver will be detroyed during the process.  
   
-The parameters are always divided in three set: The inputs, the outputs and the software settings.
-All the three categories must be formatted as an object with a list of attribute.
-The inputs and outputs formats are very constrained because of the program scheduler.
-The scheduler will defined software priorities depending of the inputs/outputs dependencies.
-```json
-{
-	"inputs": {"name1": "value1", "name2": "value2", ...},
-	"outputs": {"name1": "value1", "name2": "value2", ...},
-	"params": {"name1": "value1", "name2": "value2", ...}
-}
+So, you can setup the pipeline using the following 3 command lines:
+```bash
+sudo apt-get install docker-ce
+bash update_dependencies.sh
+bash update_webserver.sh
 ```
 
-Using the getConfiguration method from the super class, you will get an object correctly formatted without any entry in the inputs/outputs/params sub-objects.  
+If the apt command doesn't work or you want to install the webserver on mac OS, please refer to the docker manual on (https://docs.docker.com)[https://docs.docker.com]
 
-## Server software, trigger the good software with good parameters
+# Create a module for the pipeline
 
-The server must contain a module "mymodule.js" in the directory server/modules/.
-This file must contains at least 2 things: A module name and a function run.
+To contribute by adding new softwares, you will have to know a little bit of HTML and javascript.
+Please refer to the wiki pages to learn how to create a module.
 
-the module name must be set using this line:
+# Current modules by category
 
-```javascript
-exports.name = 'mymodule';
-```
-The name will be used by the server and the client to automatically transmit the html and js client files.
-If the name is not set, the module will not appear in the usable software on the client side.
-
-The run function must transform the json input to a Linux command line using the software.
-During this process you have to be careful for the server security.
-Never execute programs without analysis information from the client!
-
-```javascript
-exports.run = function (token, config, callback) { ... };
-```
-The token argument correspond to the current directory for the process execution.
-All the input/output file will be present in the directory /data/'token'  
-The config object will contain all the information from client formatted as the json presented in the previous part.  
-The callback function is the function that you must call when the execution is over.
-This callback take two arguments.
-The first one must be the token and the second one a message if the execution went wrong.
-
-You can use the [pandaseq module](https://github.com/yoann-dufresne/amplicon_pipeline/blob/master/server/modules/pandaseq.js) as example.
-
-# Dependencies
-
-## Bioinformatics tools
-
+## Demultiplexing
 * Double Tag Demultiplexer (DTD): Demultiplex experiments from illumina output files when that data has been generated from double tagged reads with only one PCR.
-* Pandaseq: Join the forward and reverse reads. [link](https://github.com/neufeld/pandaseq)
-* vsearch: Used to remove chimeras, cluster reads in OTUs and assign taxon to OTUs. [link](https://github.com/torognes/vsearch)
-* QIIME2: Interface multiple bioinformatics tools. [link](https://qiime2.org/)
 
-## node.js libraries
+## Paired-end read joiner
+* [Pandaseq](https://github.com/neufeld/pandaseq)
+* [vsearch](https://github.com/torognes/vsearch) mergepair
+* [CASPER](http://best.snu.ac.kr/casper/)
 
-* Express: web framework
-* Pug: templates engine
-* Formidable: Parse multi-part post requests (File uploads)
-* body-parser: Parse json post requests (Commands)
+## Chimera detection
+* [vsearch](https://github.com/torognes/vsearch) uchime
 
-## client js libraries
+## Sequence clustering
+* [vsearch](https://github.com/torognes/vsearch) uclust
+* [swarm](https://github.com/torognes/swarm)
 
-* JQuery: asynch requests
+## Sequence assignment
+* [vsearch](https://github.com/torognes/vsearch) usearch
+
