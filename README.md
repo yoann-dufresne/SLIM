@@ -16,7 +16,7 @@ bash update_dependencies.sh
 bash update_webserver.sh
 ```
 
-If the apt command doesn't work or you want to install the webserver on mac OS, please refer to the docker manual on (https://docs.docker.com)[https://docs.docker.com]
+If the apt command doesn't work or you want to install the webserver on mac OS, please refer to the docker manual on [https://docs.docker.com](https://docs.docker.com)
 
 # Create a module for the pipeline
 
