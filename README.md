@@ -26,7 +26,7 @@ Please refer to the wiki pages to learn how to create a module.
 # Current modules by category
 
 ## Demultiplexing
-* Double Tag Demultiplexer (DTD): Demultiplex experiments from illumina output files when that data has been generated from double tagged reads with only one PCR.
+* [Double Tag Demultiplexer (DTD)](https://github.com/yoann-dufresne/DoubleTagDemultiplexer): Demultiplex experiments from illumina output files when that data has been generated from double tagged reads with only one PCR.
 
 ## Paired-end read joiner
 * [Pandaseq](https://github.com/neufeld/pandaseq)
