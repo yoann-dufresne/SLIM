@@ -21,7 +21,7 @@ If the apt command doesn't work or you want to install the webserver on mac OS, 
 # Create a module for the pipeline
 
 To contribute by adding new softwares, you will have to know a little bit of HTML and javascript.
-Please refer to the wiki pages to learn how to create a module.
+Please refer to the wiki pages to learn [how to create a module](https://github.com/yoann-dufresne/amplicon_pipeline/wiki/How-to-write-a-new-module).
 
 # Current modules by category
 
