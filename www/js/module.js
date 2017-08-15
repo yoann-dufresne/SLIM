@@ -138,7 +138,8 @@ class Module {
 					val += '.tar.gz';
 				
 				// Create the download link
-				link.href = '/data/' + exec_token + '/' + val;
+				if (link)
+					link.href = '/data/' + exec_token + '/' + val;
 			}
 			out_input.onchange();
 		}

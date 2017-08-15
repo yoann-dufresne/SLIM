@@ -1,6 +1,5 @@
-const exec = require('child_process').spawn;
+const spawn = require('child_process').spawn;
 const fs = require('fs');
-const tools = require('../toolbox.js');
 
 
 exports.name = 'fasta-dereplication';
@@ -35,7 +34,7 @@ exports.run = (os, config, callback) => {
 	console.log('Command:\nvsearch', options.join(' '));
 
 	// Execution
-	var child = exec('/app/lib/vsearch/bin/vsearch', options);
+	var child = spawn('/app/lib/vsearch/bin/vsearch', options);
 	child.stdout.on('data', function(data) {
 		fs.appendFileSync(directory + config.log, data);
 	});

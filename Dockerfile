@@ -1,3 +1,5 @@
+# ----- Basic docker constructions -----
+
 # Use an official Python runtime as a base image
 FROM node:latest
 
@@ -20,7 +22,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir /app/lib
 
-# --- Very long updates ---
+
+# ----- Very long updates -----
+
 COPY lib/miniconda /app/lib/miniconda
 # Install miniconda
 RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/miniconda/install \
@@ -28,8 +32,8 @@ RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/min
 # Install QIIME 2
 RUN /app/lib/miniconda/install/bin/conda create -n qiime2-2017.6 --file https://data.qiime2.org/distro/core/qiime2-2017.6-conda-linux-64.txt
 
-# -------------------------
 
+# ----- Libraries deployments -----
 
 # install app dependencies
 COPY package.json /app
@@ -53,6 +57,8 @@ RUN cd /app/lib/casper/casper_v0.8.2 && make && cd /app
 # Compile swarm
 RUN cd /app/lib/swarm/src && make && cd /app
 
+
+# ----- Webserver -----
 
 # prepare the web server
 COPY server /app
