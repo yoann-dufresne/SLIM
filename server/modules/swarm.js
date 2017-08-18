@@ -29,7 +29,12 @@ exports.run = function (os, config, callback) {
 	}, log:config.log};
 
 	// Merging
-	merging.run (os, config_merging, () => {
+	merging.run (os, config_merging, (_, msg) => {
+		if (msg != null) {
+			callback(os, msg);
+			return;
+		}
+
 		// OTU search
 		config.params.inputs.merged = tmp_merged;
 		config.params.inputs.origins = tmp_origins;
@@ -41,7 +46,6 @@ exports.run = function (os, config, callback) {
 			}
 
 			// Remove unnecessary files
-			fs.unlink(directory+tmp_merged, ()=>{});
 			fs.unlink(directory+tmp_origins, ()=>{});
 
 			var written = (err) => {
@@ -50,7 +54,15 @@ exports.run = function (os, config, callback) {
 					callback(os, err);
 					return;
 				} else {
-					callback(os, null);
+					otu_manager.write_reads(
+						matrix,
+						directory + tmp_merged,
+						directory + config.params.outputs.reads,
+						()=>{
+							fs.unlink(directory+tmp_merged, ()=>{});
+							callback(os, null);
+						}
+					);
 					return;
 				}
 			};
@@ -112,45 +124,6 @@ var otu_search = (os, config, callback) => {
 		}
 	});
 };
-
-// var parse_swarm_file = (os, config, callback) => {
-// 	let directory = '/app/data/' + os.token + '/';
-// 	let swarm_file = directory + config.params.inputs.swarm_out;
-// 	let origins_file = directory + config.params.inputs.origins;
-
-// 	otu_manager.load_origins_matrix(origins_file, (origins) => {
-// 		let exps = origins.experiments;
-// 		let line_id = 0;
-// 		var matrix = [];
-
-// 		// For each line
-// 		lineReader.eachLine(swarm_file, function(line, last) {
-// 			// Define cluster and init values at 0
-// 			let clust_id = line_id++;
-// 			matrix[clust_id] = {};
-			
-// 			// Add values from origins to matrix
-// 			let read_names = line.split(' ');
-// 			for (let r_idx=0 ; r_idx<read_names.length ; r_idx++) {
-// 				// Read name from swarm
-// 				let read_name = read_names[r_idx];
-
-// 				for (let exp in origins[read_name]) {
-// 					// Init value if not previously initialized
-// 					if (!matrix[clust_id][exp])
-// 						matrix[clust_id][exp] = 0;
-
-// 					// Fill the matrix
-// 					matrix[clust_id][exp] += origins[read_name][exp];
-// 				}
-// 			}
-			
-// 			if (last) {
-// 				callback(matrix);
-// 			}
-// 		});
-// 	});
-// };
 
 
 

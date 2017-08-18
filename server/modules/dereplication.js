@@ -1,6 +1,8 @@
 const spawn = require('child_process').spawn;
 const fs = require('fs');
 
+const tools = require('../toolbox');
+
 
 exports.name = 'fasta-dereplication';
 exports.multicore = false;
@@ -46,7 +48,7 @@ exports.run = (os, config, callback) => {
 			console.log("Error code " + code + " during dereplication");
 			callback(os, code);
 		} else {
-			callback(os, null);
+			tools.sort(out_file, () => {callback(os, null);});
 		}
 	});
 };

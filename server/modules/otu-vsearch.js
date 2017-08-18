@@ -43,7 +43,6 @@ exports.run = function (os, config, callback) {
 			}
 
 			// Remove unnecessary files
-			fs.unlink(directory+tmp_merged, ()=>{});
 			fs.unlink(directory+tmp_origins, ()=>{});
 
 			var written = (err) => {
@@ -52,7 +51,15 @@ exports.run = function (os, config, callback) {
 					callback(os, err);
 					return;
 				} else {
-					callback(os, null);
+					otu_manager.write_reads(
+						matrix,
+						directory + tmp_merged,
+						directory + config.params.outputs.reads,
+						()=>{
+							fs.unlink(directory+tmp_merged, ()=>{});
+							callback(os, null);
+						}
+					);
 					return;
 				}
 			};

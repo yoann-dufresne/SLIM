@@ -2,6 +2,8 @@ const lineReader = require('line-reader');
 const fs = require('fs');
 const csv = require('csv-parser');
 
+const tools = require('./toolbox');
+
 
 
 exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
@@ -38,12 +40,14 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 
 
 	// --- Write OTU table to file ---
-	let stream = fs.createWriteStream(table_file, {'flags': 'a'});
+	let stream = fs.createWriteStream(table_file, {'flags': 'w'});
 	// Header
-	fs.closeSync(fs.openSync(table_file, 'w'));
 	stream.write('OTU');
-	for (let exp_idx=0 ; exp_idx<header.length ; exp_idx++)
+	for (let exp_idx=0 ; exp_idx<header.length ; exp_idx++) {
+		if (header[exp_idx].startsWith('__'))
+			continue;
 		stream.write('\t' + header[exp_idx]);
+	}
 	stream.write('\n');
 
 	// Content
@@ -54,6 +58,10 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 		for (let exp_idx=0 ; exp_idx<order.length ; exp_idx++) {
 			let exp = order[exp_idx];
 
+			// Pass system properties
+			if (exp.startsWith('__'))
+				continue;
+
 			// Write the value if present, else 0
 			if (otu_matrix[cluster_idx][exp]) {
 				stream.write('\t' + otu_matrix[cluster_idx][exp]);
@@ -63,9 +71,40 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 		}
 		stream.write('\n');
 	}
+	stream.end();
 
 	callback();
 };
+
+
+exports.write_reads = (otu_matrix, inputfile, outfile, callback) => {
+	console.log('Write reads clusters');
+
+	// Get the read clusters
+	let clusters = {};
+	for (let idx=0 ; idx<otu_matrix.length ; idx++) {
+		let read_names = otu_matrix[idx]['__name__'];
+		for (let id in read_names) {
+			let read_name = read_names[id];
+			clusters[read_name] = idx;
+		}
+	}
+
+	// Init writer
+	let stream = fs.createWriteStream(outfile, {'flags': 'w'});
+
+	// Init reader
+	let reader = tools.fastaReader(inputfile);
+	reader.onEnd(() => {
+		stream.end();
+		callback();
+	});
+
+	reader.read_sequences((seq) => {
+		let clust_id = clusters[seq.header];
+		stream.write('>' + seq.header + ';cluster=' + clust_id + ';\n' + seq.value + '\n');
+	});
+}
 
 
 exports.load_origins_matrix = (origins_file, callback) => {
@@ -128,10 +167,11 @@ exports.uc_to_matrix = (os, config, callback) => {
 			let clust_id = data.cluster;
 			// Create cluster if undefined
 			if (!matrix[clust_id])
-				matrix[clust_id] = {};
+				matrix[clust_id] = {__name__: [], __total__:0};
 
 			// Read name from uc file
 			let read_name = data.name;
+			let total = 0;
 			for (let exp in origins[read_name]) {
 				// Init value if not previously initialized
 				if (!matrix[clust_id][exp])
@@ -139,7 +179,11 @@ exports.uc_to_matrix = (os, config, callback) => {
 
 				// Fill the matrix
 				matrix[clust_id][exp] += origins[read_name][exp];
+				total += origins[read_name][exp];
 			}
+			// Save total in a system parameter
+			matrix[clust_id]['__name__'].push(read_name);
+			matrix[clust_id]['__total__'] += total;
 		})
 		.on('end', () => {
 			var filtered_matrix = [];
