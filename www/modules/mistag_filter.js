@@ -12,8 +12,11 @@ class MistagFilterModule extends Module {
 		var inputfasta = this.dom.getElementsByClassName('input_file')[0];
 		inputfasta.onchange = () => {
 			let mistagfasta = that.dom.getElementsByClassName('output_zone')[0].getElementsByTagName('input')[0];
+			let mistagstats = that.dom.getElementsByClassName('output_zone')[0].getElementsByTagName('input')[1];
 			mistagfasta.value = inputfasta.value.substr(0, inputfasta.value.lastIndexOf('.')) + '_mistagFiltered.fasta';
+			mistagstats.value = inputfasta.value.substr(0, inputfasta.value.lastIndexOf('.')) + '_mistagFiltered_stats.tsv';
 			mistagfasta.onchange();
+			mistagstats.onchange();
 		};
 	}
 
