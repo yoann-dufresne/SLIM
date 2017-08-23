@@ -78,4 +78,21 @@ else
 fi
 
 
+# mistag_filter
+if [ ! -d "mistag_filter" ]; then
+	git clone https://github.com/FranckLejzerowicz/mistag_filter.git mistag_filter/
+else
+	cd mistag_filter
+	git pull
+	cd ..
+fi
+
+# abundance_filters
+if [ ! -d "abundance_filters" ]; then
+	git clone https://github.com/FranckLejzerowicz/abundance_filters.git abundance_filters/
+else
+	cd abundance_filters
+	git pull
+	cd ..
+fi
 

@@ -18,7 +18,15 @@ RUN apt-get update && apt-get install -y \
 	pkg-config \
 	libboost-all-dev \
 	pigz \
-	dos2unix
+	dos2unix \
+	python2.7 \
+	r-base \
+	python-pip
+
+# Install python packages
+RUN python -m pip install --upgrade pip
+RUN pip install numpy scipy
+RUN pip install biopython
 
 RUN mkdir /app/lib
 
@@ -45,6 +53,8 @@ COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
+COPY lib/mistag_filter /app/lib/mistag_filter
+COPY lib/abundance_filters /app/lib/abundance_filters
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
