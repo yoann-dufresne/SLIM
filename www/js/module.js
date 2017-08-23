@@ -190,7 +190,10 @@ class Module {
 		for (let par_id=0 ; par_id<params.length ; par_id++) {
 			let param = params[par_id];
 
-			config.params[param.name] = param.value;
+			if (param.tagName.toUpperCase() == "INPUT" && param.type == "checkbox")
+				config.params[param.name] = param.checked;
+			else
+				config.params[param.name] = param.value;
 		}
 
 
