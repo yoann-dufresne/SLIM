@@ -143,8 +143,6 @@ class DemultiplexerModule extends Module {
 			var filename = this.out_files[idx];
 			config.outputs[filename] = filename;
 		}
-
-		config.params.mistags = this.dom.getElementsByClassName('demux_mistag')[0].checked;
 		
 		return config;
 	}
