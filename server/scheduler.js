@@ -150,7 +150,15 @@ var sub_process_start = (tok, configs_array) => {
 	// Lanch initial sub-softwares
 	job.next_sub_idx = limit;
 	for (let lanch_idx=0 ; lanch_idx<limit ; lanch_idx++)
-		sub_process.run({token:token, cores:CORES_BY_RUN, idx:lanch_idx}, configs_array[lanch_idx], sub_process_callback);
+		try {
+			sub_process.run({token:token, cores:CORES_BY_RUN, idx:lanch_idx}, configs_array[lanch_idx], sub_process_callback);
+		} catch (err) {
+			// Continue the execution in case of bad module run
+			console.log(err);
+			job.status = 'aborted';
+			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			delete running_jobs[token]
+		}
 };
 
 

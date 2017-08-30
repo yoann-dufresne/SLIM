@@ -3,6 +3,8 @@ const formidable = require('formidable');
 const path = require('path');
 const exec = require('child_process').spawn;
 
+exports.jokers = {};
+
 exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
@@ -27,7 +29,7 @@ exports.exposeDir = function (app) {
 }
 
 
-var files_to_convert = {};
+let files_to_convert = {};
 
 exports.upload = function (app) {
 	app.get('/convertion', function(req, res) {
@@ -72,8 +74,10 @@ exports.upload = function (app) {
 				files_to_convert[token].push(file.name);
 
 				// Transform in unix format
-				exec('dos2unix', [file.path, '-q']).on('close', () => {
-					exec('mac2unix', [file.path, '-q']).on('close', () => {
+				exec('dos2unix', [file.path, '-q'])
+				.on('close', () => {
+					exec('mac2unix', [file.path, '-q'])
+					.on('close', () => {
 						// Rename
 						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
 							if (err)

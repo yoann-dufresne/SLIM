@@ -22,7 +22,8 @@ fs.readdir('/app/modules/', (err, items) => {
 			continue;
 
 		let module = require('/app/modules/' + filename);
-		modules[module.name] = module;
+		if (module.name)
+			modules[module.name] = module;
 	}
 
 	console.log('Module loaded: ', JSON.stringify(Object.keys(modules)));
