@@ -11,11 +11,19 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 
 	// --- file order from matrix ---
 	// Get the experiments objects
-	let fileOrder = Object.values(otu_matrix);
+	let tmp = Object.values(otu_matrix);
 	// Transform arrays into arguments for Object.assign
-	fileOrder = [{}].concat(fileOrder);
-	// Get unique keys by merging the objects
-	fileOrder = Object.keys(Object.assign.apply(this, fileOrder));
+	let fileOrder = {};
+	for (let obj_key in tmp) {
+		let obj = tmp[obj_key];
+		for (let key in obj) {
+			if (!key.startsWith('__'))
+				fileOrder[key] = obj[key];
+		}
+	}
+
+	fileOrder = Object.keys(fileOrder);
+	console.log(JSON.stringify(fileOrder));
 
 	// Final order
 	let order = [];

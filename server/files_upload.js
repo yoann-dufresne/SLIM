@@ -68,25 +68,10 @@ exports.upload = function (app) {
 			if (token == null)
 				fs.unlink(file.path, function(){})
 			else {
-				// Add files to convertion array
-				if (!files_to_convert[token])
-					files_to_convert[token] = [];
-				files_to_convert[token].push(file.name);
-
-				// Transform in unix format
-				exec('dos2unix', [file.path, '-q'])
-				.on('close', () => {
-					exec('mac2unix', [file.path, '-q'])
-					.on('close', () => {
-						// Rename
-						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
-							if (err)
-								console.log('Error during file upload: ' + err);
-
-							files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
-						});
-					});
-				});
+				if (file.name.endsWith('gz'))
+					decompress_archive(file);
+				else
+					proccess_file(token, file, form.uploadDir);
 			}
 		});
 
@@ -102,5 +87,36 @@ exports.upload = function (app) {
 
 		// parse the incoming request containing the form data
 		form.parse(req);
+	});
+};
+
+
+var decompress_archive = (archive, token) => {
+	exec('tar', ['-xvf', archive.path])
+	.stdout.on('data', (data) => {
+		console.log('>', data.toString('utf8'));
+	});
+};
+
+
+var proccess_file = (token, file, upload_dir) => {
+	// Add files to convertion array
+	if (!files_to_convert[token])
+		files_to_convert[token] = [];
+	files_to_convert[token].push(file.name);
+
+	// Transform in unix format
+	exec('dos2unix', [file.path, '-q'])
+	.on('close', () => {
+		exec('mac2unix', [file.path, '-q'])
+		.on('close', () => {
+			// Rename
+			fs.rename(file.path, path.join(upload_dir, file.name), function (err) {
+				if (err)
+					console.log('Error during file upload: ' + err);
+
+				files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
+			});
+		});
 	});
 };
