@@ -82,7 +82,8 @@ document.querySelector("#up_submit").onclick = function (event) {
 		},
 		xhr: function() {
 			// create an XMLHttpRequest
-			var xhr = new XMLHttpRequest();
+			let xhr = new XMLHttpRequest();
+			let num_wait_files = 0;
 
 			// listen to the 'progress' event
 			xhr.upload.addEventListener('progress', function(evt) {
@@ -107,13 +108,21 @@ document.querySelector("#up_submit").onclick = function (event) {
 								data = JSON.parse(data);
 
 								// Update the status
-								if (data.length > 0)
+								if (data.length > 0) {
+									if (num_wait_files < data.length)
+										num_wait_files = data.length;
+
 									$('.progress-bar').html('Processing file(s): ' +
-										(up_filenames.length - data.length) + '/' + up_filenames.length);
-								else {
+										(num_wait_files - data.length) + '/' + num_wait_files);
+								} else {
 									clearInterval (interval);
 									$('.progress-bar').html('Done');
 									document.querySelector('#start').disabled = false;
+
+									file_manager.load_from_server();
+									var event = new Event('new_file');
+									event.files = null;
+									document.dispatchEvent(event);
 								}
 							})}
 							, 1000
