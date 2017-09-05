@@ -1,7 +1,9 @@
 
 const fs = require('fs');
-const sub_process = require('./sub_process.js');
 const si = require('systeminformation');
+
+const sub_process = require('./sub_process.js');
+const uploads = require('./files_upload.js');
 
 
 var waiting_jobs = [];
@@ -340,6 +342,8 @@ var computeSoftwareOrder = function (params, token) {
 	for (var idx in filenames) {
 		filesAvailable.push(filenames[idx]);
 	}
+	// Add the jokers
+	filesAvailable = filesAvailable.concat(Object.keys(uploads.jokers));
 
 	// DFS on files
 	while (filesAvailable.length > 0) {
@@ -443,6 +447,8 @@ var demux_executions = (params, soft_id, no_joker_files) => {
 	var inputs = params[soft_id].params.inputs;
 	var outputs = params[soft_id].params.outputs;
 
+	console.log(JSON.stringify(params[soft_id].params), '\n');
+
 	// Store all the files for a common joker subpart
 	var configurations = {};
 
@@ -452,28 +458,23 @@ var demux_executions = (params, soft_id, no_joker_files) => {
 
 		// Save for 
 		if (filename.includes('*')) {
-			let begin = filename.substring(0, filename.indexOf('*'));
-			let end = filename.substring(filename.indexOf('*')+1);
+			let files = get_joker_files(filename, no_joker_files);
 
-			// Look for corresponding files
-			for (var idx=0 ; idx<no_joker_files.length ; idx++) {
-				var candidate = no_joker_files[idx];
+			let prefix = filename.substring(0, filename.indexOf('*'));
+			let suffix = filename.substring(filename.indexOf('*')+1);
 
-				if (candidate.includes('*'))
-					continue;
+			// // Look for corresponding files
+			for (var idx=0 ; idx<files.length ; idx++) {
+				let file = files[idx];
+				let core = file.substr(prefix.length);
+				core = core.substr(0, core.length-suffix.length);
 
-				// If the file correspond, extract the core text
-				if (candidate.startsWith(begin) && candidate.endsWith(end)) {
-					var core = candidate.substring(begin.length);
-					core = core.substring(0, core.indexOf(end));
-
-					// Get the config
-					var config = configurations[core] ? configurations[core] :
-						JSON.parse(JSON.stringify(params[soft_id]));
-					// Update the config
-					config.params.inputs[in_id] = candidate;
-					configurations[core] = config;
-				}
+				// Get the config
+				var config = configurations[core] ? configurations[core] :
+					JSON.parse(JSON.stringify(params[soft_id]));
+				// Update the config
+				config.params.inputs[in_id] = file;
+				configurations[core] = config;
 			}
 		}
 	}
@@ -538,3 +539,29 @@ var getAllFiles = (params, token) => {
 
 	return filenames
 };
+
+var get_joker_files = (filename, no_joker_files) => {
+	if (uploads.jokers[filename]) {
+		// Joker from zip
+		return uploads.jokers[filename];
+	} else {
+		// Joker by filename
+		let begin = filename.substring(0, filename.indexOf('*'));
+		let end = filename.substring(filename.indexOf('*')+1);
+
+		let filelist = [];
+		// Look for corresponding files
+		for (var idx=0 ; idx<no_joker_files.length ; idx++) {
+			var candidate = no_joker_files[idx];
+
+			if (candidate.includes('*'))
+				continue;
+
+			// If the file correspond, extract the core text
+			if (candidate.startsWith(begin) && candidate.endsWith(end))
+				filelist.push(candidate);
+		}
+
+		return filelist;
+	}
+}

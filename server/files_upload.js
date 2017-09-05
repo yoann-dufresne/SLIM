@@ -23,6 +23,7 @@ exports.exposeDir = function (app) {
 				}
 			}
 			
+			items = items.concat(Object.keys(exports.jokers));
 			res.send(items);
 		});
 	});
@@ -69,9 +70,10 @@ exports.upload = function (app) {
 				fs.unlink(file.path, function(){})
 			else {
 				// Remove file if already exists
+				let filepath = '/app/data/' + token + '/' + file.name;
 				if (fs.existsSync(filepath))
 					fs.unlinkSync(filepath);
-				
+
 				if (file.name.endsWith('gz'))
 					decompress_archive(token, file);
 				else
@@ -98,7 +100,8 @@ exports.upload = function (app) {
 var decompress_archive = (token, archive) => {
 	let dir = '/app/data/' + token + '/';
 
-	let ext = null;
+	let prefix = null;
+	let suffix = null;
 	let file_list = [];
 
 	exec('tar', ['-xvf', archive.path, '-C', dir])
@@ -108,30 +111,46 @@ var decompress_archive = (token, archive) => {
 			name: data.toString('utf8').trim(),
 			path: dir + data.toString('utf8').trim()
 		};
-		file_list.push(file.name);
+		file_list.push(file);
 
-		// Determine file extensions
-		let tmp_ext = file.name.substr(file.name.lastIndexOf('.')+1);
-		if (ext == null) {
-			ext = tmp_ext;
-		} else if (ext == "" || ext != tmp_ext) {
-			ext = "";
+		// Determine maximal prefix
+		if (prefix == null)
+			prefix = file.name;
+		else {
+			// Get the first idx for different 
+			let cmon_idx;
+			for (cmon_idx=0 ; cmon_idx<prefix.length ; cmon_idx++)
+				if (prefix[cmon_idx] != file.name[cmon_idx])
+					break;
+			prefix = prefix.substr(0, cmon_idx);
+		}
+
+		// Determine maximal suffix
+		if (suffix == null)
+			suffix = file.name;
+		else {
+			// Get the first idx for different 
+			let cmon_idx;
+			for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--)
+				if (suffix[cmon_idx] != file.name[cmon_idx])
+					break;
+			suffix = suffix.substr(cmon_idx+1);
 		}
 	})
 	.on('close', () => {
 		fs.unlink(archive.path, ()=>{});
 
 		// Create an archive joker
-		if (file_list.length > 1 && ext != "") {
+		if (file_list.length > 1 && (prefix.length > 0 || suffix.length > 0)) {
 			let files = [];
-			for (let idx=0 ; idx<file_list.length ; idx++) {
+			for (let idx in file_list) {
 				let file = file_list[idx];
 				proccess_file(token, file, dir);
 				files.push(file.name);
 			}
 
-			let arch_name = archive.name.substr(0, archive.name.lastIndexOf('.tar.gz'));
-			exports.jokers[arch_name + '*.' + ext] = file_list;
+			file_list = file_list.map((file) => {return file.name;});
+			exports.jokers[prefix + '*' + suffix] = file_list;
 		}
 	});
 };
