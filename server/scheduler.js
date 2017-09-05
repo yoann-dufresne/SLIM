@@ -27,10 +27,12 @@ exports.start = function () {
 };
 
 var scheduler = function () {
+	let directory = '/app/data/' + token + '/';
+
 	// Add a new job if not so busy
 	if (Object.keys(running_jobs).length < MAX_JOBS && waiting_jobs.length > 0) {
 		let token = waiting_jobs.shift();
-		fs.readFile ('/app/data/' + token + '/exec.log', (err, data) => {
+		fs.readFile (directory + 'exec.log', (err, data) => {
 			if (err) throw err;
 			
 			// Load the configuration file.
@@ -45,7 +47,7 @@ var scheduler = function () {
 			// Verify if ended
 			if (job.order == null || job.order.length == 0) {
 				job.status = 'ended';
-				fs.writeFile('/app/data/' + token + '/exec.log', JSON.stringify(job), (err) => {});
+				fs.writeFile(directory + 'exec.log', JSON.stringify(job), (err) => {});
 				console.log(token + ': Ended');
 
 				// Mayby problematic: TODO : verify with multiple jobs
@@ -66,12 +68,16 @@ var scheduler = function () {
 			for (let sub_idx=0 ; sub_idx<configs_array.length ; sub_idx++) {
 				configs_array[sub_idx].status = "waiting";
 				configs_array[sub_idx].log = 'out_' + nextId + '_' + sub_idx + '.log';
+				// Clear pevious log if exists
+				let filepath = directory + configs_array[sub_idx].log;
+				if (fs.existsSync(filepath))
+					fs.unlink(filepath, ()=>{});
 			}
 			job.conf[nextId] = configs_array;
 
 			// Save the status
 			running_jobs[token] = job;
-			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			fs.writeFileSync(directory + 'exec.log', JSON.stringify(job));
 			console.log (token + ': status updated');
 
 			// Start the sub-process

@@ -38,6 +38,7 @@ exports.run = function (os, config, callback) {
 		'-w', directory + tmp_outfile,
 		'-t', options.threshold,
 		'-A', algorithms[algo_name] ? algorithms[algo_name] : 'simple_bayesian',
+		'-d', 'bfsrk',
 		'-T', os.cores];
 
 	// Length options

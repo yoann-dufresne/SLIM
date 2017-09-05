@@ -23,7 +23,6 @@ exports.write_otu_table = (otu_matrix, table_file, t2sOrder, callback) => {
 	}
 
 	fileOrder = Object.keys(fileOrder);
-	console.log(JSON.stringify(fileOrder));
 
 	// Final order
 	let order = [];

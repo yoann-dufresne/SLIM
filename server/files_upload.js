@@ -68,8 +68,12 @@ exports.upload = function (app) {
 			if (token == null)
 				fs.unlink(file.path, function(){})
 			else {
+				// Remove file if already exists
+				if (fs.existsSync(filepath))
+					fs.unlinkSync(filepath);
+				
 				if (file.name.endsWith('gz'))
-					decompress_archive(file);
+					decompress_archive(token, file);
 				else
 					proccess_file(token, file, form.uploadDir);
 			}
@@ -91,10 +95,44 @@ exports.upload = function (app) {
 };
 
 
-var decompress_archive = (archive, token) => {
-	exec('tar', ['-xvf', archive.path])
+var decompress_archive = (token, archive) => {
+	let dir = '/app/data/' + token + '/';
+
+	let ext = null;
+	let file_list = [];
+
+	exec('tar', ['-xvf', archive.path, '-C', dir])
 	.stdout.on('data', (data) => {
-		console.log('>', data.toString('utf8'));
+		// Create file to process
+		let file = {
+			name: data.toString('utf8').trim(),
+			path: dir + data.toString('utf8').trim()
+		};
+		file_list.push(file.name);
+
+		// Determine file extensions
+		let tmp_ext = file.name.substr(file.name.lastIndexOf('.')+1);
+		if (ext == null) {
+			ext = tmp_ext;
+		} else if (ext == "" || ext != tmp_ext) {
+			ext = "";
+		}
+	})
+	.on('close', () => {
+		fs.unlink(archive.path, ()=>{});
+
+		// Create an archive joker
+		if (file_list.length > 1 && ext != "") {
+			let files = [];
+			for (let idx=0 ; idx<file_list.length ; idx++) {
+				let file = file_list[idx];
+				proccess_file(token, file, dir);
+				files.push(file.name);
+			}
+
+			let arch_name = archive.name.substr(0, archive.name.lastIndexOf('.tar.gz'));
+			exports.jokers[arch_name + '*.' + ext] = file_list;
+		}
 	});
 };
 
