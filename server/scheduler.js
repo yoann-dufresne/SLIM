@@ -27,12 +27,10 @@ exports.start = function () {
 };
 
 var scheduler = function () {
-	let directory = '/app/data/' + token + '/';
-
 	// Add a new job if not so busy
 	if (Object.keys(running_jobs).length < MAX_JOBS && waiting_jobs.length > 0) {
 		let token = waiting_jobs.shift();
-		fs.readFile (directory + 'exec.log', (err, data) => {
+		fs.readFile ('/app/data/' + token + '/exec.log', (err, data) => {
 			if (err) throw err;
 			
 			// Load the configuration file.
@@ -42,6 +40,8 @@ var scheduler = function () {
 	
 	// Update the software executions
 	for (let token in running_jobs) {
+		let directory = '/app/data/' + token + '/';
+
 		let job = running_jobs[token];
 		if (job.status == "ready") {
 			// Verify if ended
