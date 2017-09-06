@@ -230,7 +230,7 @@ exports.listen_commands = function (app) {
 
 		// Explicit input file names
 		let files = getAllFiles(params, token);
-		exe.conf = expand_parameters(params, files, order)
+		exe.conf = expand_parameters(token, params, files, order)
 
 		// Finalise status
 		exe.status = 'ready';
@@ -343,7 +343,8 @@ var computeSoftwareOrder = function (params, token) {
 		filesAvailable.push(filenames[idx]);
 	}
 	// Add the jokers
-	filesAvailable = filesAvailable.concat(Object.keys(uploads.jokers));
+	if (uploads.jokers[token])
+		filesAvailable = filesAvailable.concat(Object.keys(uploads.jokers[token]));
 
 	// DFS on files
 	while (filesAvailable.length > 0) {
@@ -386,7 +387,7 @@ var computeSoftwareOrder = function (params, token) {
 	return order;
 }
 
-var expand_parameters = (params, no_joker_files, order) => {
+var expand_parameters = (token, params, no_joker_files, order) => {
 	for (var idx in order) {
 		var soft_id = order[idx];
 
@@ -395,7 +396,7 @@ var expand_parameters = (params, no_joker_files, order) => {
 		params[soft_id].params.inputs = inputs;
 
 		// * demultiplexing
-		var dev_params = demux_executions(params, soft_id, no_joker_files);
+		var dev_params = demux_executions(token, params, soft_id, no_joker_files);
 		// Copy soft parameters
 		params[soft_id] = dev_params[soft_id];
 		// Add jokers
@@ -443,11 +444,9 @@ var demux_files = (inputs, files) => {
 
 
 // From one entry, generate multiple exactutions
-var demux_executions = (params, soft_id, no_joker_files) => {
+var demux_executions = (token, params, soft_id, no_joker_files) => {
 	var inputs = params[soft_id].params.inputs;
 	var outputs = params[soft_id].params.outputs;
-
-	console.log(JSON.stringify(params[soft_id].params), '\n');
 
 	// Store all the files for a common joker subpart
 	var configurations = {};
@@ -458,7 +457,7 @@ var demux_executions = (params, soft_id, no_joker_files) => {
 
 		// Save for 
 		if (filename.includes('*')) {
-			let files = get_joker_files(filename, no_joker_files);
+			let files = get_joker_files(token, filename, no_joker_files);
 
 			let prefix = filename.substring(0, filename.indexOf('*'));
 			let suffix = filename.substring(filename.indexOf('*')+1);
@@ -540,10 +539,10 @@ var getAllFiles = (params, token) => {
 	return filenames
 };
 
-var get_joker_files = (filename, no_joker_files) => {
-	if (uploads.jokers[filename]) {
+var get_joker_files = (token, filename, no_joker_files) => {
+	if (uploads.jokers[token][filename]) {
 		// Joker from zip
-		return uploads.jokers[filename];
+		return uploads.jokers[token][filename];
 	} else {
 		// Joker by filename
 		let begin = filename.substring(0, filename.indexOf('*'));

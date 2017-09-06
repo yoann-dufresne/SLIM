@@ -8,7 +8,9 @@ exports.jokers = {};
 exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
-		fs.readdir("/app/data/" + req.query.token, function(err, items) {
+		let token = req.query.token;
+
+		fs.readdir("/app/data/" + token, function(err, items) {
 			// If token incorrect
 			if (!items) {
 				res.status(403).send("bad token");
@@ -23,7 +25,9 @@ exports.exposeDir = function (app) {
 				}
 			}
 			
-			items = items.concat(Object.keys(exports.jokers));
+			let jok = exports.jokers[token] ? exports.jokers[token] : {};
+
+			items = items.concat(Object.keys(jok));
 			res.send(items);
 		});
 	});
@@ -138,7 +142,7 @@ var decompress_archive = (token, archive) => {
 		}
 	})
 	.on('close', () => {
-		fs.unlink(archive.path, ()=>{});
+		fs.unlinkSync(archive.path);
 
 		// Create an archive joker
 		if (file_list.length > 1 && (prefix.length > 0 || suffix.length > 0)) {
@@ -149,8 +153,11 @@ var decompress_archive = (token, archive) => {
 				files.push(file.name);
 			}
 
+			if (!exports.jokers[token])
+				exports.jokers[token] = {};
+
 			file_list = file_list.map((file) => {return file.name;});
-			exports.jokers[prefix + '*' + suffix] = file_list;
+			exports.jokers[token][prefix + '*' + suffix] = file_list;
 		}
 	});
 };
