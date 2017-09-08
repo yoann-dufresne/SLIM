@@ -54,7 +54,6 @@ COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
 COPY lib/mistag_filter /app/lib/mistag_filter
-COPY lib/abundance_filters /app/lib/abundance_filters
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app

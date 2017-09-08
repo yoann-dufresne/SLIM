@@ -1,7 +1,9 @@
 
 const fs = require('fs');
-const sub_process = require('./sub_process.js');
 const si = require('systeminformation');
+
+const sub_process = require('./sub_process.js');
+const uploads = require('./files_upload.js');
 
 
 var waiting_jobs = [];
@@ -40,12 +42,14 @@ var scheduler = function () {
 	
 	// Update the software executions
 	for (let token in running_jobs) {
+		let directory = '/app/data/' + token + '/';
+
 		let job = running_jobs[token];
 		if (job.status == "ready") {
 			// Verify if ended
 			if (job.order == null || job.order.length == 0) {
 				job.status = 'ended';
-				fs.writeFile('/app/data/' + token + '/exec.log', JSON.stringify(job), (err) => {});
+				fs.writeFile(directory + 'exec.log', JSON.stringify(job), (err) => {});
 				console.log(token + ': Ended');
 
 				// Mayby problematic: TODO : verify with multiple jobs
@@ -66,12 +70,16 @@ var scheduler = function () {
 			for (let sub_idx=0 ; sub_idx<configs_array.length ; sub_idx++) {
 				configs_array[sub_idx].status = "waiting";
 				configs_array[sub_idx].log = 'out_' + nextId + '_' + sub_idx + '.log';
+				// Clear pevious log if exists
+				let filepath = directory + configs_array[sub_idx].log;
+				if (fs.existsSync(filepath))
+					fs.unlink(filepath, ()=>{});
 			}
 			job.conf[nextId] = configs_array;
 
 			// Save the status
 			running_jobs[token] = job;
-			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			fs.writeFileSync(directory + 'exec.log', JSON.stringify(job));
 			console.log (token + ': status updated');
 
 			// Start the sub-process
@@ -150,7 +158,15 @@ var sub_process_start = (tok, configs_array) => {
 	// Lanch initial sub-softwares
 	job.next_sub_idx = limit;
 	for (let lanch_idx=0 ; lanch_idx<limit ; lanch_idx++)
-		sub_process.run({token:token, cores:CORES_BY_RUN, idx:lanch_idx}, configs_array[lanch_idx], sub_process_callback);
+		try {
+			sub_process.run({token:token, cores:CORES_BY_RUN, idx:lanch_idx}, configs_array[lanch_idx], sub_process_callback);
+		} catch (err) {
+			// Continue the execution in case of bad module run
+			console.log(err);
+			job.status = 'aborted';
+			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			delete running_jobs[token]
+		}
 };
 
 
@@ -214,7 +230,7 @@ exports.listen_commands = function (app) {
 
 		// Explicit input file names
 		let files = getAllFiles(params, token);
-		exe.conf = expand_parameters(params, files, order)
+		exe.conf = expand_parameters(token, params, files, order)
 
 		// Finalise status
 		exe.status = 'ready';
@@ -326,6 +342,9 @@ var computeSoftwareOrder = function (params, token) {
 	for (var idx in filenames) {
 		filesAvailable.push(filenames[idx]);
 	}
+	// Add the jokers
+	if (uploads.jokers[token])
+		filesAvailable = filesAvailable.concat(Object.keys(uploads.jokers[token]));
 
 	// DFS on files
 	while (filesAvailable.length > 0) {
@@ -368,7 +387,7 @@ var computeSoftwareOrder = function (params, token) {
 	return order;
 }
 
-var expand_parameters = (params, no_joker_files, order) => {
+var expand_parameters = (token, params, no_joker_files, order) => {
 	for (var idx in order) {
 		var soft_id = order[idx];
 
@@ -377,7 +396,7 @@ var expand_parameters = (params, no_joker_files, order) => {
 		params[soft_id].params.inputs = inputs;
 
 		// * demultiplexing
-		var dev_params = demux_executions(params, soft_id, no_joker_files);
+		var dev_params = demux_executions(token, params, soft_id, no_joker_files);
 		// Copy soft parameters
 		params[soft_id] = dev_params[soft_id];
 		// Add jokers
@@ -425,7 +444,7 @@ var demux_files = (inputs, files) => {
 
 
 // From one entry, generate multiple exactutions
-var demux_executions = (params, soft_id, no_joker_files) => {
+var demux_executions = (token, params, soft_id, no_joker_files) => {
 	var inputs = params[soft_id].params.inputs;
 	var outputs = params[soft_id].params.outputs;
 
@@ -438,28 +457,23 @@ var demux_executions = (params, soft_id, no_joker_files) => {
 
 		// Save for 
 		if (filename.includes('*')) {
-			let begin = filename.substring(0, filename.indexOf('*'));
-			let end = filename.substring(filename.indexOf('*')+1);
+			let files = get_joker_files(token, filename, no_joker_files);
 
-			// Look for corresponding files
-			for (var idx=0 ; idx<no_joker_files.length ; idx++) {
-				var candidate = no_joker_files[idx];
+			let prefix = filename.substring(0, filename.indexOf('*'));
+			let suffix = filename.substring(filename.indexOf('*')+1);
 
-				if (candidate.includes('*'))
-					continue;
+			// // Look for corresponding files
+			for (var idx=0 ; idx<files.length ; idx++) {
+				let file = files[idx];
+				let core = file.substr(prefix.length);
+				core = core.substr(0, core.length-suffix.length);
 
-				// If the file correspond, extract the core text
-				if (candidate.startsWith(begin) && candidate.endsWith(end)) {
-					var core = candidate.substring(begin.length);
-					core = core.substring(0, core.indexOf(end));
-
-					// Get the config
-					var config = configurations[core] ? configurations[core] :
-						JSON.parse(JSON.stringify(params[soft_id]));
-					// Update the config
-					config.params.inputs[in_id] = candidate;
-					configurations[core] = config;
-				}
+				// Get the config
+				var config = configurations[core] ? configurations[core] :
+					JSON.parse(JSON.stringify(params[soft_id]));
+				// Update the config
+				config.params.inputs[in_id] = file;
+				configurations[core] = config;
 			}
 		}
 	}
@@ -524,3 +538,29 @@ var getAllFiles = (params, token) => {
 
 	return filenames
 };
+
+var get_joker_files = (token, filename, no_joker_files) => {
+	if (uploads.jokers[token][filename]) {
+		// Joker from zip
+		return uploads.jokers[token][filename];
+	} else {
+		// Joker by filename
+		let begin = filename.substring(0, filename.indexOf('*'));
+		let end = filename.substring(filename.indexOf('*')+1);
+
+		let filelist = [];
+		// Look for corresponding files
+		for (var idx=0 ; idx<no_joker_files.length ; idx++) {
+			var candidate = no_joker_files[idx];
+
+			if (candidate.includes('*'))
+				continue;
+
+			// If the file correspond, extract the core text
+			if (candidate.startsWith(begin) && candidate.endsWith(end))
+				filelist.push(candidate);
+		}
+
+		return filelist;
+	}
+}

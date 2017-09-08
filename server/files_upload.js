@@ -3,10 +3,14 @@ const formidable = require('formidable');
 const path = require('path');
 const exec = require('child_process').spawn;
 
+exports.jokers = {};
+
 exports.exposeDir = function (app) {
 	// list data directory
 	app.get('/list', function(req, res) {
-		fs.readdir("/app/data/" + req.query.token, function(err, items) {
+		let token = req.query.token;
+
+		fs.readdir("/app/data/" + token, function(err, items) {
 			// If token incorrect
 			if (!items) {
 				res.status(403).send("bad token");
@@ -21,13 +25,16 @@ exports.exposeDir = function (app) {
 				}
 			}
 			
+			let jok = exports.jokers[token] ? exports.jokers[token] : {};
+
+			items = items.concat(Object.keys(jok));
 			res.send(items);
 		});
 	});
 }
 
 
-var files_to_convert = {};
+let files_to_convert = {};
 
 exports.upload = function (app) {
 	app.get('/convertion', function(req, res) {
@@ -66,23 +73,15 @@ exports.upload = function (app) {
 			if (token == null)
 				fs.unlink(file.path, function(){})
 			else {
-				// Add files to convertion array
-				if (!files_to_convert[token])
-					files_to_convert[token] = [];
-				files_to_convert[token].push(file.name);
+				// Remove file if already exists
+				let filepath = '/app/data/' + token + '/' + file.name;
+				if (fs.existsSync(filepath))
+					fs.unlinkSync(filepath);
 
-				// Transform in unix format
-				exec('dos2unix', [file.path, '-q']).on('close', () => {
-					exec('mac2unix', [file.path, '-q']).on('close', () => {
-						// Rename
-						fs.rename(file.path, path.join(form.uploadDir, file.name), function (err) {
-							if (err)
-								console.log('Error during file upload: ' + err);
-
-							files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
-						});
-					});
-				});
+				if (file.name.endsWith('gz'))
+					decompress_archive(token, file);
+				else
+					proccess_file(token, file, form.uploadDir);
 			}
 		});
 
@@ -98,5 +97,90 @@ exports.upload = function (app) {
 
 		// parse the incoming request containing the form data
 		form.parse(req);
+	});
+};
+
+
+var decompress_archive = (token, archive) => {
+	let dir = '/app/data/' + token + '/';
+
+	let prefix = null;
+	let suffix = null;
+	let file_list = [];
+
+	exec('tar', ['-xvf', archive.path, '-C', dir])
+	.stdout.on('data', (data) => {
+		// Create file to process
+		let file = {
+			name: data.toString('utf8').trim(),
+			path: dir + data.toString('utf8').trim()
+		};
+		file_list.push(file);
+
+		// Determine maximal prefix
+		if (prefix == null)
+			prefix = file.name;
+		else {
+			// Get the first idx for different 
+			let cmon_idx;
+			for (cmon_idx=0 ; cmon_idx<prefix.length ; cmon_idx++)
+				if (prefix[cmon_idx] != file.name[cmon_idx])
+					break;
+			prefix = prefix.substr(0, cmon_idx);
+		}
+
+		// Determine maximal suffix
+		if (suffix == null)
+			suffix = file.name;
+		else {
+			// Get the first idx for different 
+			let cmon_idx;
+			for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--)
+				if (suffix[cmon_idx] != file.name[cmon_idx])
+					break;
+			suffix = suffix.substr(cmon_idx+1);
+		}
+	})
+	.on('close', () => {
+		fs.unlinkSync(archive.path);
+
+		// Create an archive joker
+		if (file_list.length > 1 && (prefix.length > 0 || suffix.length > 0)) {
+			let files = [];
+			for (let idx in file_list) {
+				let file = file_list[idx];
+				proccess_file(token, file, dir);
+				files.push(file.name);
+			}
+
+			if (!exports.jokers[token])
+				exports.jokers[token] = {};
+
+			file_list = file_list.map((file) => {return file.name;});
+			exports.jokers[token][prefix + '*' + suffix] = file_list;
+		}
+	});
+};
+
+
+var proccess_file = (token, file, upload_dir) => {
+	// Add files to convertion array
+	if (!files_to_convert[token])
+		files_to_convert[token] = [];
+	files_to_convert[token].push(file.name);
+
+	// Transform in unix format
+	exec('dos2unix', [file.path, '-q'])
+	.on('close', () => {
+		exec('mac2unix', [file.path, '-q'])
+		.on('close', () => {
+			// Rename
+			fs.rename(file.path, path.join(upload_dir, file.name), function (err) {
+				if (err)
+					console.log('Error during file upload: ' + err);
+
+				files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
+			});
+		});
 	});
 };
