@@ -95,3 +95,33 @@ else
 	git pull
 	cd ..
 fi
+
+
+# Blast+
+if [ ! -d "blast" ]; then
+	mkdir blast
+	wget -qO- ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.6.0+-x64-linux.tar.gz | tar xvz -C blast/
+fi
+
+
+# pad_with_gaps
+if [ ! -d "scripts" ]; then
+	mkdir scripts
+	if [ ! -d "scripts/pad_with_gaps" ]; then
+		git clone https://github.com/FranckLejzerowicz/pad_with_gaps.git scripts/pad_with_gaps/
+	else
+		cd scripts/pad_with_gaps
+		git pull
+		cd ../..
+	fi
+else
+	cd scripts
+	if [ ! -d "pad_with_gaps" ]; then
+		git clone https://github.com/FranckLejzerowicz/pad_with_gaps.git pad_with_gaps/
+	else
+		cd pad_with_gaps
+		git pull
+		cd ..
+	cd ..
+	fi
+fi
