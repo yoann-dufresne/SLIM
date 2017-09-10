@@ -16,7 +16,6 @@ class MistagFilterModule extends Module {
 			mistagfasta.value = inputfasta.value.substr(0, inputfasta.value.lastIndexOf('.')) + '_mistagFiltered.fasta';
 			mistagstats.value = inputfasta.value.substr(0, inputfasta.value.lastIndexOf('.')) + '_mistagFiltered_stats.tsv';
 			mistagfasta.onchange();
-			mistagstats.onchange();
 		};
 	}
 
