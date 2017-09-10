@@ -1,0 +1,36 @@
+<p>Padded fasta file</p>
+<input type="text" name="fasta" class="input_file fasta">
+
+<p>Output directory (will be compressed)</p>
+<span class="output_zone">
+	<input type="text" name="outDir" value="">
+	<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
+<p>Components of the entropy trace</p>
+<p>
+Number (auto) <input type="number" name="auto" class="param_value autoCompo" value="1" style="width: 50px;">
+Selection (manual) <input type="text" name="manu" class="param_value manuCompo" style="width: 120px;">
+</p>
+<p>Abundance thresholds</p>
+<p>
+Min samples occurrence <input type="number" name="sample" class="param_value nSamples" value="1" style="width: 50px;">
+Min percent abundance <input type="number" name="abund" class="param_value pAbund" value="0.0" pattern="[0-9]+([\.,][0-9]+)?" step="0.01" title="Number with up to 2 decimal places" style="width: 60px;">
+</p>
+<p>
+Across dataset <input type="number" name="abundSum" class="param_value abundSum" value="0" style="width: 50px;">
+Biggest oligotype <input type="number" name="abundOligo" class="param_value abundOligo" value="0" style="width: 50px;">
+</p>
+
+<div class="options">
+	<p>Perform padding <input type="checkbox" name="padding" class="param_value padding" checked>
+	<!-- to be added when tk-python bug fixed -->
+	<!-- Figure display <input type="checkbox" name="display" class="param_value display">-->
+	Sample name separator <input type="text" name="sep" class="param_value sep" value="_" style="width: 30px;">
+	Make oligotype sets <input type="checkbox" name="sets" class="param_value sets" checked>
+	</p>
+	<p>
+	Skip basic analyses <input type="checkbox" name="basic" class="param_value basic" checked>
+	Skip GEFX network <input type="checkbox" name="gefx" class="param_value gefx" checked></p>
+	</p>
+</div>
