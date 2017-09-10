@@ -21,12 +21,17 @@ RUN apt-get update && apt-get install -y \
 	dos2unix \
 	python2.7 \
 	r-base \
-	python-pip
+	python-pip \
+	python-tk
 
 # Install python packages
 RUN python -m pip install --upgrade pip
 RUN pip install numpy scipy
 RUN pip install biopython
+RUN pip install matplotlib
+RUN pip install django
+# Install oligotyping
+RUN pip install oligotyping
 
 RUN mkdir /app/lib
 
@@ -55,6 +60,16 @@ COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
 COPY lib/mistag_filter /app/lib/mistag_filter
 COPY lib/abundance_filters /app/lib/abundance_filters
+COPY lib/scripts/pad_with_gaps /app/lib/scripts/pad_with_gaps
+COPY lib/R /app/lib/R
+COPY lib/oligotyping /app/lib/oligotyping
+COPY lib/blast /app/lib/blast
+
+# Install R dependencies
+RUN R -f /app/lib/R/install-packages.R
+
+# Make blast programs accessible
+ENV PATH="${PATH}:/app/lib/blast/ncbi-blast-2.6.0+/bin"
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
