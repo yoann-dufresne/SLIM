@@ -15,6 +15,7 @@ exports.run = (os, config, callback) => {
 	var design = directory + config.params.inputs.design
 	// Output fasta file name
 	var out_file = directory + config.params.outputs.fasta;
+	var out_stats = directory + config.params.outputs.stats;
 
 	console.log ('Mistag filtering for file ' + filename);
   
