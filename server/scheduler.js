@@ -4,6 +4,7 @@ const si = require('systeminformation');
 
 const sub_process = require('./sub_process.js');
 const uploads = require('./files_upload.js');
+const mailer = require('./mail_manager.js');
 
 
 var waiting_jobs = [];
@@ -15,6 +16,9 @@ var NB_CORES = 1;
 var MAX_JOBS = 1;
 const CORES_BY_RUN = 8;
 const SCHEDULE_TIME = 10000;
+
+
+exports.urls = {};
 
 
 exports.start = function () {
@@ -53,6 +57,7 @@ var scheduler = function () {
 				console.log(token + ': Ended');
 
 				// Mayby problematic: TODO : verify with multiple jobs
+				uploads.trigger_job_end(token);
 				delete running_jobs[token];
 				continue;
 			}
@@ -73,7 +78,7 @@ var scheduler = function () {
 				// Clear pevious log if exists
 				let filepath = directory + configs_array[sub_idx].log;
 				if (fs.existsSync(filepath))
-					fs.unlink(filepath, ()=>{});
+					fs.unlinkSync(filepath);
 			}
 			job.conf[nextId] = configs_array;
 
@@ -185,13 +190,19 @@ exports.listen_commands = function (app) {
 		}
 
 		var token = params.token;
+		var mail = params.mail;
 		delete params.token;
+		delete params.mail;
 
 		// Verification of the existance of the token
 		if (! fs.existsSync('/app/data/' + token)){
 			res.status(403).send('Invalid token')
 			return;
 		}
+		// Save URL
+		exports.urls[token] = req.protocol + '://' + req.get('host') + '?token=' + token;
+		mailer.mails[token] = mail;
+		mailer.send_address(token);
 
 		// Save the conf and return message
 		fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {

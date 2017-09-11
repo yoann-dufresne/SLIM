@@ -8,13 +8,6 @@ input[type="text"] {
     width: 400px;
 }
 
-#start {
-	display: block;
-	margin: auto;
-	margin-top: 20px;
-	margin-bottom: 150px;
-}
-
 .no_vertical_margins {
 	margin-bottom: 0px;
 	margin-top: 0px;
@@ -187,3 +180,25 @@ input[type="text"].integer {
 .file_list p, .input_list p {
 	margin: 0px;
 }
+
+
+
+
+
+/* ----------------------- Run area ------------------------------*/
+#warnings {
+	color: red;
+	margin-top: 10px;
+}
+
+#mail {
+	margin-right: 10px;
+	width: 250px;
+}
+
+#start_area {
+	margin: auto;
+	margin-top: 20px;
+	margin-bottom: 150px;
+}
+

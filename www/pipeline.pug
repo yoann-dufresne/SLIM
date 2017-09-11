@@ -49,7 +49,10 @@ body
 	select#module_list
 	button#add_module Add module
 
-	button#start Start analysis
+	div#warnings
+	div#start_area
+		input(type='text', value='Your email address')#mail
+		button#start Start analysis
 
 	script(src='/js/module.js')
 

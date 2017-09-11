@@ -3,6 +3,8 @@ const formidable = require('formidable');
 const path = require('path');
 const exec = require('child_process').spawn;
 
+const mailer = require('./mail_manager.js');
+
 exports.jokers = {};
 
 exports.exposeDir = function (app) {
@@ -183,4 +185,28 @@ var proccess_file = (token, file, upload_dir) => {
 			});
 		});
 	});
+};
+
+
+
+exports.trigger_job_end = (token) => {
+	// End mail
+	mailer.send_end_mail (token);
+
+	// Reminder
+	setTimeout (
+		() => {mailer.send_delete_reminder(token)},
+		1000 * 3600 * 23
+	);
+
+	// Delete environment 24h15 after the process end
+	setTimeout (
+		() => {require('child_process').exec('rm -rf /app/data/' + token, (err)=>{
+			if (err)
+				console.log(err);
+			else
+				console.log(token + ': files deleted');
+		})},
+		1000 * 3600 * 24 + 15 * 60000
+	);	
 };

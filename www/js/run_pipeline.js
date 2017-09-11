@@ -13,7 +13,10 @@ add_button.onclick = function () {
 var run = document.querySelector('#start');
 
 var get_config = () => {
-	var config = {token:exec_token};
+	var config = {
+		token:exec_token,
+		mail: document.getElementById('mail').value
+	};
 	for (var idx in module_manager.modules) {
 		var module = module_manager.modules[idx];
 
@@ -28,6 +31,16 @@ var get_config = () => {
 
 var status_interval;
 run.onclick = function () {
+	// Verify mail address
+	let mail_value = document.getElementById('mail').value;
+	if (mail_value.includes('@'))
+		document.getElementById('warnings').innerHTML = '';
+	else {
+		document.getElementById('warnings').innerHTML = '<p>A valid mail address should be entered</p>';
+		return;
+	}
+
+	// Get config
 	var config = get_config();
 
 	$.post( "/run", config)
