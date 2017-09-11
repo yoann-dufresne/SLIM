@@ -199,9 +199,13 @@ exports.listen_commands = function (app) {
 			res.status(403).send('Invalid token')
 			return;
 		}
-		// Save URL
+		// Save URL and mail address
 		exports.urls[token] = req.protocol + '://' + req.get('host') + '?token=' + token;
 		mailer.mails[token] = mail;
+
+		// Send a mail and cancel the directory removal
+		if (uploads.deletions[token])
+				clearTimeout(uploads.deletions[token]);
 		mailer.send_address(token);
 
 		// Save the conf and return message

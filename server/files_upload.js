@@ -6,6 +6,7 @@ const exec = require('child_process').spawn;
 const mailer = require('./mail_manager.js');
 
 exports.jokers = {};
+exports.deletions = {};
 
 exports.exposeDir = function (app) {
 	// list data directory
@@ -95,6 +96,23 @@ exports.upload = function (app) {
 		// once all the files have been uploaded, send a response to the client
 		form.on('end', function() {
 			res.send('success');
+
+			// Remove previous deletion delay
+			if (exports.deletions[token])
+				clearTimeout(exports.deletions[token]);
+
+			// Delete data after 8h id they are not used.
+			exports.deletions[token] = setTimeout(
+				() => {
+					require('child_process').exec('rm -rf /app/data/' + token, (err)=>{
+						if (err)
+							console.log(err);
+						else
+							console.log(token + ': files deleted');
+					});
+				},
+				1000 * 3600 * 8
+			);
 		});
 
 		// parse the incoming request containing the form data
@@ -206,7 +224,7 @@ exports.trigger_job_end = (token) => {
 				console.log(err);
 			else
 				console.log(token + ': files deleted');
-		})},
+		});},
 		1000 * 3600 * 24 + 15 * 60000
 	);	
 };
