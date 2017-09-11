@@ -78,4 +78,11 @@ else
 fi
 
 
-
+# mistag_filter
+if [ ! -d "mistag_filter" ]; then
+	git clone https://github.com/FranckLejzerowicz/mistag_filter.git mistag_filter/
+else
+	cd mistag_filter
+	git pull
+	cd ..
+fi
