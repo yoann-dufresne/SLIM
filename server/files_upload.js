@@ -122,6 +122,30 @@ exports.upload = function (app) {
 
 
 var decompress_archive = (token, archive) => {
+	if (archive.name.endsWith('.tar.gz'))
+		decompress_tgz(token, archive);
+	else
+		decompress_gz(token, archive);
+};
+
+var decompress_gz = (token, archive) => {
+	fs.renameSync(archive.path, '/app/data/' + token + '/' + archive.name);
+	archive.path = '/app/data/' + token + '/' + archive.name;
+
+	let gunzip = exec('gunzip', [archive.path]);
+
+	gunzip.stdout.on('data', (data) => {
+		console.log(data);
+	});
+	gunzip.stderr.on('data', (data) => {
+		console.log(`stderr: ${data}`);
+	});
+	gunzip.on('close', () => {
+		
+	});
+};
+
+var decompress_tgz = (token, archive) => {
 	let dir = '/app/data/' + token + '/';
 
 	let prefix = null;
