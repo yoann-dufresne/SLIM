@@ -1,7 +1,7 @@
 
 class MergeVsearchModule extends Module {
 	constructor (params) {
-		super ("mergepair-vsearch");
+		super ("mergepair-vsearch", 'https://github.com/yoann-dufresne/amplicon_pipeline/wiki/Mergepair-vsearch');
 
 		this.params = params;
 	}
