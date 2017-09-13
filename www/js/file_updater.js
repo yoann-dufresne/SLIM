@@ -39,8 +39,9 @@ class FileUpdater {
 			$(input_file).autocomplete({
 				lookup: autocomplete,
 				onSelect: function(suggestion) {
+					let prev = input_file.value;
 					input_file.value = suggestion.data;
-					if (input_file.onchange)
+					if (input_file.onchange && prev != input_file.value)
 						input_file.onchange();
 				}
 			});

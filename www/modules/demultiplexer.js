@@ -41,6 +41,7 @@ class DemultiplexerModule extends Module {
 
 			// Create inputs
 			for (var name in pairs) {
+				console.log("Reload");
 				var pair_div = this.create_R1R2_pair(name, pairs[name]);
 				this.illumina_div.appendChild(pair_div);
 			}
@@ -81,6 +82,7 @@ class DemultiplexerModule extends Module {
 						pair.r2 = fastq_name;
 				}
 			}
+			console.log(pair);
 		}
 
 		// Create the divs
@@ -117,6 +119,9 @@ class DemultiplexerModule extends Module {
 				// Parse each line
 				let lib = row.data[0].run;
 				let sample = row.data[0].sample;
+
+				if (!lib || lib == "")
+					return;
 
 				// Add library
 				if (!libs.includes(lib))
