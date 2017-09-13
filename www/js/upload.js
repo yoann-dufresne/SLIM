@@ -34,25 +34,6 @@ document.querySelector("#up_submit").onclick = function (event) {
 
 	// Read the file content if it's a CSV and store it on the client side
 	var file_selector = document.getElementById('up_files');
-	for (var idx=0 ; idx<file_selector.files.length ; idx++) {
-		var file = file_selector.files[idx];
-
-		// If CSV
-		if (file.name.endsWith(".csv")) {
-			// Read the file
-			var reader = new FileReader();
-			reader.filename = file.name;
-			reader.onload = (e) => {
-				// Parse the file content
-				var csv_txt = e.target.result;
-				var data = Papa.parse(csv_txt, {header: true});
-
-				// Save the content
-				file_manager.contents[e.target.filename] = data;
-			};
-			reader.readAsText(file);
-		}
-	}
 
 	// Upload the file
 	document.querySelector('#start').disabled = true;

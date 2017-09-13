@@ -17,23 +17,6 @@ class DemultiplexerModule extends Module {
 		gui_file_updater.file_trigger();
 	}
 
-	create_R1R2_pair (library_name, pair) {
-		if (!pair)
-			pair = {r1:"", r2:""};
-		var pair_div = document.createElement('div');
-		pair_div.classList.add('lib_div');
-		pair_div.innerHTML = '<p>' + library_name + '</p>' +
-			'<p class="illumina_read R1">R1 '
-				+ '<input type="text" name="' + library_name + '_R1" '
-				+ 'class="reads_file input_file fastq" value="' + pair.r1 + '">'
-			+ '</p><p class="illumina_read R2">R2 '
-				+ '<input type="text" name="' + library_name + '_R2" '
-				+ 'class="reads_file input_file fastq" value="' + pair.r2 + '">'
-			+ '</p>';
-
-		return pair_div;
-	}
-
 	defineIO () {
 		// Save inputs
 		this.illumina_div = this.dom.getElementsByClassName('illumina_reads')[0];
@@ -75,59 +58,106 @@ class DemultiplexerModule extends Module {
 		// Change the output files using the tags file
 		var that = this;
 		let tags_text = this.dom.getElementsByClassName('tags')[0];
-		tags_text.onchange = function () {
-			that.out_files = [];
-			that.out_area.innerHTML = "";
+		tags_text.onchange = () => {that.generate_R1R2fields()};
+	}
 
-			// The file is not uploaded
-			if (file_manager.contents[tags_text.value] == undefined)
-				return;
+	create_R1R2_pair (library_name, pair) {
+		// Try to infer R1 and R2
+		if (!pair) {
+			pair = {r1:"", r2:""};
 
-			// Get the file content
-			var data = file_manager.contents[tags_text.value].data;
-			var csv_name = tags_text.value;
-			csv_name = csv_name.substr(0, csv_name.lastIndexOf('.'));
-			var libraries = [];
-			var nbLibs = 0;
-			for (let idx=0 ; idx<data.length ; idx++) {
-				let sample = data[idx];
+			// Browse all the files to auto assign values
+			let fastqs = file_manager.getFiles(['fastq']);
+			for (let idx in fastqs) {
+				let fastq_name = fastqs[idx];
 
-				// Add the run with joker
-				if (!libraries.includes(sample.run)) {
-					libraries.push(sample.run);
-					that.out_files.push(csv_name + '_' + sample.run + "*_fwd.fastq");
-					that.out_files.push(csv_name + '_' + sample.run + "*_rev.fastq");
-					nbLibs++;
+				// File suspected to correspond
+				if (fastq_name.includes(library_name)) {
+
+					// Verify presence of R1 or R2 in the name
+					if (fastq_name.includes('R1'))
+						pair.r1 = fastq_name;
+					else if (fastq_name.includes('R2'))
+						pair.r2 = fastq_name;
+				}
+			}
+		}
+
+		// Create the divs
+		var pair_div = document.createElement('div');
+		pair_div.classList.add('lib_div');
+		pair_div.innerHTML = '<p>' + library_name + '</p>' +
+			'<p class="illumina_read R1">R1 '
+				+ '<input type="text" name="' + library_name + '_R1" '
+				+ 'class="reads_file input_file fastq" value="' + pair.r1 + '">'
+			+ '</p><p class="illumina_read R2">R2 '
+				+ '<input type="text" name="' + library_name + '_R2" '
+				+ 'class="reads_file input_file fastq" value="' + pair.r2 + '">'
+			+ '</p>';
+
+		return pair_div;
+	}
+
+	generate_R1R2fields () {
+		var that = this;
+		var libs = [];
+
+		let csv_filename = this.dom.getElementsByClassName('tags')[0].value;
+		csv_filename = csv_filename.substr(0, csv_filename.lastIndexOf('.'));
+		let out_fwd = csv_filename + '*_fwd.fastq';
+		let out_rev = csv_filename + '*_rev.fastq';
+
+		let out_files = [out_fwd, out_rev];
+
+		Papa.parse("/data/" + exec_token + '/' + csv_filename + '.csv', {
+			download: true,
+			worker: true,
+			header: true,
+			step: function(row) {
+				// Parse each line
+				let lib = row.data[0].run;
+				let sample = row.data[0].sample;
+
+				// Add library
+				if (!libs.includes(lib))
+					libs.push(lib);
+
+				// Generate filenames
+				let out_fwd = csv_filename + '_' + lib + '_' + sample + '_fwd.fastq';
+				let out_rev = csv_filename + '_' + lib + '_' + sample + '_rev.fastq';
+				out_files.push(out_fwd);
+				out_files.push(out_rev);
+			},
+			complete: function() {
+				that.illumina_div.innerHTML = "";
+				that.out_area.innerHTML = "";
+
+				for (let idx=0 ; idx<libs.length ; idx++) {
+					// Create the fields R1 and R2 for each library
+					that.illumina_div.appendChild(that.create_R1R2_pair(libs[idx]));
+
+					// Generate jokers
+					let out_fwd = csv_filename + '_' + libs[idx] + '*_fwd.fastq';
+					let out_rev = csv_filename + '_' + libs[idx] + '*_rev.fastq';
+					out_files.push(out_fwd);
+					out_files.push(out_rev);
 				}
 
-				// Add the sample outfiles
-				that.out_files.push(csv_name + '_' + sample.run + "_" + sample.sample + "_fwd.fastq");
-				that.out_files.push(csv_name + '_' + sample.run + "_" + sample.sample + "_rev.fastq");
-			}
-			// Add general file if there are multiple libraries
-			if (nbLibs > 1) {
-				that.out_files.push(csv_name + "*_fwd.fastq");
-				that.out_files.push(csv_name + "*_rev.fastq");
-			}
+				// Print outputs
+				out_files.sort();
+				for (let idx in out_files) {
+					let filename = out_files[idx];
+					that.out_area.innerHTML += that.format_output(filename);
+				}
 
-			// Create inputs for each library
-			that.illumina_div.innerHTML = "";
-			for (let l_idx in libraries) {
-				let lib = libraries[l_idx];
-				let lib_div = that.create_R1R2_pair(lib);
-				that.illumina_div.appendChild(lib_div);
-			}
+				// Notify the file adds
+				var event = new Event('new_output');
+				event.files = out_files;
+				document.dispatchEvent(event);
 
-			// Add the files in the output text area
-			for (let idx=0 ; idx<that.out_files.length ; idx++) {
-				that.out_area.innerHTML += that.format_output(that.out_files[idx]);
+				that.out_files = out_files;
 			}
-
-			// Notify the files manager
-			var event = new Event('new_output');
-			event.files = that.out_files;
-			document.dispatchEvent(event);
-		}
+		});
 	}
 
 	format_output(filename) {

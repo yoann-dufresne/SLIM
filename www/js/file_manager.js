@@ -8,8 +8,6 @@ class FileManager {
 		this.rmvObs = [];
 
 		this.eventListeners();
-
-		this.contents = {};
 	}
 
 	load_from_server () {
@@ -19,18 +17,6 @@ class FileManager {
 			var event = new Event('new_file');
 			event.files = data;
 			document.dispatchEvent(event);
-
-			// Load the content of CSV files
-			for (var idx=0 ; idx<data.length ; idx++) {
-				var filename = data[idx];
-
-				if (!filename.endsWith('.csv'))
-					continue;
-
-				$.get('/data/' + exec_token + '/' + filename, (data) => {
-					that.contents[filename] = Papa.parse(data, {header: true});
-				});
-			}
 		});
 	}
 
