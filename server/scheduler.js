@@ -1,10 +1,12 @@
 
 const fs = require('fs');
 const si = require('systeminformation');
+const formidable = require('formidable');
 
 const sub_process = require('./sub_process.js');
 const uploads = require('./files_upload.js');
 const mailer = require('./mail_manager.js');
+const accounts = require('./accounts.js');
 
 
 var waiting_jobs = [];
@@ -56,7 +58,7 @@ var scheduler = function () {
 				fs.writeFile(directory + 'exec.log', JSON.stringify(job), (err) => {});
 				console.log(token + ': Ended');
 
-				// Mayby problematic: TODO : verify with multiple jobs
+				// Mayby problematic:
 				uploads.trigger_job_end(token);
 				delete running_jobs[token];
 				continue;
@@ -183,78 +185,120 @@ exports.listen_commands = function (app) {
 	app.post('/run', function (req, res) {
 		var params = req.body;
 
-		// Token verifications
-		if (params.token == undefined) {
-			res.status(403).send('No token present in the request')
-			return;
-		}
+		var form = new formidable.IncomingForm();
+		let token = null;
+		let file = null;
 
-		var token = params.token;
-		var mail = params.mail;
-		delete params.token;
-		delete params.mail;
-
-		// Verification of the existance of the token
-		if (! fs.existsSync('/app/data/' + token)){
-			res.status(403).send('Invalid token')
-			return;
-		}
-		// Save URL and mail address
-		exports.urls[token] = req.protocol + '://' + req.get('host') + '?token=' + token;
-		mailer.mails[token] = mail;
-
-		// Send a mail and cancel the directory removal
-		if (uploads.deletions[token])
-				clearTimeout(uploads.deletions[token]);
-		mailer.send_address(token);
-
-		// Save the conf and return message
-		fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {
-			if (err) throw err;
-			console.log(token + ': configuration saved!');
+		form.on('field', function (field, value) {
+			if (field == "token")
+				token = value;
 		});
-		res.send('Pipeline started');
 
-		// Create the execution log file
-		var logFile = '/app/data/' + token + '/exec.log';
-		
-		for (var idx in params) {
-			params[idx].status = "waiting";
-		}
-		var exe = {
-			status: "waiting",
-			conf: params,
-			order: null
-		};
-		fs.writeFileSync(logFile, JSON.stringify(exe));
+		form.on('file', function(field, f) {
+			if (field == "config")
+				file = f;
+		});
 
-		
-		// Schedule the softwares
-		var order = computeSoftwareOrder(params, token);
+		form.on('end', function () {
+			// Verify data integrity
+			if (token == null || !accounts.tokens[token] || !file) {
+				console.log('Wrong token', token);
+				res.status(400).send('Wrong token');
+				return;
+			}
 
-		// If dependencies are not satisfied
-		if (order.length < Object.keys(exe.conf).length) {
-			exe.status = 'aborted';
-			exe.msg = "dependencies not satisfied: " +
-				JSON.stringify(Object.keys(global_dependencies[token]));
-			console.log("dependencies not satisfied:\n", global_dependencies[token]);
+			// Save the url
+			exports.urls[token] = req.protocol + '://' + req.get('host') + '?token=' + token;
 
-			fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
-			return;
-		}
+			// Move the file in the fine directory
+			let filename = '/app/data/' + token + '/' + file.name;
+			fs.renameSync(file.path, filename);
+			let params = JSON.parse(fs.readFileSync(filename, 'utf8'));
+			console.log(JSON.stringify(params));
 
-		// Explicit input file names
-		let files = getAllFiles(params, token);
-		exe.conf = expand_parameters(token, params, files, order)
-
-		// Finalise status
-		exe.status = 'ready';
-		exe.order = order;
-		fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
-
-		waiting_jobs.push(token);
+			// Answer the client
+			run_job(params, (code, msg) => {
+				res.status(code).send(msg ? msg : "");
+			});
+		});
+		form.parse(req);
 	});
 }
+
+
+var run_job = (params, callback) => {
+	// Token verifications
+	if (params.token == undefined) {
+		callback(403, 'No token present in the request')
+		return;
+	}
+
+	var token = params.token;
+	var mail = params.mail;
+	delete params.token;
+	delete params.mail;
+
+	// Verification of the existance of the token
+	if (! fs.existsSync('/app/data/' + token)){
+		callback(403, 'Invalid token')
+		return;
+	}
+	// Save URL and mail address
+	mailer.mails[token] = mail;
+
+	// Send a mail and cancel the directory removal
+	if (uploads.deletions[token])
+			clearTimeout(uploads.deletions[token]);
+	mailer.send_address(token);
+
+	// Save the conf and return message
+	fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {
+		if (err) throw err;
+		console.log(token + ': configuration saved!');
+	});
+	callback(200, 'Pipeline started');
+
+	// Create the execution log file
+	var logFile = '/app/data/' + token + '/exec.log';
+	
+	for (var idx in params) {
+		params[idx].status = "waiting";
+	}
+	var exe = {
+		status: "waiting",
+		conf: params,
+		order: null
+	};
+	fs.writeFileSync(logFile, JSON.stringify(exe));
+
+	
+	// Schedule the softwares
+	var order = computeSoftwareOrder(params, token);
+
+	// If dependencies are not satisfied
+	if (order.length < Object.keys(exe.conf).length) {
+		exe.status = 'aborted';
+		exe.msg = "dependencies not satisfied: " +
+			JSON.stringify(Object.keys(global_dependencies[token]));
+		console.log("dependencies not satisfied:\n", global_dependencies[token]);
+
+		fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
+		return;
+	}
+
+	// Explicit input file names
+	let files = getAllFiles(params, token);
+	exe.conf = expand_parameters(token, params, files, order)
+
+	// Finalise status
+	exe.status = 'ready';
+	exe.order = order;
+	fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
+
+	waiting_jobs.push(token);
+};
+
+
 
 exports.expose_status = function (app) {
 	app.get('/status', function (req, res) {
@@ -555,7 +599,7 @@ var getAllFiles = (params, token) => {
 };
 
 var get_joker_files = (token, filename, no_joker_files) => {
-	if (uploads.jokers[token][filename]) {
+	if (uploads.jokers[token] && uploads.jokers[token][filename]) {
 		// Joker from zip
 		return uploads.jokers[token][filename];
 	} else {

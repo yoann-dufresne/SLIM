@@ -42,12 +42,21 @@ run.onclick = function () {
 
 	// Get config
 	var config = get_config();
-
-	$.post( "/run", config)
-	.done(function( data ) {
-		run.disabled = true;
+	var file = new File([JSON.stringify(config)], "config.log", {
+		type: "text/plain",
 	});
 
+	// Form
+	var formData = new FormData();
+	formData.append("config", file);
+	formData.append("token", exec_token);
+
+	// Request sender
+	var request = new XMLHttpRequest();
+	request.open("POST", "/run");
+	request.send(formData);
+	run.disabled = true;
+	
 	status_interval = setInterval(()=>{update_run_status(exec_token);}, 5000);
 	update_run_status(exec_token);
 };

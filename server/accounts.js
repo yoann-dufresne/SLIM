@@ -1,6 +1,8 @@
 const fs = require('fs');
 
 
+exports.tokens = {};
+
 exports.token_generation = function (app) {
 	app.get('/token_generation', function (req, res) {
 		if ((!req.query.token) || (!fs.existsSync('/app/data/' + req.query.token))) {
@@ -12,6 +14,7 @@ exports.token_generation = function (app) {
 			}
 
 			fs.mkdir("/app/data/" + token, function(){res.send(token);});
+			exports.tokens[token] = token;
 		} else {
 			res.send(req.query.token);
 		}
