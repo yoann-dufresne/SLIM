@@ -22,7 +22,7 @@ exports.run = (os, config, callback) => {
 		threshold = parseInt(config.params.params.threshold);
 
 	// Command line
-	var options = ['--derep_fulllength', filename,
+	var options = ['--derep_prefix', filename,
 		'--sizeout', '--sizein',
 		'--minseqlength', '1',
 		'--minuniquesize', threshold,
