@@ -114,9 +114,9 @@ def print_otus (matrix, order):
 		print()
 
 
-def main ():
-	origins, experiments = read_origins (sys.argv[2])
-	matrix = read_uc(sys.argv[1], origins)
+def main (uc_file, origins_file, outfile, t2s):
+	origins, experiments = read_origins (origins_file)
+	matrix = read_uc(uc_file, origins)
 
 	# Compute the basic order
 	order = list(experiments)
@@ -124,16 +124,29 @@ def main ():
 		order[idx] = {"src":order[idx], "dst":order[idx]}
 
 	# get order from t2s
-	if len(sys.argv) > 3:
-		order = read_t2s(sys.argv[3], list(experiments))
+	if t2s != "":
+		order = read_t2s(t2s, list(experiments))
 
+	if outfile != "":
+		sys.stdout = open(outfile, 'w')
 	print_otus(matrix, order)
 
 
 if __name__ == '__main__':
-	# Error case
-	if len(sys.argv) == 1:
-		print('No filename found')
-		exit(1)
+	# Arguments parsing
+	uc_file = ""
+	origins = ""
+	outfile = ""
+	t2s = ""
 
-	main()
+	for idx in range(len(sys.argv)):
+		if sys.argv[idx] == '-uc':
+			uc_file = sys.argv[idx+1]
+		elif sys.argv[idx] == '-so':
+			origins = sys.argv[idx+1]
+		elif sys.argv[idx] == '-o':
+			outfile = sys.argv[idx+1]
+		elif sys.argv[idx] == '-t2s':
+			t2s = sys.argv[idx+1]
+
+	main(uc_file, origins, outfile, t2s)
