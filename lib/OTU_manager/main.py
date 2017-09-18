@@ -1,11 +1,12 @@
 import sys
-
+from Bio import SeqIO
 
 
 def read_uc (filename, origins):
 	# Init
 	true_clusters = []
 	clusters = {}
+	read_clusters = {};
 	
 	# File reading
 	with open(filename) as fp:
@@ -14,6 +15,9 @@ def read_uc (filename, origins):
 			split = line.strip().split("\t")
 			line_type, cluster_id, _, _, _, _, _, _, read_name, _ = split
 			cluster_id = int(cluster_id)
+
+			# Index read
+			read_clusters[read_name] = cluster_id
 
 			if line_type == 'C':
 				true_clusters.append(cluster_id)
@@ -36,7 +40,14 @@ def read_uc (filename, origins):
 	for idx in true_clusters:
 		matrix.append(clusters[idx])
 
-	return matrix
+	return matrix, read_clusters
+
+
+def rewrite_fasta (read_clusters, fin, fout):
+	with open(fout, 'w') as fp:
+		for seq_record in SeqIO.parse(fin, "fasta"):
+			fp.write('>' + seq_record.id + ';cluster=' + str(read_clusters[seq_record.id]) + ';\n')
+			fp.write(str(seq_record.seq) + '\n')
 
 
 def read_origins (filename):
@@ -89,7 +100,7 @@ def read_t2s (filename, true_names):
 
 			order.append({"src":brut_name, "dst":dst})
 
-	return order
+	return order, read_clusters
 
 
 def print_otus (matrix, order):
@@ -114,9 +125,9 @@ def print_otus (matrix, order):
 		print()
 
 
-def main (uc_file, origins_file, outfile, t2s):
+def main (uc_file, origins_file, outfile, t2s, fin, fout):
 	origins, experiments = read_origins (origins_file)
-	matrix = read_uc(uc_file, origins)
+	matrix, read_clusters = read_uc(uc_file, origins)
 
 	# Compute the basic order
 	order = list(experiments)
@@ -131,6 +142,10 @@ def main (uc_file, origins_file, outfile, t2s):
 		sys.stdout = open(outfile, 'w')
 	print_otus(matrix, order)
 
+	# Rewrite reads including cluster ids
+	if (fin != "" and fout != ""):
+		rewrite_fasta(read_clusters, fin, fout)
+
 
 if __name__ == '__main__':
 	# Arguments parsing
@@ -138,6 +153,7 @@ if __name__ == '__main__':
 	origins = ""
 	outfile = ""
 	t2s = ""
+	fin = fout = ""
 
 	for idx in range(len(sys.argv)):
 		if sys.argv[idx] == '-uc':
@@ -148,5 +164,10 @@ if __name__ == '__main__':
 			outfile = sys.argv[idx+1]
 		elif sys.argv[idx] == '-t2s':
 			t2s = sys.argv[idx+1]
+		elif sys.argv[idx] == '-fasta_in':
+			fin = sys.argv[idx+1]
+		elif sys.argv[idx] == '-fasta_out':
+			fout = sys.argv[idx+1]
 
-	main(uc_file, origins, outfile, t2s)
+	main(uc_file, origins, outfile, t2s, fin, fout)
+	exit(0)
