@@ -38,50 +38,12 @@ exports.run = function (os, config, callback) {
 		// OTU search
 		config.params.inputs.merged = tmp_merged;
 		config.params.inputs.origins = tmp_origins;
-		otu_search(os, config, (matrix) => {
-			if (!matrix) {
-				console.log(os.token, ': OTUs parsing impossible');
-				callback(os, 'OTU parsing errors');
-				return;
-			}
-
+		otu_search(os, config, (os, msg) => {
 			// Remove unnecessary files
 			fs.unlink(directory+tmp_origins, ()=>{});
+			fs.unlink(directory+tmp_merged, ()=>{});
 
-			var written = (err) => {
-				if (err) {
-					console.log(token + ': ' + err);
-					callback(os, err);
-					return;
-				} else {
-					otu_manager.write_reads(
-						matrix,
-						directory + tmp_merged,
-						directory + config.params.outputs.reads,
-						()=>{
-							fs.unlink(directory+tmp_merged, ()=>{});
-							callback(os, null);
-						}
-					);
-					return;
-				}
-			};
-
-			if (config.params.params.ordered != 'true') {
-				// OTU saving
-				otu_manager.write_otu_table(matrix, directory+otu_file, null, written);
-			} else {
-				toolbox.read_tags2sample(directory+config.params.params.t2s, (libs) => {
-					// Compute order
-					let order = [];
-					for (let libname in libs) {
-						order = order.concat(libs[libname].map((elem) => {return libname + '_' + elem.name}));
-					}
-
-					// Write OTU
-					otu_manager.write_otu_table(matrix, directory+otu_file, order, written);
-				});
-			}
+			callback(os, msg);
 		});
 	});
 };
@@ -113,13 +75,15 @@ var otu_search = (os, config, callback) => {
 		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
-		if (code != 0)
-			callback();
-		else {
+		if (code != 0) {
+			fs.unlink(directory+tmp_output, ()=>{});
+			console.log (os.token + ': Error durong swarm execution')
+			callback(os, 'Error during swarm execution');
+		} else {
 			config.params.inputs.uc = tmp_output;
-			otu_manager.uc_to_matrix(os, config, (matrix) => {
+			otu_manager.write_from_uc(os, config, (os, msg) => {
 				fs.unlink(directory+tmp_output, ()=>{});
-				callback(matrix);
+				callback(os, msg);
 			});
 		}
 	});

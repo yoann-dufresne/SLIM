@@ -27,7 +27,7 @@ exports.run = (os, config, callback) => {
 	// Origins of the reads
 	//  * first dimention : sequence hash
 	//  * second dimention : provenance
-	var origins_table = [];
+	let origins_table = {};
 	var save_origins = (outfile, fasta, callback) => {
 		// Prepare the buffered file reader
 		var reader = tools.fastaReader(fasta);
@@ -35,15 +35,16 @@ exports.run = (os, config, callback) => {
 
 		// Process sequences asynchoneously
 		reader.read_sequences((seq) => {
-			var hash = seq.value;
-			var header = seq.header;
+			let hash = seq.value;
+			let header = seq.header;
 
 			// Save header
 			fs.appendFileSync(outfile, header);
 
 			// save the samples
-			for (var sample in origins_table[hash])
+			for (let sample in origins_table[hash]) {
 				fs.appendFileSync(outfile, '\t' + sample + ';size=' + origins_table[hash][sample] + ';');
+			}
 			fs.appendFileSync(outfile, '\n');
 		});
 	};
@@ -93,7 +94,7 @@ exports.run = (os, config, callback) => {
 
 			// fill the origins
 			if (!origins_table[hash])
-				origins_table[hash] = [];
+				origins_table[hash] = {};
 			origins_table[hash][sample_name] = size;
 
 			// Fill the merged file

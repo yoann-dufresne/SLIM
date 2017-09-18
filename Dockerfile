@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
 	pkg-config \
 	libboost-all-dev \
 	pigz \
-	dos2unix
+	dos2unix \
+	python3-pip python3-dev
 
 RUN mkdir /app/lib
 
@@ -33,6 +34,11 @@ RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/min
 RUN /app/lib/miniconda/install/bin/conda create -n qiime2-2017.6 --file https://data.qiime2.org/distro/core/qiime2-2017.6-conda-linux-64.txt
 
 
+# ----- Python dependancies -----
+
+RUN pip3 install --upgrade pip && pip3 install NumPy biopython
+
+
 # ----- Libraries deployments -----
 
 # install app dependencies
@@ -45,6 +51,7 @@ COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
+COPY lib/OTU_manager /app/lib/OTU_manager
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
