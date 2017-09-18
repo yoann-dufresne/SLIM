@@ -34,7 +34,7 @@ exports.exposeDir = function (app) {
 			res.send(items);
 		});
 	});
-}
+};
 
 
 let files_to_convert = {};
@@ -177,11 +177,14 @@ var decompress_tgz = (token, archive) => {
 		if (suffix == null)
 			suffix = file.name;
 		else {
+			let delta_size = file.name.length - suffix.length;
+
 			// Get the first idx for different 
 			let cmon_idx;
-			for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--)
-				if (suffix[cmon_idx] != file.name[cmon_idx])
+			for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--) {
+				if (suffix[cmon_idx] != file.name[cmon_idx + delta_size])
 					break;
+			}
 			suffix = suffix.substr(cmon_idx+1);
 		}
 	})
