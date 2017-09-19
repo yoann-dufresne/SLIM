@@ -19,10 +19,21 @@ exports.run = function (os, config, callback) {
 		options = options.concat(['-m']);
 
 	parse_inputs(os.token, config.params.inputs, (executions) => {
+		// On errors
+		if (executions == null) {
+			callback(os, 'Incorrect CSV file');
+			return;
+		}
+
 		exe_left = Object.keys(executions);
 
 		var run_demux = () => {
 			var library = exe_left.pop();
+			if (library == undefined) {
+				callback(os, 'No library found or wrong CSV format');
+				return;
+			}
+
 			var local_options = options.concat([
 				'-rl', library,
 				'-r1', directory + executions[library].r1, 
@@ -69,6 +80,8 @@ var parse_inputs = (token, inputs, callback) => {
 		strict: true    // require column length match headers length
 	});
 
+	var onError = false;
+
 	fs.createReadStream(directory + inputs.tags)
 	.pipe(stream).on('data', function (data) {
 		if (!pairs[data.run]) {
@@ -78,6 +91,11 @@ var parse_inputs = (token, inputs, callback) => {
 			};
 		}
 	}).on('end', () => {
-		callback(pairs);
+		if (!onError)
+			callback(pairs);
+	}).on('error', (e) => {
+		console.log(token + ': ' + e);
+		onError = true;
+		callback(null);
 	});
 };

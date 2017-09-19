@@ -159,6 +159,9 @@ class DemultiplexerModule extends Module {
 				document.dispatchEvent(event);
 
 				that.out_files = out_files;
+			},
+			error: function(e) {
+				console.log("Papaparse error:", e);
 			}
 		});
 	}
