@@ -19,10 +19,12 @@ class Module {
 		this.specific.classList.add('specific');
 		this.dom.appendChild(this.specific);
 
+		this.specific.innerHTML = module_manager.htmls[this.name];
 		var that = this;
-		$.get('/modules/' + this.name + '.html', function (data) {
-			that.specific.innerHTML = data;
-		}).done (() => {that.onLoad(), callback();});
+		setTimeout(() => {
+			that.onLoad();
+			callback();
+		}, 50);
 	}
 
 	createOptionBox (option) {
@@ -202,9 +204,11 @@ class Module {
 
 	toDOMelement () {
 		// DOM element creation
+		this.root = document.createDocumentFragment();
 		this.dom = document.createElement('div');
 		this.dom.classList.add('module');
 		this.dom.idx = this.id;
+		this.root.appendChild(this.dom);
 
 		var header = document.createElement('div');
 		header.classList.add('mod_head');
@@ -280,34 +284,47 @@ class ModuleManager {
 	constructor() {
 		var that = this;
 		this.modules = {};
+		this.htmls = {};
+		this.loadings = 1;
 
 		$.get("/softwares", function( data ) {
 			data = JSON.parse(data);
 			that.available_modules = [];
 
-			var modules_list = document.querySelector('#module_list');
+			let modules_list = document.querySelector('#module_list');
 			for (var category in data) {
 				// Create categories in the select options
-				var opt_grp = document.createElement('optgroup');
+				let opt_grp = document.createElement('optgroup');
 				opt_grp.label = category;
-				var modules = data[category];
+				let modules = data[category];
 
-				for (var idx in modules) {
+				for (let idx in modules) {
 					// Add the module to the available ones
 					that.available_modules.push(modules[idx]);
 
 					// Add the option in the select
-					var opt = document.createElement('option');
+					let opt = document.createElement('option');
 					opt.innerHTML = modules[idx];
 					opt.value = modules[idx];
 					opt_grp.appendChild(opt);
+
+					that.loadings += 1;
+					$.get('/modules/' + modules[idx] + '.html', function (data) {
+						that.htmls[modules[idx]] = data;
+					}).done (() => {that.loadings -= 1;});
 				}
 				
 				modules_list.appendChild(opt_grp);
 			}
+
+			that.loadings -= 1;
 		});
 
 		this.moduleCreators = {};
+	}
+
+	isLoading () {
+		return this.loadings != 0;
 	}
 
 	loadModules () {
@@ -342,7 +359,7 @@ class ModuleManager {
 
 		// Add the module to the dom
 		var div = document.querySelector('#modules');
-		div.appendChild(module.dom);
+		div.appendChild(module.root);
 
 		// Modify the execution status
 		if (status) {

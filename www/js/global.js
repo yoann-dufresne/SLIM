@@ -15,10 +15,15 @@ var on_token_generated = () => {
 
 var load_modules = (log) => {
 	// Wait for modules loading
-	if (Object.keys(module_manager.moduleCreators).length == 0) {
+	if (module_manager.isLoading() || Object.keys(module_manager.moduleCreators).length == 0) {
+		console.log('loading');
 		setTimeout(()=>{load_modules (log);}, 50);
 		return;
 	}
+
+	// Reload mail address
+	document.getElementById('mail').value = log.mail;
+	delete log.mail;
 
 	// For each module in the log file
 	for (let idx in log) {
@@ -103,25 +108,11 @@ up_conf.onchange = () => {
 	reader.onload = function(e) {
 		var json = JSON.parse(e.target.result);
 
+		console.log('Reading ended');
 		load_modules(json);
 	};
 	reader.readAsText(file);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
