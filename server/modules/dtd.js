@@ -1,5 +1,6 @@
 const exec = require('child_process').spawn;
 const fs = require('fs');
+const csv = require('csv-parser');
 
 
 exports.name = 'demultiplexer';
@@ -17,61 +18,66 @@ exports.run = function (os, config, callback) {
 	if (config.params.params.mistags == 'true')
 		options = options.concat(['-m']);
 
-	executions = parse_inputs(config.params.inputs);
-	exe_left = Object.keys(executions);
+	parse_inputs(os.token, config.params.inputs, (executions) => {
+		exe_left = Object.keys(executions);
 
-	var run_demux = () => {
-		var library = exe_left.pop();
-		var local_options = options.concat([
-			'-rl', library,
-			'-r1', directory + executions[library].r1, 
-			'-r2', directory + executions[library].r2,
-		]);
+		var run_demux = () => {
+			var library = exe_left.pop();
+			var local_options = options.concat([
+				'-rl', library,
+				'-r1', directory + executions[library].r1, 
+				'-r2', directory + executions[library].r2,
+			]);
 
-		var log = directory + config.log;
-		console.log("Running dtd with the command line:");
-		console.log('/app/lib/DTD/dtd', local_options.join(' '));
-		fs.appendFileSync(log, '--- Command ---\n');
-		fs.appendFileSync(log, 'dtd ' + local_options.join(' ') + '\n');
-		fs.appendFileSync(log, '--- Exec ---\n');
-		var child = exec('/app/lib/DTD/dtd', local_options);
+			var log = directory + config.log;
+			console.log("Running dtd with the command line:");
+			console.log('/app/lib/DTD/dtd', local_options.join(' '));
+			fs.appendFileSync(log, '--- Command ---\n');
+			fs.appendFileSync(log, 'dtd ' + local_options.join(' ') + '\n');
+			fs.appendFileSync(log, '--- Exec ---\n');
+			var child = exec('/app/lib/DTD/dtd', local_options);
 
 
-		child.stdout.on('data', function(data) {
-			fs.appendFileSync(log, data);
-		});
-		child.stderr.on('data', function(data) {
-			fs.appendFileSync(log, data);
-		});
-		child.on('close', function(code) {
-			if (code == 0) {
-				if (exe_left.length == 0)
-					callback(os, null);
+			child.stdout.on('data', function(data) {
+				fs.appendFileSync(log, data);
+			});
+			child.stderr.on('data', function(data) {
+				fs.appendFileSync(log, data);
+			});
+			child.on('close', function(code) {
+				if (code == 0) {
+					if (exe_left.length == 0)
+						callback(os, null);
+					else
+						run_demux();
+				}
 				else
-					run_demux();
-			}
-			else
-				callback(os, "DTD terminate on code " + code);
-		});
-	}
-	run_demux();
+					callback(os, "DTD terminate on code " + code);
+			});
+		}
+		run_demux();
+	});
 };
 
-var parse_inputs = (inputs) => {
+var parse_inputs = (token, inputs, callback) => {
+	let directory = '/app/data/' + token + '/';
 	var pairs = {};
-	for (let id in inputs) {
-		// Detect inputs from pairs
-		if (id.endsWith('_R1') || id.endsWith('_R2')) {
-			let split = id.split('_');
 
-			// Add new library
-			if (!pairs[split[0]])
-				pairs[split[0]] = {};
+	var stream = csv({
+		separator: ',',
+		newline: '\n',  // specify a newline character
+		strict: true    // require column length match headers length
+	});
 
-			// Add file
-			pairs[split[0]][split[1].toLowerCase()] = inputs[id];
+	fs.createReadStream(directory + inputs.tags)
+	.pipe(stream).on('data', function (data) {
+		if (!pairs[data.run]) {
+			pairs[data.run] = {
+				r1: inputs[data.run + '_R1'],
+				r2: inputs[data.run + '_R2']
+			};
 		}
-	}
-
-	return pairs;
+	}).on('end', () => {
+		callback(pairs);
+	});
 };

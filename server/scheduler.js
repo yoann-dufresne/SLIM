@@ -214,7 +214,6 @@ exports.listen_commands = function (app) {
 			let filename = '/app/data/' + token + '/' + file.name;
 			fs.renameSync(file.path, filename);
 			let params = JSON.parse(fs.readFileSync(filename, 'utf8'));
-			console.log(JSON.stringify(params));
 
 			// Answer the client
 			run_job(params, (code, msg) => {

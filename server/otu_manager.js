@@ -1,7 +1,5 @@
 const exec = require('child_process').spawn;
-const lineReader = require('line-reader');
 const fs = require('fs');
-const csv = require('csv-parser');
 
 const tools = require('./toolbox');
 
