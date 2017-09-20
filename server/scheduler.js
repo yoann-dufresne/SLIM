@@ -242,7 +242,6 @@ var run_job = (params, callback) => {
 	var token = params.token;
 	var mail = params.mail;
 	delete params.token;
-	delete params.mail;
 
 	// Verification of the existance of the token
 	if (! fs.existsSync('/app/data/' + token)){
@@ -260,6 +259,7 @@ var run_job = (params, callback) => {
 	// Save the conf and return message
 	fs.writeFileSync('/app/data/' + token + '/pipeline.conf', JSON.stringify(params));
 	console.log(token + ': configuration saved!');
+	delete params.mail;
 
 	// Create the execution log file
 	var logFile = '/app/data/' + token + '/exec.log';

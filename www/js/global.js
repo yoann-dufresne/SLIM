@@ -16,7 +16,6 @@ var on_token_generated = () => {
 var load_modules = (log) => {
 	// Wait for modules loading
 	if (module_manager.isLoading() || Object.keys(module_manager.moduleCreators).length == 0) {
-		console.log('loading');
 		setTimeout(()=>{load_modules (log);}, 50);
 		return;
 	}
@@ -108,7 +107,6 @@ up_conf.onchange = () => {
 	reader.onload = function(e) {
 		var json = JSON.parse(e.target.result);
 
-		console.log('Reading ended');
 		load_modules(json);
 	};
 	reader.readAsText(file);
