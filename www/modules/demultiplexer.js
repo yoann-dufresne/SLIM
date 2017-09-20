@@ -18,31 +18,30 @@ class DemultiplexerModule extends Module {
 	}
 
 	defineIO () {
+		let tags_text = this.dom.getElementsByClassName('tags')[0];
+
 		// Save inputs
 		this.illumina_div = this.dom.getElementsByClassName('illumina_reads')[0];
 
 		// --- Reload inputs ---
 		if (this.params.inputs) {
-			// Reconstruct pair
-			var pairs = {};
-			for (let id in this.params.inputs) {
-				// Detect inputs from pairs
-				if (id.endsWith('_R1') || id.endsWith('_R2')) {
-					let split = id.split('_');
+			let libs = {};
+			// Reconstruct pairs
+			for (let input in this.params.inputs) {
+				if (input.endsWith('_R1') || input.endsWith('_R2')) {
+					// Retrive libname from filename
+					let libname = input.substr(0, input.length-3);
 
-					// Add new library
-					if (!pairs[split[0]])
-						pairs[split[0]] = {};
+					// If library already exist, pass
+					if (libs[libname])
+						continue;
 
-					// Add file
-					pairs[split[0]][split[1].toLowerCase()] = this.params.inputs[id];
+					this.illumina_div.appendChild(this.create_R1R2_pair(libname, {
+						r1: this.params.inputs[libname + '_R1'],
+						r2: this.params.inputs[libname + '_R2']
+					}));
+					libs[libname] = true;
 				}
-			}
-
-			// Create inputs
-			for (var name in pairs) {
-				var pair_div = this.create_R1R2_pair(name, pairs[name]);
-				this.illumina_div.appendChild(pair_div);
 			}
 		}
 
@@ -57,8 +56,7 @@ class DemultiplexerModule extends Module {
 		
 		// Change the output files using the tags file
 		var that = this;
-		let tags_text = this.dom.getElementsByClassName('tags')[0];
-		tags_text.onchange = () => {that.generate_R1R2fields()};
+		tags_text.onchange = () => {that.generate_R1R2fields(()=>{})};
 	}
 
 	create_R1R2_pair (library_name, pair) {
@@ -98,7 +96,7 @@ class DemultiplexerModule extends Module {
 		return pair_div;
 	}
 
-	generate_R1R2fields () {
+	generate_R1R2fields (callback) {
 		var that = this;
 		var libs = [];
 
@@ -159,6 +157,7 @@ class DemultiplexerModule extends Module {
 				document.dispatchEvent(event);
 
 				that.out_files = out_files;
+				callback(that.illumina_div);
 			},
 			error: function(e) {
 				console.log("Papaparse error:", e);
