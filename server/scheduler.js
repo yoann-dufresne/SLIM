@@ -211,9 +211,16 @@ exports.listen_commands = function (app) {
 			exports.urls[token] = req.protocol + '://' + req.get('host') + '?token=' + token;
 
 			// Move the file in the fine directory
-			let filename = '/app/data/' + token + '/' + file.name;
+			let filename = '/app/data/' + token + '/' + 'config.log';
+
+			// Remove previous config
+			if (fs.existsSync(filename))
+				fs.unlinkSync(filename);
+
+			// Parse config
 			fs.renameSync(file.path, filename);
-			let params = JSON.parse(fs.readFileSync(filename, 'utf8'));
+			let txt = fs.readFileSync(filename, 'utf8');
+			let params = JSON.parse(txt);
 
 			// Answer the client
 			run_job(params, (code, msg) => {
@@ -251,11 +258,8 @@ var run_job = (params, callback) => {
 	mailer.send_address(token);
 
 	// Save the conf and return message
-	fs.writeFile('/app/data/' + token + '/pipeline.conf', JSON.stringify(params), (err) => {
-		if (err) throw err;
-		console.log(token + ': configuration saved!');
-	});
-	callback(200, 'Pipeline started');
+	fs.writeFileSync('/app/data/' + token + '/pipeline.conf', JSON.stringify(params));
+	console.log(token + ': configuration saved!');
 
 	// Create the execution log file
 	var logFile = '/app/data/' + token + '/exec.log';
@@ -269,7 +273,7 @@ var run_job = (params, callback) => {
 		order: null
 	};
 	fs.writeFileSync(logFile, JSON.stringify(exe));
-
+	callback(200, 'Pipeline started');
 	
 	// Schedule the softwares
 	var order = computeSoftwareOrder(params, token);
@@ -281,7 +285,7 @@ var run_job = (params, callback) => {
 			JSON.stringify(Object.keys(global_dependencies[token]));
 		console.log("dependencies not satisfied:\n", global_dependencies[token]);
 
-		fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
+		fs.writeFileSync(logFile, JSON.stringify(exe));
 		return;
 	}
 
@@ -292,7 +296,7 @@ var run_job = (params, callback) => {
 	// Finalise status
 	exe.status = 'ready';
 	exe.order = order;
-	fs.writeFile(logFile, JSON.stringify(exe), function (err) {if (err) console.log(err)});
+	fs.writeFileSync(logFile, JSON.stringify(exe));
 
 	waiting_jobs.push(token);
 };
@@ -316,54 +320,53 @@ exports.expose_status = function (app) {
 		}
 
 		// Send back execution status
-		fs.readFile(execFile, (err, data) => {
-			var exec = JSON.parse(data);
-			var status = {global:exec.status, jobs:{}};
+		let data = fs.readFileSync(execFile);
+		var exec = JSON.parse(data);
+		var status = {global:exec.status, jobs:{}};
 
-			if (status.global == 'aborted')
-				status.msg = exec.msg;
+		if (status.global == 'aborted')
+			status.msg = exec.msg;
 
-			// Browse process
-			for (var idx in exec.conf) {
-				sub_status = {};
-				// Analyse the sub process results
-				for (var sub_idx=0 ; sub_idx<exec.conf[idx].length ; sub_idx++) {
-					let st = exec.conf[idx][sub_idx].status;
-					sub_status[st] = sub_status[st] ? sub_status[st] + 1 : 1;
-				}
-
-				// Write
-				switch (Object.keys(sub_status).length ) {
-				case 0:
-					status.jobs[idx] = 'ready';
-					break;
-				case 1:
-					status.jobs[idx] = Object.keys(sub_status)[0];
-					break;
-				default:
-					// If aborted
-					if (sub_status['aborted']) {
-						if (sub_status['aborted'] == exec.conf[idx].length)
-							status.jobs[idx] = 'aborted';
-						else
-							status.jobs[idx] = 'errors';
-						break;
-					}
-
-					// If it's running
-					var total = 0;
-					for (var key in sub_status) {
-						total += sub_status[key];
-					}
-
-					status.jobs[idx] = 'running';
-					status.sub_jobs = total;
-					status.sub_ended = sub_status['ended'] ? sub_status['ended'] : 0;
-				}
+		// Browse process
+		for (var idx in exec.conf) {
+			sub_status = {};
+			// Analyse the sub process results
+			for (var sub_idx=0 ; sub_idx<exec.conf[idx].length ; sub_idx++) {
+				let st = exec.conf[idx][sub_idx].status;
+				sub_status[st] = sub_status[st] ? sub_status[st] + 1 : 1;
 			}
 
-			res.send(JSON.stringify(status));
-		});
+			// Write
+			switch (Object.keys(sub_status).length ) {
+			case 0:
+				status.jobs[idx] = 'ready';
+				break;
+			case 1:
+				status.jobs[idx] = Object.keys(sub_status)[0];
+				break;
+			default:
+				// If aborted
+				if (sub_status['aborted']) {
+					if (sub_status['aborted'] == exec.conf[idx].length)
+						status.jobs[idx] = 'aborted';
+					else
+						status.jobs[idx] = 'errors';
+					break;
+				}
+
+				// If it's running
+				var total = 0;
+				for (var key in sub_status) {
+					total += sub_status[key];
+				}
+
+				status.jobs[idx] = 'running';
+				status.sub_jobs = total;
+				status.sub_ended = sub_status['ended'] ? sub_status['ended'] : 0;
+			}
+		}
+
+		res.send(JSON.stringify(status));
 	});
 }
 
