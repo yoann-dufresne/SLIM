@@ -48,7 +48,7 @@ exports.run = function (os, config, callback) {
 					directory + config.params.inputs.otu_table,
 					directory + config.params.outputs.assigned,
 					config.params.params.acceptance,
-					()=>{callback(os, null);}
+					(msg)=>{callback(os, msg);}
 				);
 			});
 		} else

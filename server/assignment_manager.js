@@ -6,7 +6,11 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 	// Create output file and header
 	fs.closeSync(fs.openSync(matrix_out, 'w'));
 
+	let onError = false;
 	lineReader.eachLine(matrix_in, function(line, last) {
+		if (onError)
+			return;
+
 		// Header
 		if (line.startsWith('OTU')) {
 			fs.appendFileSync(matrix_out, line + '\ttaxon\n');
@@ -15,12 +19,17 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 			let split = line.split('\t');
 			let cluster = split[0];
 
-			let cons = consensus(assignments[cluster], threshold);
-			fs.appendFile(matrix_out, line + '\t' + cons + '\n', ()=>{});
+			if (assignments[cluster]) {
+				let cons = consensus(assignments[cluster], threshold);
+				fs.appendFile(matrix_out, line + '\t' + cons + '\n', ()=>{});
+			} else {
+				callback('Number of OTUs and number of reads differs');
+				onError = true;
+			}
 		}
 
 		if (last) {
-			callback();
+			callback(null);
 		}
 	});
 
