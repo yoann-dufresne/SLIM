@@ -90,11 +90,7 @@ document.querySelector("#up_submit").onclick = function (event) {
 
 								// Update the status
 								if (data.length > 0) {
-									if (num_wait_files < data.length)
-										num_wait_files = data.length;
-
-									$('.progress-bar').html('Processing file(s): ' +
-										(num_wait_files - data.length) + '/' + num_wait_files);
+									$('.progress-bar').html('Processing file(s): ' + data.length + ' remaining');
 								} else {
 									clearInterval (interval);
 									$('.progress-bar').html('Done');

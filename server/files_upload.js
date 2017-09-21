@@ -37,14 +37,14 @@ exports.exposeDir = function (app) {
 };
 
 
-let files_to_convert = {};
+let files_to_process = {};
 
 exports.upload = function (app) {
 	app.get('/convertion', function(req, res) {
 		var token = req.query.token;
 
-		if (files_to_convert[token])
-			res.send(JSON.stringify(files_to_convert[token]));
+		if (files_to_process[token])
+			res.send(JSON.stringify(files_to_process[token]));
 		else
 			res.send('[]');
 	});
@@ -140,6 +140,10 @@ var decompress_archive = (token, archive) => {
 };
 
 var decompress_gz = (token, archive) => {
+	if (!files_to_process[token])
+		files_to_process[token] = [];
+	files_to_process[token].push(archive.name);
+	
 	fs.renameSync(archive.path, '/app/data/' + token + '/' + archive.name);
 	archive.path = '/app/data/' + token + '/' + archive.name;
 
@@ -152,12 +156,16 @@ var decompress_gz = (token, archive) => {
 		console.log(`stderr: ${data}`);
 	});
 	gunzip.on('close', () => {
-		
+		files_to_process[token].splice (files_to_process[token].indexOf(archive.name), 1);
 	});
 };
 
 var decompress_tgz = (token, archive) => {
 	let dir = '/app/data/' + token + '/';
+
+	if (!files_to_process[token])
+		files_to_process[token] = [];
+	files_to_process[token].push(archive.name);
 
 	let prefix = null;
 	let suffix = null;
@@ -217,15 +225,17 @@ var decompress_tgz = (token, archive) => {
 			file_list = file_list.map((file) => {return file.name;});
 			exports.jokers[token][prefix + '*' + suffix] = file_list;
 		}
+
+		files_to_process[token].splice (files_to_process[token].indexOf(archive.name), 1);
 	});
 };
 
 
 var proccess_file = (token, file, upload_dir) => {
 	// Add files to convertion array
-	if (!files_to_convert[token])
-		files_to_convert[token] = [];
-	files_to_convert[token].push(file.name);
+	if (!files_to_process[token])
+		files_to_process[token] = [];
+	files_to_process[token].push(file.name);
 
 	// Transform in unix format
 	exec('dos2unix', [file.path, '-q'])
@@ -237,7 +247,7 @@ var proccess_file = (token, file, upload_dir) => {
 				if (err)
 					console.log('Error during file upload: ' + err);
 
-				files_to_convert[token].splice (files_to_convert[token].indexOf(file.name), 1);
+				files_to_process[token].splice (files_to_process[token].indexOf(file.name), 1);
 			});
 		});
 	});
