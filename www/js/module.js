@@ -360,6 +360,7 @@ class ModuleManager {
 		// Add the module to the dom
 		var div = document.querySelector('#modules');
 		div.appendChild(module.root);
+		gui_file_updater.file_trigger();
 
 		// Modify the execution status
 		if (status) {

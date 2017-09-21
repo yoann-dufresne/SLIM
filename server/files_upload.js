@@ -17,7 +17,7 @@ exports.exposeDir = function (app) {
 			// If token incorrect
 			if (!items) {
 				res.status(403).send("bad token");
-				console.log('/list bad call');
+				console.log('/list bad token');
 				return;
 			}
 
@@ -105,7 +105,7 @@ exports.upload = function (app) {
 		form.on('end', function() {
 			if (onError)
 				return;
-			
+
 			res.send('success');
 
 			// Remove previous deletion delay

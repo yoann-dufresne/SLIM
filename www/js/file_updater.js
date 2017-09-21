@@ -10,6 +10,8 @@
 class FileUpdater {
 
 	constructor (file_manager) {
+		this.prev_values = {};
+
 		var that = this;
 		file_manager.register_observer(() => {
 			that.file_trigger();
@@ -23,28 +25,38 @@ class FileUpdater {
 	}
 
 	update_input_files () {
-		var input_files = document.getElementsByClassName('input_file');
+		var that = this;
+		var modules = module_manager.modules;
+		for (let mod_idx in modules) {
+			var input_files = modules[mod_idx].dom.getElementsByClassName('input_file');
 
-		for (let id_file=0 ; id_file<input_files.length ; id_file++) {
-			let input_file = input_files[id_file];
+			for (let id_file=0 ; id_file<input_files.length ; id_file++) {
+				let input_file = input_files[id_file];
 
-			// Get all the file list for autocomplete
-			let autocomplete = file_manager.getFiles(input_file.classList);
-			// Transform the file list to autocomplete format
-			for (let idx=0 ; idx<autocomplete.length ; idx++) {
-				autocomplete[idx] = {value:autocomplete[idx], data:autocomplete[idx]};
-			}
-
-			// Setup the jquery autocomplete
-			$(input_file).autocomplete({
-				lookup: autocomplete,
-				onSelect: function(suggestion) {
-					let prev = input_file.value;
-					input_file.value = suggestion.data;
-					if (input_file.onchange && prev != input_file.value)
-						input_file.onchange();
+				// Get all the file list for autocomplete
+				let autocomplete = file_manager.getFiles(input_file.classList);
+				// Transform the file list to autocomplete format
+				for (let idx=0 ; idx<autocomplete.length ; idx++) {
+					autocomplete[idx] = {value:autocomplete[idx], data:autocomplete[idx]};
 				}
-			});
+
+				// Setup the jquery autocomplete
+				$(input_file).autocomplete({
+					lookup: autocomplete,
+					onSelect: function(suggestion) {
+						// Read values
+						let prev = that.prev_values[mod_idx + '_' + input_file.name];
+						input_file.value = suggestion.data;
+
+						// Compare and execute specific actions
+						if (input_file.onchange != undefined && prev != input_file.value)
+							input_file.onchange();
+
+						// Update previous values
+						that.prev_values[mod_idx + '_' + input_file.name] = suggestion.data;
+					}
+				});
+			}
 		}
 	}
 
