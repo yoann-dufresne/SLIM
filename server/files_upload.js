@@ -59,13 +59,18 @@ exports.upload = function (app) {
 
 		// set upload directory corresponding to the token send
 		var token = null;
+		var onError = false;
 		form.on('field', function(name, value) {
+			if (onError)
+				return;
+
 			if (name == 'token') {
 				if (fs.existsSync('/app/data/' + value)) {
 					token = value;
 					form.uploadDir = path.join(__dirname, '/data/' + value);
 				} else {
-					res.status(403).send('Invalid token')
+					res.status(403).send('Invalid token');
+					onError = true;
 				}
 			}	
 		});
@@ -73,6 +78,9 @@ exports.upload = function (app) {
 		// every time a file has been uploaded successfully,
 		// convert and rename it to it's orignal name
 		form.on('file', function(field, file) {
+			if (onError)
+				return;
+
 			if (token == null)
 				fs.unlink(file.path, function(){})
 			else {
@@ -95,6 +103,9 @@ exports.upload = function (app) {
 
 		// once all the files have been uploaded, send a response to the client
 		form.on('end', function() {
+			if (onError)
+				return;
+			
 			res.send('success');
 
 			// Remove previous deletion delay
