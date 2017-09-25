@@ -8,6 +8,9 @@ class FileManager {
 		this.rmvObs = [];
 
 		this.eventListeners();
+
+		this.timeout_add = null;
+		this.timeout_rmv = null;
 	}
 
 	load_from_server () {
@@ -77,18 +80,64 @@ class FileManager {
 		this.rmvObs.push(callback);
 	}
 
+	effective_add_notification () {
+		let event = new Event('new_file');
+		event.files = Array.from(new Set(this.new_files));
+
+		for (let idx in this.addObs) {
+			let callback = this.addObs[idx];
+			callback(this, event);
+		}
+	}
+
 	notifyAdd (params) {
-		for (var idx in this.addObs) {
-			var callback = this.addObs[idx];
-			callback(this, params);
+		var that = this;
+
+		if (this.timeout_add == null) {
+			this.new_files = [];
+
+			this.timeout_add = setTimeout(function() {
+				that.effective_add_notification();
+				that.timeout_add = null;
+			}, 100);
+		} else {
+			clearTimeout(this.timeout_add);
+			this.timeout_add = setTimeout(function() {
+				that.effective_add_notification();
+				that.timeout_add = null;
+			}, 100);
+		}
+		this.new_files = this.new_files.concat(params.files);
+	}
+
+	effective_rmv_notification () {
+		let event = new Event('rmv_file');
+		event.files = Array.from(new Set(this.rmv_files));
+
+		for (let idx in this.rmvObs) {
+			let callback = this.rmvObs[idx];
+			callback(this, event);
 		}
 	}
 
 	notifyRmv (params) {
-		for (var idx in this.rmvObs) {
-			var callback = this.rmvObs[idx];
-			callback(this, params);
+		var that = this;
+
+		if (this.timeout_rmv == null) {
+			this.rmv_files = [];
+
+			this.timeout_rmv = setTimeout(function() {
+				that.effective_rmv_notification();
+				that.timeout_rmv = null;
+			}, 200);
+		} else {
+			clearTimeout(this.timeout_rmv);
+			this.timeout_rmv = setTimeout(function() {
+				that.effective_rmv_notification();
+				that.timeout_rmv = null;
+			}, 200);
 		}
+		this.rmv_files = this.rmv_files.concat(params.files);
 	}
 
 	eventListeners () {

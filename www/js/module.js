@@ -11,7 +11,6 @@ class Module {
 		this.name = name;
 		this.doc = doc;
 		this.id = __next_id++;
-		this.toDOMelement();
 	}
 
 	specificDOMelements (callback) {
@@ -21,10 +20,8 @@ class Module {
 
 		this.specific.innerHTML = module_manager.htmls[this.name];
 		var that = this;
-		setTimeout(() => {
-			that.onLoad();
-			callback();
-		}, 50);
+		that.onLoad();
+		callback();	
 	}
 
 	createOptionBox (option) {
@@ -355,6 +352,7 @@ class ModuleManager {
 		if (params.idx)
 			__next_id = params.idx;
 		var module = this.moduleCreators[name](params);
+		module.toDOMelement();
 		this.modules[module.id] = module;
 
 		// Add the module to the dom

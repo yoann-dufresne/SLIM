@@ -16,12 +16,26 @@ class FileUpdater {
 		file_manager.register_observer(() => {
 			that.file_trigger();
 		});
+
+		this.previousCall = 0;
+		this.timeout = null;
 	}
 
 	/* Function triggered when files change */
 	file_trigger () {
-		this.update_input_lists();
-		this.update_input_files();
+		let time = new Date().getTime();
+		if (time - this.previousCall < 200) {
+			if (this.timeout != null)
+				clearTimeout(this.timeout);
+
+			var that = this;
+			this.timeout = setTimeout(() => {
+				that.update_input_lists();
+				that.update_input_files();
+				that.timeout = null;
+			}, 200);
+		}
+		this.previousCall = time;
 	}
 
 	update_input_files () {
