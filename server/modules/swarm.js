@@ -59,10 +59,14 @@ var otu_search = (os, config, callback) => {
 	var options = [directory + config.params.inputs.merged,
 	'-o', '/dev/null', //directory + tmp_output,
 	'-u', directory + tmp_output,
-	'-f', '-z',
+	'-z',
 	'-w', directory + config.params.outputs.centroids,
-	'-t', os.cores,
-	'-d', config.params.params.max_diff];
+	'-t', os.cores];
+
+	if (config.params.params.max_diff == 1)
+		options = options.concat(['-f']);
+	else
+		options = options.concat(['-d', config.params.params.max_diff]);
 
 	// Execute swarm
 	console.log("Running swarm with the command line:");
