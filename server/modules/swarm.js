@@ -61,7 +61,8 @@ var otu_search = (os, config, callback) => {
 	'-u', directory + tmp_output,
 	'-f', '-z',
 	'-w', directory + config.params.outputs.centroids,
-	'-t', os.cores];
+	'-t', os.cores,
+	'-d', config.params.params.max_diff];
 
 	// Execute swarm
 	console.log("Running swarm with the command line:");
