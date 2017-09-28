@@ -16,7 +16,7 @@ exports.write_from_uc = (os, config, callback) => {
 	var fin = config.params.inputs.merged;
 	var fout = config.params.outputs.reads;
 	
-	var options = ['/app/lib/OTU_manager/main.py',
+	var options = ['/app/lib/python_scripts/matrix_creation.py',
 		'-uc', directory + uc_file,
 		'-so', directory + origins_file,
 		'-o', directory + otu_table,

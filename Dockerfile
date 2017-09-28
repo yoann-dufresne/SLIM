@@ -51,7 +51,7 @@ COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
-COPY lib/OTU_manager /app/lib/OTU_manager
+COPY lib/python_scripts /app/lib/python_scripts
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
