@@ -5,6 +5,12 @@ var on_token_generated = () => {
 	// Files loading
 	file_manager.load_from_server();
 
+	// Delay the module reconstructions if they are not loaded
+	if (module_manager.isLoading()) {
+		setTimeout(on_token_generated, 100);
+		return;
+	}
+
 	// Modules loading
 	$.get('/data/' + exec_token + '/pipeline.conf')
 	.done((data) => {

@@ -4,7 +4,7 @@ const fs = require('fs');
 
 exports.name = 'fasta-filtering';
 exports.multicore = false;
-exports.category = 'FASTA/FASTQ';
+exports.category = 'Utils';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;

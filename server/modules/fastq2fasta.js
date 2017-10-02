@@ -7,7 +7,7 @@ const derep = require('./dereplication.js');
 
 exports.name = 'fastq2fasta';
 exports.multicore = true;
-exports.category = 'FASTA/FASTQ';
+exports.category = 'Utils';
 
 
 exports.run = function (os, config, callback) {

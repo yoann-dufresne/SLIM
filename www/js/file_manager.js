@@ -1,8 +1,8 @@
 
 class FileManager {
 	constructor () {
-		this.server_files = [];
-		this.futur_files = [];
+		this.server_files = {};
+		this.futur_files = {};
 
 		this.addObs = [];
 		this.rmvObs = [];
@@ -13,7 +13,7 @@ class FileManager {
 		this.timeout_rmv = null;
 	}
 
-	load_from_server () {
+	load_from_server (callback) {
 		var that = this;
 		$.get('/list?token=' + exec_token, (data) => {
 			// Get all the server files
@@ -42,28 +42,19 @@ class FileManager {
 		return formated;
 	}
 
-	filterFiles (filenames, extentions) {
-		var filtered = [];
+	getFiles (extentions = []) {
+		if (extentions.length == 0)
+			extentions = [... new Set(Object.keys(this.server_files).concat(Object.keys(this.futur_files)))];
 
-		for (var eIdx in extentions) {
-			var ext = extentions[eIdx];
-			for (var idx in filenames) {
-				var filename = filenames[idx];
-				if (filename.endsWith(ext))
-					filtered.push(filename);
-			}
+		// Construct the file object
+		var files = [];
+		for (var idx in extentions) {
+			if (this.server_files[extentions[idx]] != undefined)
+				files = files.concat(this.server_files[extentions[idx]]);
+			if (this.futur_files[extentions[idx]] != undefined)
+				files = files.concat(this.futur_files[extentions[idx]]);
 		}
 
-		return filtered;
-	}
-
-	getFiles (extentions = []) {
-		var files = this.server_files.concat(this.futur_files);
-
-		if (extentions.length == 0)
-			return files;
-
-		files = this.filterFiles (files, extentions);
 		return files;
 	}
 
@@ -147,8 +138,14 @@ class FileManager {
 		document.addEventListener('new_file', (event) => {
 			for (var idx in event.files) {
 				var filename = event.files[idx];
-				if (that.server_files.indexOf(filename) == -1)
-					that.server_files.push(filename);
+				var extention = filename.substr(filename.lastIndexOf('.')+1);
+
+				// Create new array if doesn't exist
+				if (that.server_files[extention] == undefined)
+					that.server_files[extention] = [];
+
+				if (that.server_files[extention].indexOf(filename) == -1)
+					that.server_files[extention].push(filename);
 			}
 			that.notifyAdd(event);
 		});
@@ -157,9 +154,13 @@ class FileManager {
 		document.addEventListener('rmv_file', (event) => {
 			for (var idx in event.files) {
 				var filename = event.files[idx];
-				var file_idx = that.server_files.indexOf(filename);
-				if (file_idx != -1)
-					that.server_files.splice(file_idx, 1);
+				var extention = filename.substr(filename.lastIndexOf('.')+1);
+
+				if (that.futur_files[extention] != undefined) {
+					var file_idx = that.server_files[extention].indexOf(filename);
+					if (file_idx != -1)
+						that.server_files[extention].splice(file_idx, 1);
+				}
 			}
 			that.notifyRmv(event);
 		});
@@ -168,8 +169,14 @@ class FileManager {
 		document.addEventListener('new_output', (event) => {
 			for (var idx in event.files) {
 				var filename = event.files[idx];
-				if (that.futur_files.indexOf(filename) == -1)
-					that.futur_files.push(filename);
+				var extention = filename.substr(filename.lastIndexOf('.')+1);
+
+				// Create new array if doesn't exist
+				if (that.futur_files[extention] == undefined)
+					that.futur_files[extention] = [];
+
+				if (that.futur_files[extention].indexOf(filename) == -1)
+					that.futur_files[extention].push(filename);
 			}
 			that.notifyAdd(event);
 		});
@@ -178,9 +185,13 @@ class FileManager {
 		document.addEventListener('rmv_output', (event) => {
 			for (var idx in event.files) {
 				var filename = event.files[idx];
-				var file_idx = that.futur_files.indexOf(filename);
-				if (file_idx != -1)
-					that.futur_files.splice(file_idx, 1);
+				var extention = filename.substr(filename.lastIndexOf('.')+1);
+
+				if (that.futur_files[extention] != undefined) {
+					var file_idx = that.futur_files[extention].indexOf(filename);
+					if (file_idx != -1)
+						that.futur_files[extention].splice(file_idx, 1);
+				}
 			}
 			that.notifyRmv(event);
 		});

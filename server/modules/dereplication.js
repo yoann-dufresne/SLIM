@@ -1,4 +1,4 @@
-const spawn = require('child_process').spawn;
+const exec = require('child_process').spawn;
 const fs = require('fs');
 
 const tools = require('../toolbox');
@@ -6,7 +6,7 @@ const tools = require('../toolbox');
 
 exports.name = 'fasta-dereplication';
 exports.multicore = false;
-exports.category = 'FASTA/FASTQ';
+exports.category = 'Utils';
 
 exports.run = (os, config, callback) => {
 	var token = os.token;
@@ -33,10 +33,10 @@ exports.run = (os, config, callback) => {
 	if (config && config.params.params && config.params.params.rename)
 		options = options.concat(['--relabel', config.params.params.rename + '_']);
 
-	console.log('Command:\nvsearch', options.join(' '));
+	console.log(os.token + ': vsearch', options.join(' '));
 
 	// Execution
-	var child = spawn('/app/lib/vsearch/bin/vsearch', options);
+	var child = exec('/app/lib/vsearch/bin/vsearch', options);
 	child.stdout.on('data', function(data) {
 		fs.appendFileSync(directory + config.log, data);
 	});

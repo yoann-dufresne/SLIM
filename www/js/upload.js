@@ -82,6 +82,10 @@ document.querySelector("#up_submit").onclick = function (event) {
 					if (percentComplete === 100) {
 						$('.progress-bar').html('Processing file(s)');
 
+						var event = new Event('new_file');
+						event.files = [];
+						document.dispatchEvent(event);
+
 						// Verify files that have been converted to linux format
 						var interval = setInterval(
 							// Get the file list to process
@@ -121,7 +125,7 @@ file_manager.register_observer((manager) => {
 	var up_list = document.querySelector("#up_list");
 	up_list.innerHTML = '';
 
-	var filenames = manager.server_files;
+	var filenames = [].concat(... Object.values(file_manager.server_files));
 	if (filenames.length > 0) {
 			up_list.innerHTML = '<p>Server files</p>';
 			var ul = document.createElement("ul");

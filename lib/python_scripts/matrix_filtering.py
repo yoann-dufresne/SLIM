@@ -9,12 +9,18 @@ def main (threshold, matrix, centroids, reads):
 
 	# Centroids
 	if centroids != '':
-		filter_centroids(centroids, filtered_clusters)
+		filter_centroids(centroids, filtered_clusters, threshold)
+
+	# reads
+	if reads != '':
+		filter_reads(reads, filtered_clusters, threshold)
 
 
 def filter_matrix (file, threshold):
+	print('Filter matrix')
+
 	idx = file.rfind('.')
-	output = '{}_filtered_{}.tsv'.format(file[0:idx-1], threshold)
+	output = '{}_filtered_{}.tsv'.format(file[0:idx], threshold)
 
 	with open(file) as fp, open(output, 'w') as out:
 		# Write header
@@ -35,15 +41,39 @@ def filter_matrix (file, threshold):
 			else:
 				out.write(line)
 
-		return filtered_clusters
+		return frozenset(filtered_clusters)
 
 
-def filter_centroids (filename, filtered_clusters):
-	for idx, seq_record in enumerate(SeqIO.parse(filename, "fasta")):
-		if len(filetered_clusters) == 0 or filtered_clusters[0] != idx:
-			out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
-		else:
-			filtered_clusters = filetered_clusters[1:]
+def filter_centroids (filename, filtered_clusters, threshold):
+	print('Filter the OTU centroids')
+
+	idx = filename.rfind('.')
+	output = '{}_filtered_{}.fasta'.format(filename[0:idx], threshold)
+
+	with open(output, 'w') as out:
+		for idx, seq_record in enumerate(SeqIO.parse(filename, "fasta")):
+			if not idx in filtered_clusters:
+				out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
+
+
+def filter_reads (filename, filtered_clusters, threshold):
+	print('filter the clusterized reads')
+
+	filtered_clusters = filtered_clusters
+
+	idx = filename.rfind('.')
+	output = '{}_filtered_{}.fasta'.format(filename[0:idx], threshold)
+
+	with open(output, 'w') as out:
+		for seq_record in SeqIO.parse(filename, "fasta"):
+			# Parse the cluster id
+			cluster = seq_record.id
+			cluster = cluster[cluster.find(';cluster=')+9:]
+			cluster = int(cluster[:cluster.find(';')])
+
+			# Rewrite if cluster is not filtered
+			if not cluster in filtered_clusters:
+				out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
 
 
 if __name__ == '__main__':

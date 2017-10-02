@@ -7,19 +7,19 @@ const derep = require('./dereplication.js');
 
 exports.name = 'fasta-merging';
 exports.multicore = true;
-exports.category = 'FASTA/FASTQ';
+exports.category = 'Utils';
 
 exports.run = (os, config, callback) => {
 	let token = os.token;
 
 	console.log(token + ": Merging fastas");
 	var directory = '/app/data/' + token + '/';
-	var merged = directory + config.params.outputs.merged;
+	var merged = tools.tmp_filename();
 	var origins = directory + config.params.outputs.origins;
 	var fastas = Object.values(config.params.inputs);
 	fastas = fastas.map((fasta) => {return directory + fasta})
 	
-	var command = ['/app/lib/python_scripts/fasta_merging.py', '-out', merged, '-ori', origins].concat(fastas);
+	var command = ['/app/lib/python_scripts/fasta_merging.py', '-out', directory+merged, '-ori', origins].concat(fastas);
 
 	// Joining
 	console.log(token + ': FASTA merging');
@@ -37,9 +37,14 @@ exports.run = (os, config, callback) => {
 		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
-		if (code == 0)
-			callback(os, null);
-		else
+		if (code == 0) {
+			config.params.inputs.fasta = merged;
+			config.params.outputs.derep = config.params.outputs.merged;
+			derep.run(os, config,(_, msg) => {
+				fs.unlink(directory+merged, ()=>{});
+				callback(os, msg);
+			});
+		} else
 			callback(os, 'Impossible to merge fasta files')
 	});
 };

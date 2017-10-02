@@ -128,7 +128,10 @@ class Module {
 
 			// On change events
 			out_input.onchange = function () {
-				that.output_onchange ([out_input.old_value], [out_input.value]);
+				if (out_input.old_value == undefined)
+					that.output_onchange ([], [out_input.value]);
+				else
+					that.output_onchange ([out_input.old_value], [out_input.value]);
 				out_input.old_value = out_input.value;
 				
 				// Joker case

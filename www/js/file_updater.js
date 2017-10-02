@@ -23,18 +23,21 @@ class FileUpdater {
 
 	/* Function triggered when files change */
 	file_trigger () {
+		var that = this;
+		var up_func = () => {
+			that.update_input_lists();
+			that.update_input_files();
+			that.timeout = null;
+		};
+		
 		let time = new Date().getTime();
 		if (time - this.previousCall < 200) {
 			if (this.timeout != null)
 				clearTimeout(this.timeout);
 
-			var that = this;
-			this.timeout = setTimeout(() => {
-				that.update_input_lists();
-				that.update_input_files();
-				that.timeout = null;
-			}, 200);
-		}
+			this.timeout = setTimeout(up_func, 200);
+		} else
+			up_func();
 		this.previousCall = time;
 	}
 
@@ -48,7 +51,8 @@ class FileUpdater {
 				let input_file = input_files[id_file];
 
 				// Get all the file list for autocomplete
-				let autocomplete = file_manager.getFiles(input_file.classList);
+				let autocomplete = file_manager.getFiles(input_file.classList).filter((val)=>{return typeof(val) == "string"});
+				
 				// Transform the file list to autocomplete format
 				for (let idx=0 ; idx<autocomplete.length ; idx++) {
 					autocomplete[idx] = {value:autocomplete[idx], data:autocomplete[idx]};
