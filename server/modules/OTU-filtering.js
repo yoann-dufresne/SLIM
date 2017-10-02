@@ -25,17 +25,17 @@ exports.run = function (os, config, callback) {
 
 	let reads = '';
 	let reads_filtered = '';
-	if (config.params.inputs.reads == undefined) {
+	if (config.params.inputs.reads != undefined) {
 		reads = config.params.inputs.reads;
 		reads_filtered = reads.substr(0, reads.lastIndexOf('.')) + '_filtered_' + thresh + '.fasta';
 	}
 
 	// Run the program
 	var options = ['/app/lib/python_scripts/matrix_filtering.py',
-		'-m', directory + config.params.inputs.matrix,
-		'-c', directory + config.params.inputs.centroids,
-		'-r', directory + config.params.inputs.reads,
-		'-t', config.params.params.threshold];	
+		'-m', directory + matrix,
+		'-c', centroids == '' ? '' : directory + centroids,
+		'-r', reads == '' ? '' : directory + reads,
+		'-t', thresh];	
 
 	console.log("Running OTU filtering with the command line:");
 	console.log('python3', options.join(' '));
