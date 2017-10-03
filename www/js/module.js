@@ -89,7 +89,8 @@ class Module {
 			for (let in_id=0 ; in_id<in_files.length ; in_id++) {
 				let input = in_files[in_id];
 
-				input.value = this.params.inputs[input.name].replace('$', '*');
+				if (this.params.inputs[input.name] != undefined)
+					input.value = this.params.inputs[input.name].replace('$', '*');
 			}
 
 			// Reload input lists
