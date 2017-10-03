@@ -100,9 +100,10 @@ class FileUpdater {
 
 			let classes = input_list.classList;
 			let filenames = file_manager.getFiles(classes);
+			var html = '';
 			for (let file_id in filenames) {
 				let filename = filenames[file_id];
-				input_list.innerHTML += '<p><input type="checkbox" name="' + filename + '" class="checklist"'
+				html += '<p><input type="checkbox" name="' + filename + '" class="checklist"'
 					+ (checked.includes(filename) ? ' checked' : '') + '> ' + filename + '</p>';
 			}
 
@@ -111,12 +112,54 @@ class FileUpdater {
 				let check = checked[id_check];
 
 				if (!filenames.includes(check)) {
-					input_list.innerHTML += '<p><input type="checkbox" name="' + check
+					html += '<p><input type="checkbox" name="' + check
 						+ '" class="checklist" checked> ' + check + '</p>';
 				}
 			}
+			input_list.innerHTML = html;
 		}
 	}
+
+
+	// /* Update the file lists by looking at the div classes */
+	// update_input_lists () {
+	// 	var input_lists = document.getElementsByClassName('input_list');
+
+	// 	for (let id_list=0 ; id_list<input_lists.length ; id_list++) {
+	// 		let input_list = input_lists[id_list];
+	// 		let checked = [];
+			
+	// 		// Save checked files
+	// 		let inputs = input_list.getElementsByTagName('input');
+	// 		for (let input_id=0 ; input_id<inputs.length ; input_id++) {
+	// 			let input = inputs[input_id];
+	// 			if (input.checked)
+	// 				checked.push(input.name);
+	// 		}
+
+
+	// 		// Recreate file list
+	// 		input_list.innerHTML = "";
+
+	// 		let classes = input_list.classList;
+	// 		let filenames = file_manager.getFiles(classes);
+	// 		for (let file_id in filenames) {
+	// 			let filename = filenames[file_id];
+	// 			input_list.innerHTML += '<p><input type="checkbox" name="' + filename + '" class="checklist"'
+	// 				+ (checked.includes(filename) ? ' checked' : '') + '> ' + filename + '</p>';
+	// 		}
+
+	// 		// Add reloaded inputs
+	// 		for (let id_check=0 ; id_check<checked.length ; id_check++) {
+	// 			let check = checked[id_check];
+
+	// 			if (!filenames.includes(check)) {
+	// 				input_list.innerHTML += '<p><input type="checkbox" name="' + check
+	// 					+ '" class="checklist" checked> ' + check + '</p>';
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 var gui_file_updater = new FileUpdater(file_manager);

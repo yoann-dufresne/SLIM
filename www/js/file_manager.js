@@ -90,13 +90,13 @@ class FileManager {
 			this.timeout_add = setTimeout(function() {
 				that.effective_add_notification();
 				that.timeout_add = null;
-			}, 100);
+			}, 10);
 		} else {
 			clearTimeout(this.timeout_add);
 			this.timeout_add = setTimeout(function() {
 				that.effective_add_notification();
 				that.timeout_add = null;
-			}, 100);
+			}, 10);
 		}
 		this.new_files = this.new_files.concat(params.files);
 	}
@@ -120,13 +120,13 @@ class FileManager {
 			this.timeout_rmv = setTimeout(function() {
 				that.effective_rmv_notification();
 				that.timeout_rmv = null;
-			}, 200);
+			}, 10);
 		} else {
 			clearTimeout(this.timeout_rmv);
 			this.timeout_rmv = setTimeout(function() {
 				that.effective_rmv_notification();
 				that.timeout_rmv = null;
-			}, 200);
+			}, 10);
 		}
 		this.rmv_files = this.rmv_files.concat(params.files);
 	}
