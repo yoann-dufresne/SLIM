@@ -160,7 +160,7 @@ var decompress_gz = (token, archive) => {
 	});
 };
 
-var decompress_tgz = (token, archive) => {
+let decompress_tgz = function (token, archive) {
 	let dir = '/app/data/' + token + '/';
 
 	if (!files_to_process[token])
@@ -173,38 +173,43 @@ var decompress_tgz = (token, archive) => {
 
 	exec('tar', ['-xvf', archive.path, '-C', dir])
 	.stdout.on('data', (data) => {
-		// Create file to process
-		let file = {
-			name: data.toString('utf8').trim(),
-			path: dir + data.toString('utf8').trim()
-		};
-		file_list.push(file);
+		let names = data.toString('utf8').trim().split('\n');
 
-		// Determine maximal prefix
-		if (prefix == null)
-			prefix = file.name;
-		else {
-			// Get the first idx for different 
-			let cmon_idx;
-			for (cmon_idx=0 ; cmon_idx<prefix.length ; cmon_idx++)
-				if (prefix[cmon_idx] != file.name[cmon_idx])
-					break;
-			prefix = prefix.substr(0, cmon_idx);
-		}
+		for (let name_idx=0 ; name_idx<names.length ; name_idx++) {
+			data = names[name_idx];
+			// Create file to process
+			let file = {
+				name: data,
+				path: dir + data
+			};
+			file_list.push(file);
 
-		// Determine maximal suffix
-		if (suffix == null)
-			suffix = file.name;
-		else {
-			let delta_size = file.name.length - suffix.length;
-
-			// Get the first idx for different 
-			let cmon_idx;
-			for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--) {
-				if (suffix[cmon_idx] != file.name[cmon_idx + delta_size])
-					break;
+			// Determine maximal prefix
+			if (prefix == null)
+				prefix = file.name;
+			else {
+				// Get the first idx for different 
+				let cmon_idx;
+				for (cmon_idx=0 ; cmon_idx<prefix.length ; cmon_idx++)
+					if (prefix[cmon_idx] != file.name[cmon_idx])
+						break;
+				prefix = prefix.substr(0, cmon_idx);
 			}
-			suffix = suffix.substr(cmon_idx+1);
+
+			// Determine maximal suffix
+			if (suffix == null)
+				suffix = file.name;
+			else {
+				let delta_size = file.name.length - suffix.length;
+
+				// Get the first idx for different 
+				let cmon_idx;
+				for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--) {
+					if (suffix[cmon_idx] != file.name[cmon_idx + delta_size])
+						break;
+				}
+				suffix = suffix.substr(cmon_idx+1);
+			}
 		}
 	})
 	.on('close', () => {
@@ -222,8 +227,8 @@ var decompress_tgz = (token, archive) => {
 			if (!exports.jokers[token])
 				exports.jokers[token] = {};
 
-			file_list = file_list.map((file) => {return file.name;});
-			exports.jokers[token][prefix + '*' + suffix] = file_list;
+			file_list2 = file_list.map((file) => {return file.name;});
+			exports.jokers[token][prefix + '*' + suffix] = file_list2;
 		}
 
 		files_to_process[token].splice (files_to_process[token].indexOf(archive.name), 1);
@@ -243,12 +248,9 @@ var proccess_file = (token, file, upload_dir) => {
 		exec('mac2unix', [file.path, '-q'])
 		.on('close', () => {
 			// Rename
-			fs.rename(file.path, path.join(upload_dir, file.name), function (err) {
-				if (err)
-					console.log('Error during file upload: ' + err);
+			fs.renameSync(file.path, path.join(upload_dir, file.name));
 
-				files_to_process[token].splice (files_to_process[token].indexOf(file.name), 1);
-			});
+			files_to_process[token].splice (files_to_process[token].indexOf(file.name), 1);
 		});
 	});
 };
