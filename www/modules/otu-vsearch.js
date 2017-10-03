@@ -33,8 +33,8 @@ class OtuVsearchModule extends Module {
 
 		// Reload params
 		// config.params.sorted = this.sorted.checked ? this.t2s.value : "";
-		if (this.params.params && this.params.params.ordered && this.params.params.ordered == 'true') {
-			this.sorted.checked = this.params.params.ordered;
+		if (this.params.params && this.params.params.ordered_vsearch && this.params.params.ordered_vsearch == 'true') {
+			this.sorted.checked = this.params.params.ordered_vsearch;
 		}
 
 		this.sorted.onchange = () => {
