@@ -220,7 +220,14 @@ exports.listen_commands = function (app) {
 			// Parse config
 			fs.renameSync(file.path, filename);
 			let txt = fs.readFileSync(filename, 'utf8');
-			let params = JSON.parse(txt);
+			let params = {};
+			try {
+				params = JSON.parse(txt);
+			} catch (error) {
+				console.log(token + ': Syntax error during the run command');
+				res.status(400).send('JSON syntax error');
+				return;
+			}
 
 			// Answer the client
 			run_job(params, (code, msg) => {

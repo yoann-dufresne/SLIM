@@ -32,15 +32,12 @@ class SwarmModule extends Module {
 		this.t2s = this.dom.getElementsByClassName('t2s_value')[0];
 
 		// Reload params
-		// config.params.sorted = this.sorted.checked ? this.t2s.value : "";
-		if (this.params.params && this.params.params.ordered_swarm && this.params.params.ordered_swarm == 'true') {
+		if (this.params.params && this.params.params.ordered_swarm && this.params.params.ordered_swarm == true) {
 			this.sorted.checked = this.params.params.ordered_swarm;
 		}
 
 		this.sorted.onchange = () => {
 			that.sorted.value = that.sorted.checked;
-			console.log(that.sorted)
-			console.log(that.sorted.checked)
 			
 			if (that.sorted.checked) {
 				that.t2s.style.display = "inline-block";
