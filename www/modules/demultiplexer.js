@@ -48,10 +48,12 @@ class DemultiplexerModule extends Module {
 		this.out_area = this.dom.getElementsByClassName('file_list')[0];
 		// Reload outputs
 		if (this.params.outputs) {
+			var html = '';
 			for (var filename in this.params.outputs) {
 				this.out_files.push(filename)
-				this.out_area.innerHTML += this.format_output(filename);
+				html += this.format_output(filename);
 			}
+			this.out_area.innerHTML = html;
 		}
 		
 		// Change the output files using the tags file

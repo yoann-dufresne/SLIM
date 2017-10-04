@@ -97,6 +97,7 @@ class Module {
 			var in_lists = this.dom.getElementsByClassName('input_list');
 			for (let list_id=0 ; list_id<in_lists.length ; list_id++) {
 				let in_list = in_lists[list_id];
+				var html = '';
 
 				for (let in_id in this.params.inputs) {
 					// Detect list items
@@ -106,10 +107,11 @@ class Module {
 					// Detect list id
 					let loaded_list_id = in_id.split('_')[1];
 					if (loaded_list_id == list_id) {
-						in_list.innerHTML += '<p><input type="checkbox" name="' + this.params.inputs[in_id].replace('$', '*')
+						html += '<p><input type="checkbox" name="' + this.params.inputs[in_id].replace('$', '*')
 							+ '" class="checklist" checked> ' + this.params.inputs[in_id].replace('$', '*') + '</p>';
 					}
 				}
+				in_list.innerHTML = html;
 			}
 		}
 
