@@ -201,7 +201,7 @@ exports.listen_commands = function (app) {
 
 		form.on('end', function () {
 			// Verify data integrity
-			if (token == null || !accounts.tokens[token] || !file) {
+			if (token == null || !accounts.tokens[token] || file == null) {
 				console.log('Wrong token', token);
 				res.status(400).send('Wrong token');
 				return;
