@@ -30,9 +30,9 @@ def filter_matrix (file, threshold):
 		filtered_clusters = []
 		for line in fp:
 			# Parse line
-			values = [int(val) for val in line.split('\t')]
+			values = [int(val) for val in line.strip().split('\t') if val.isdigit()]
 			id = values[0]
-			values = values[1:]
+			values = for val in values[1:]
 			s = sum(values)
 
 			# Rewrite only if over or equals to the threshold
