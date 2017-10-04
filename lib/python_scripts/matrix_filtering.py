@@ -32,7 +32,7 @@ def filter_matrix (file, threshold):
 			# Parse line
 			values = [int(val) for val in line.strip().split('\t') if val.isdigit()]
 			id = values[0]
-			values = for val in values[1:]
+			values = values[1:]
 			s = sum(values)
 
 			# Rewrite only if over or equals to the threshold
