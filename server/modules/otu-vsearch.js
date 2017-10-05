@@ -59,10 +59,12 @@ var otu_search = (os, config, callback) => {
 
 	// Clustering options
 	var options = ['--cluster_fast', directory + in_reads,
+		'--sizein', '--sizeout',
 		'--uc', directory + tmp_output,
 		'--id', config.params.params.similarity,
 		'--centroids', directory + centroids_file,
-		'--threads', os.cores];
+		'--threads', os.cores,
+		'--qmask', 'none'];
 
 	// Execute vsearch
 	console.log("Running vsearch with the command line:");

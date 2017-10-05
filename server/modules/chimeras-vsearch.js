@@ -11,7 +11,7 @@ exports.run = function (os, config, callback) {
 	var directory = '/app/data/' + token + '/';
 	var options = ['--uchime_denovo', directory + config.params.inputs.input,
 		'--nonchimeras', directory + config.params.outputs.nonchimeras,
-		'--sizeout'];
+		'--sizeout', '--qmask', 'none'];
 
 	if (config.params.outputs.chimeras) {
 		options = options.concat(['--chimeras', directory + config.params.outputs.chimeras]);

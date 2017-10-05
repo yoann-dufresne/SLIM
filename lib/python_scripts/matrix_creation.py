@@ -22,7 +22,6 @@ def read_uc (filename, origins):
 
 			if line_type == 'C':
 				true_clusters.append(cluster_id)
-				continue
 
 			# Matrix construction
 			if not cluster_id in clusters:
@@ -47,8 +46,8 @@ def read_uc (filename, origins):
 def rewrite_fasta (read_clusters, fin, fout):
 	with open(fout, 'w') as fp:
 		for seq_record in SeqIO.parse(fin, "fasta"):
-			fp.write('>' + seq_record.id + ';cluster=' + str(read_clusters[seq_record.id]) + ';\n')
-			fp.write(str(seq_record.seq) + '\n')
+			fp.write('>{};cluster={};\n'.format(seq_record.id, read_clusters[seq_record.id]))
+			fp.write('{}\n'.format(seq_record.seq))
 
 
 def read_origins (filename):
