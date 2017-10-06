@@ -23,7 +23,7 @@ exports.write_from_uc = (os, config, callback) => {
 		'-fasta_in', directory + fin,
 		'-fasta_out', directory + fout];
 
-	if (config.params.params.ordered == 'true')
+	if (config.params.params.ordered == true)
 		options = options.concat(['-t2s', directory + config.params.params.t2s]);
 
 	console.log("python3", options.join(' '));

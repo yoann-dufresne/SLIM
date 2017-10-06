@@ -82,6 +82,7 @@ var otu_search = (os, config, callback) => {
 			callback();
 		else {
 			config.params.inputs.uc = tmp_output;
+			config.params.params.ordered = config.params.params.ordered_vsearch;
 			otu_manager.write_from_uc(os, config, (os, msg) => {
 				fs.unlink(directory+tmp_output, ()=>{});
 				callback(os, msg);

@@ -22,6 +22,7 @@ def read_uc (filename, origins):
 
 			if line_type == 'C':
 				true_clusters.append(cluster_id)
+				continue
 
 			# Matrix construction
 			if not cluster_id in clusters:
@@ -88,9 +89,10 @@ def read_t2s (filename, true_names):
 				continue
 
 			# Read the experiments
+			t2s_name = filename[filename.rfind('/')+1:filename.rfind('.')]
 			library = split[header['run']]
 			sample = split[header['sample']]
-			dst = library + '_' + sample
+			dst = '{}_{}_{}'.format(t2s_name, library, sample)
 
 			brut_name = ""
 			for name in true_names:
@@ -100,7 +102,7 @@ def read_t2s (filename, true_names):
 
 			order.append({"src":brut_name, "dst":dst})
 
-	return order, read_clusters
+	return order
 
 
 def print_otus (matrix, order):
