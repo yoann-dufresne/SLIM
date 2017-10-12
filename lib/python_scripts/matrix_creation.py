@@ -8,20 +8,22 @@ def read_uc (filename, origins):
 	true_clusters = []
 	clusters = {}
 	read_clusters = {};
+	lines = {};
 	
 	# File reading
 	with open(filename) as fp:
 		for line in fp:
 			# Line reading
 			split = line.strip().split("\t")
-			line_type, cluster_id, _, _, _, _, _, _, read_name, _ = split
-			cluster_id = int(cluster_id)
+			line_type, cluster_id, _, _, _, _, _, _, read_name, centroid_name = split
+			cluster_id = int(cluster_id) if line_type != 'H' else read_clusters[centroid_name]
 
 			# Index read
 			read_clusters[read_name] = cluster_id
 
 			if line_type == 'C':
 				true_clusters.append(cluster_id)
+
 				continue
 
 			# Matrix construction
