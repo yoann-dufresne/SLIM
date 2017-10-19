@@ -87,7 +87,8 @@ var uc_to_assignment = (os, config, callback) => {
 
 			assignments[clusters[data.name]].push({
 				similarity: (data.similarity / 100.0),
-				taxon: data.hit.substr(data.hit.indexOf(' '))
+				sequence_id: data.hit.substr(0, data.hit.indexOf(' ')),
+				taxon: data.hit.substr(data.hit.indexOf(' ')+1)
 			});
 		})
 		.on('end', () => {

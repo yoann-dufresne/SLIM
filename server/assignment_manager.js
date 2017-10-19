@@ -13,7 +13,7 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 
 		// Header
 		if (line.startsWith('OTU')) {
-			fs.appendFileSync(matrix_out, line + '\ttaxon\n');
+			fs.appendFileSync(matrix_out, line + '\ttaxon\tmean identity\tref ids\n');
 			return;
 		} else if (line != '') {
 			let split = line.split('\t');
@@ -21,7 +21,8 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 
 			if (assignments[cluster]) {
 				let cons = consensus(assignments[cluster], threshold);
-				fs.appendFile(matrix_out, line + '\t' + cons + '\n', ()=>{});
+				fs.appendFile(matrix_out, line + '\t' + cons.taxon + '\t'
+						+ cons.identity + '\t' + cons.ids.join(";") + '\n', ()=>{});
 			} else {
 				callback('Number of OTUs and number of reads differs');
 				onError = true;
@@ -39,7 +40,7 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 
 var consensus = (taxa, threshold) => {
 	if (taxa.length == 0)
-		return 'unassigned';
+		return {taxon:'unassigned', identity:0, ids:[]};
 
 	let used_taxa = taxa;
 	let max_sim = 0;
@@ -61,13 +62,23 @@ var consensus = (taxa, threshold) => {
 		}
 	}
 
-	// Only one taxon remaining
-	if (used_taxa.length == 1)
-		return used_taxa[0].taxon;
-
 	// Create consensus taxonomy
-	detailed_taxa = taxa.map ((elem) => {return elem.taxon.split(';');});
+	let detailed_taxa = used_taxa.map ((elem) => {return elem.taxon.split(';');});
+	let mean = used_taxa.map((elem) => {return elem.similarity;})
+		.reduce((sum, val) => {return sum + val}, 0)
+		/ used_taxa.length;
+	let ids = used_taxa.map((elem) => {return elem.sequence_id});
 
+	// Taxo consensus
+	let cons = used_taxa[0].taxon;
+	if (used_taxa.length != 1)
+		cons = taxo_consensus (detailed_taxa);
+
+	return {taxon: cons, identity: mean, ids: ids};
+};
+
+
+var taxo_consensus = (detailed_taxa) => {
 	let cons = '';
 	let tax_id = 0;
 	while (true) {
