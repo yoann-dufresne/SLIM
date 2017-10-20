@@ -7,8 +7,9 @@ def read_uc (filename, origins):
 	# Init
 	true_clusters = []
 	clusters = {}
-	read_clusters = {};
-	lines = {};
+	read_clusters = {}
+	lines = {}
+	treated = {}
 	
 	# File reading
 	with open(filename) as fp:
@@ -23,8 +24,12 @@ def read_uc (filename, origins):
 
 			if line_type == 'C':
 				true_clusters.append(cluster_id)
-
 				continue
+
+			if read_name in treated:
+				continue
+			else:
+				treated[read_name] = True
 
 			# Matrix construction
 			if not cluster_id in clusters:
