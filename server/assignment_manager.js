@@ -6,11 +6,7 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 	// Create output file and header
 	fs.closeSync(fs.openSync(matrix_out, 'w'));
 
-	let onError = false;
 	lineReader.eachLine(matrix_in, function(line, last) {
-		if (onError)
-			return;
-
 		// Header
 		if (line.startsWith('OTU')) {
 			fs.appendFileSync(matrix_out, line + '\ttaxon\tmean identity\tref ids\n');
@@ -24,8 +20,7 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 				fs.appendFile(matrix_out, line + '\t' + cons.taxon + '\t'
 						+ cons.identity + '\t' + cons.ids.join(";") + '\n', ()=>{});
 			} else {
-				callback('Number of OTUs and number of reads differs');
-				onError = true;
+				fs.appendFile(matrix_out, line + '\t\t0\t\n', ()=>{});
 			}
 		}
 
@@ -33,8 +28,6 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 			callback(null);
 		}
 	});
-
-	let line_idx = 0;
 };
 
 

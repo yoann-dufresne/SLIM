@@ -25,7 +25,7 @@ exports.run = function (os, config, callback) {
 	console.log("Running vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));
 	fs.appendFileSync(directory + config.log, '--- Command ---\n');
-	fs.appendFileSync(directory + config.log, 'casper ' + options.join(' ') + '\n');
+	fs.appendFileSync(directory + config.log, 'vsearch ' + options.join(' ') + '\n');
 	fs.appendFileSync(directory + config.log, '--- Exec ---\n');
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
 
@@ -51,8 +51,10 @@ exports.run = function (os, config, callback) {
 					(msg)=>{callback(os, msg);}
 				);
 			});
-		} else
+		} else {
+			console.log("vsearch terminate on code " + code);
 			callback(os, "vsearch terminate on code " + code);
+		}
 	});
 };
 
@@ -63,7 +65,7 @@ var uc_to_assignment = (os, config, callback) => {
 	let uc = config.params.inputs.uc;
 	let fasta = config.params.inputs.fasta;
 
-	let assignments = [];
+	let assignments = {};
 
 	// --- Cluster identification ---
 	let clusters = {};
@@ -85,7 +87,16 @@ var uc_to_assignment = (os, config, callback) => {
 			if (data.type == "N")
 				return;
 
-			assignments[clusters[data.name]].push({
+			let true_header = data.name.substr(0, data.name.indexOf(';'));
+			let clust_id = clusters[true_header];
+
+			// First assignment => array creation
+			if (assignments[clust_id] == undefined) {
+				assignments[clust_id] = [];
+			}
+
+			// Add candidate assignment for the cluster
+			assignments[clust_id].push({
 				similarity: (data.similarity / 100.0),
 				sequence_id: data.hit.substr(0, data.hit.indexOf(' ')),
 				taxon: data.hit.substr(data.hit.indexOf(' ')+1)
@@ -96,9 +107,15 @@ var uc_to_assignment = (os, config, callback) => {
 		});
 	});
 
-	let clust_id = 0;
+	let auto_id = 0;
 	reader.read_sequences((seq)=>{
-		clusters[seq.header] = clust_id++;
-		assignments.push([]);
+		let true_header = seq.header.substr(0, seq.header.indexOf(';'));
+		if (seq.header.includes("cluster=")) {
+			let clust_id = seq.header.substr(seq.header.indexOf("cluster=") + 8);
+			clust_id = clust_id.substr(0, clust_id.indexOf(';'));
+
+			clusters[true_header] = clust_id;
+		} else
+			clusters[true_header] = auto_id++;
 	});
 };

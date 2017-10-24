@@ -53,7 +53,10 @@ def filter_centroids (filename, filtered_clusters, threshold):
 	with open(output, 'w') as out:
 		for idx, seq_record in enumerate(SeqIO.parse(filename, "fasta")):
 			if not idx in filtered_clusters:
-				out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
+				if 'cluster=' in seq_record.id:
+					out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
+				else:
+					out.write('>{};cluster={};\n{}\n'.format(seq_record.id, idx, seq_record.seq))
 
 
 def filter_reads (filename, filtered_clusters, threshold):
