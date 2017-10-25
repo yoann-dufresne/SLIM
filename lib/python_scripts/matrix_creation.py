@@ -104,8 +104,8 @@ def read_t2s (filename, true_names):
 			brut_name = ""
 			for name in true_names:
 				if name.startswith(dst):
-					brut_name = name
-					break
+					if brut_name == "" or len(brut_name) > len(name):
+						brut_name = name
 
 			order.append({"src":brut_name, "dst":dst})
 
