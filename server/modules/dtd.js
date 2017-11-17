@@ -13,9 +13,10 @@ exports.run = function (os, config, callback) {
 	var options = ['-l', directory + config.params.inputs.tags,
 		'-p', directory + config.params.inputs.primers,
 		'-d', directory,
+		'-e', config.params.params.errors,
 		'-t'];
 
-	if (config.params.params.mistags == 'true')
+	if (config.params.params.mistags == true)
 		options = options.concat(['-m']);
 
 	parse_inputs(os.token, config.params.inputs, (executions) => {
