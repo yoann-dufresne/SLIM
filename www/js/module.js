@@ -47,6 +47,8 @@ class Module {
 			option.style.display = 'none';
 		}
 		option.insertBefore(retract, option.firstChild);
+		var line = document.createElement('hr');
+		option.insertBefore(line, option.firstChild);
 		option.style.display = 'none';
 
 		box.appendChild(option);

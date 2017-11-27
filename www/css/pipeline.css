@@ -3,9 +3,13 @@
 	text-align: center;
 }
 
+body {
+	background-color: #f5f5f5;
+}
+
 /* ------------------------ Global style ------------------------ */
 input[type="text"] {
-    width: 400px;
+	width: 400px;
 }
 
 .no_vertical_margins {
@@ -20,12 +24,15 @@ select {
 /* ------------------------ General Module ------------------------ */
 
 .module {
-	border: black solid 1px;
+	background-color: white;
 	width: 600px;
 	min-height: 100px;
 	margin: auto;
 	margin-bottom: 20px;
-	text-align: left;
+
+	padding: 7px;
+	box-shadow: 5px 5px 5px black;
+	border-radius: 5px;
 }
 
 .mod_head * {
@@ -58,6 +65,22 @@ input[type="text"].integer {
 	display: none;
 	padding: 5px;
 	text-align: left;
+}
+
+.options:before, .options:after {
+	border-top: 1px solid black;
+	display: block;
+	height: 1px;
+	content: " ";
+	width: 40%;
+	position: absolute;
+	left: 0;
+	top: 1.2em;
+}
+
+.rmv_module {
+	display: block;
+	margin-top: 15px;
 }
 
 
