@@ -258,6 +258,7 @@ class Module {
 
 		// Remove module
 		var rmv = document.createElement('button');
+		rmv.classList.add('rmv_module');
 		rmv.innerHTML = 'Remove this module';
 		rmv.onclick = function () {
 			// remove from modules list
@@ -343,7 +344,12 @@ class ModuleManager {
 			let name = this.available_modules[idx];
 
 			$.get('/modules/' + name + '.js', (data) => {
-				eval(data);
+				try {
+					eval(data);
+				} catch (e) {
+					console.error("Errors while load module " + name + "\n"
+						+ "On line " + e.lineNumber);
+				}
 			});
 		}
 	}
