@@ -16,6 +16,7 @@ class AssignVsearchModule extends Module {
 			output.value = filename + '_assigned-vsearch.tsv';
 			output.onchange();
 		};
+	}
 };
 
 module_manager.moduleCreators['assignment-vsearch'] = (params) => {
