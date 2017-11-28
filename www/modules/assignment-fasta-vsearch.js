@@ -1,14 +1,14 @@
 
-class AssignVsearchModule extends Module {
+class AssignFastaVsearchModule extends Module {
 	constructor (params) {
-		super ("assignment-vsearch");
+		super ("assignment-fasta-vsearch");
 		this.params = params;
 	}
 
 	onLoad () {
 		super.onLoad();
 
-		var input = this.dom.getElementsByClassName('otu_matrix')[0];
+		var input = this.dom.getElementsByClassName('sequences')[0];
 		var output = this.dom.getElementsByClassName('assigned')[0];
 
 		input.onchange = () => {
@@ -19,7 +19,7 @@ class AssignVsearchModule extends Module {
 	}
 };
 
-module_manager.moduleCreators['assignment-vsearch'] = (params) => {
-	return new AssignVsearchModule(params);
+module_manager.moduleCreators['assignment-fasta-vsearch'] = (params) => {
+	return new AssignFastaVsearchModule(params);
 };
 

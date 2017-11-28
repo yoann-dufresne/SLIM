@@ -31,6 +31,22 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 };
 
 
+exports.assignment_to_tsv = (assignments, tsv_out, threshold, callback) => {
+	// Create output file and header
+	fs.closeSync(fs.openSync(tsv_out, 'w'));
+	fs.appendFileSync(tsv_out, "sequence\ttaxon\tmean similarity\treference ids\n");
+
+	for (let sequence in assignments) {
+		let cons = consensus(assignments[sequence], threshold);
+
+		fs.appendFile(tsv_out, sequence + '\t' + cons.taxon + '\t'
+			+ cons.identity + '\t' + cons.ids.join(";") + '\n', ()=>{});
+	};
+
+	callback(null);
+};
+
+
 var consensus = (taxa, threshold) => {
 	if (taxa.length == 0)
 		return {taxon:'unassigned', identity:0, ids:[]};

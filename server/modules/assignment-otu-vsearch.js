@@ -6,7 +6,7 @@ const tools = require('../toolbox.js');
 const ass_manager = require('../assignment_manager.js');
 
 
-exports.name = 'assignment-vsearch';
+exports.name = 'assignment-otu-vsearch';
 exports.multicore = true;
 exports.category = 'Assignment';
 

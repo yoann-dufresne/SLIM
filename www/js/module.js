@@ -345,6 +345,7 @@ class ModuleManager {
 		for (let idx=0 ; idx<this.available_modules.length ; idx++) {
 			let name = this.available_modules[idx];
 
+			console.log('/modules/' + name + '.js')
 			$.get('/modules/' + name + '.js', (data) => {
 				try {
 					eval(data);
