@@ -8,8 +8,8 @@ class AssignVsearchModule extends Module {
 	onLoad () {
 		super.onLoad();
 
-		var input = this.dom.getElementsByClassName('input_file')[0];
-		var output = this.dom.getElementsByClassName('assigned_vsearch')[0];
+		var input = this.dom.getElementsByClassName('otu_matrix')[0];
+		var output = this.dom.getElementsByClassName('assigned')[0];
 
 		input.onchange = () => {
 			var filename = input.value.substr(0, input.value.lastIndexOf('.'));
