@@ -17,36 +17,37 @@ head
 //p #{name}'s Pug source code!
 
 body
-	div#configuration
-		p Configuration
-		button#down_conf Save
-		button#up_conf Load
-		input#up_conf_hidden(type='file', name='uploaded', hidden)
+	div#main_frame
+		div#configuration
+			p Configuration
+			button#down_conf Save
+			button#up_conf Load
+			input#up_conf_hidden(type='file', name='uploaded', hidden)
 
-	div#uploader.module
-		h2 Files uploader
-		div#up_list.file_list
-		form#up_form
-			p Add files:
-			input#up_files(type='file', name='uploaded' multiple)
-			button#up_submit Upload
-			div.progress
-				div.progress-bar(role="progressbar")
+		div#uploader.module
+			h2 Files uploader
+			div#up_list.file_list
+			form#up_form
+				p Add files:
+				input#up_files(type='file', name='uploaded' multiple)
+				button#up_submit Upload
+				div.progress
+					div.progress-bar(role="progressbar")
 
-	script(src='/js/upload.js')
+		script(src='/js/upload.js')
 
-	div#modules
-	
+		div#modules
+		
+		div#module_managment
+			h3 Add a new module
+			div#add_area
+				select#module_list
+				button#add_module +
 
-
-
-	select#module_list
-	button#add_module Add module
-
-	div#warnings
-	div#start_area
-		input(type='text', value='Your email address')#mail
-		button#start Start analysis
+		div#warnings
+		div#start_area
+			input(type='text', value='Your email address')#mail
+			button#start Start analysis
 
 	script(src='/js/module.js')
 

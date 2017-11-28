@@ -21,11 +21,15 @@ select {
 	text-align: left;
 }
 
+#main_frame {
+	width: 600px;
+	margin: auto;
+}
+
 /* ------------------------ Configuration area ------------------------ */
 
 #configuration {
 	margin: auto;
-	top: 0px;
 	margin-bottom: 10px;
 	padding: 8px;
 	width: 230px;
@@ -42,9 +46,7 @@ select {
 
 .module {
 	background-color: white;
-	width: 600px;
 	min-height: 100px;
-	margin: auto;
 	margin-bottom: 20px;
 
 	padding: 7px;
@@ -82,17 +84,6 @@ input[type="text"].integer {
 	display: none;
 	padding: 5px;
 	text-align: left;
-}
-
-.options:before, .options:after {
-	border-top: 1px solid black;
-	display: block;
-	height: 1px;
-	content: " ";
-	width: 40%;
-	position: absolute;
-	left: 0;
-	top: 1.2em;
 }
 
 .rmv_module {
@@ -222,7 +213,35 @@ input[type="text"].integer {
 }
 
 
+/* ----------------------- Add module ------------------------------*/
 
+#module_managment {
+	min-height: 100px;
+	background-color: white;
+	border: dashed 5px #d1d1d1;
+}
+
+#add_area {
+	margin-bottom: 25px;
+}
+
+#add_module {
+	margin-left: 10px;
+	border: solid grey 3px;
+	background-color: white;
+	border-radius: 100%;
+	width: 30px;
+	height: 30px;
+	font-size: 21px;
+	text-align: center;
+	vertical-align: middle;
+	color: #505050;
+}
+
+#add_module:hover {
+	background-color: gray;
+	color: white;
+}
 
 
 /* ----------------------- Run area ------------------------------*/
@@ -237,7 +256,6 @@ input[type="text"].integer {
 }
 
 #start_area {
-	margin: auto;
 	margin-top: 20px;
 	margin-bottom: 150px;
 }
