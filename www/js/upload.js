@@ -127,7 +127,7 @@ file_manager.register_observer((manager) => {
 
 	var filenames = [].concat(... Object.values(file_manager.server_files));
 	if (filenames.length > 0) {
-			up_list.innerHTML = '<p>Server files</p>';
+			up_list.innerHTML = '';
 			var ul = document.createElement("ul");
 			
 			for (var idx in filenames) {

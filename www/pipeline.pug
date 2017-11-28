@@ -17,17 +17,14 @@ head
 //p #{name}'s Pug source code!
 
 body
-	h1 Amplicon analysis pipeline
-
 	div#configuration
 		p Configuration
 		button#down_conf Save
 		button#up_conf Load
 		input#up_conf_hidden(type='file', name='uploaded', hidden)
 
-	h2 Files uploader
-
 	div#uploader.module
+		h2 Files uploader
 		div#up_list.file_list
 		form#up_form
 			p Add files:
@@ -37,9 +34,6 @@ body
 				div.progress-bar(role="progressbar")
 
 	script(src='/js/upload.js')
-
-
-	h2 Analysis
 
 	div#modules
 	
