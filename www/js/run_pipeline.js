@@ -11,6 +11,7 @@ add_button.onclick = function () {
 
 // --- Pipeline execution ---
 var run = document.querySelector('#start');
+var mail_area = document.getElementById('mail');
 
 var get_config = () => {
 	var config = {
@@ -29,10 +30,21 @@ var get_config = () => {
 	return config;
 };
 
+mail_area.addEventListener("focusin", () => {
+	if (mail_area.value == "Your email address") {
+		mail_area.value = "";
+	}
+});
+mail_area.addEventListener("focusout", () => {
+	if (mail_area.value == "") {
+		mail_area.value = "Your email address";
+	}
+});
+
 var status_interval;
 run.onclick = function () {
 	// Verify mail address
-	let mail_value = document.getElementById('mail').value;
+	let mail_value = mail_area.value;
 	if (mail_value.includes('@'))
 		document.getElementById('warnings').innerHTML = '';
 	else {
