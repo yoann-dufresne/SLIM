@@ -1,7 +1,7 @@
 
 class DereplicationModule extends Module {
 	constructor (params) {
-		super ("fasta-dereplication");
+		super ("fasta-dereplication", 'https://github.com/yoann-dufresne/amplicon_pipeline/wiki/Fasta-dereplication');
 
 		this.params = params;
 	}

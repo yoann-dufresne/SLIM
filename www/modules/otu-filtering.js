@@ -1,7 +1,7 @@
 
 class OtuFilteringModule extends Module {
 	constructor (params) {
-		super ("otu-filtering");
+		super ("otu-filtering", 'https://github.com/yoann-dufresne/amplicon_pipeline/wiki/OTU-filtering');
 
 		this.params = params;
 	}
