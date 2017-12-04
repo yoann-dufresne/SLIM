@@ -88,7 +88,13 @@ $.get('/token_generation' + (exec_token == '' ? '' : '?token=' + exec_token))
 
 // --- Save/Upload config ---
 var down_conf = document.getElementById("down_conf");
+var reset_conf = document.getElementById("reset_conf");
 var up_conf = document.getElementById("up_conf_hidden");
+
+reset_conf.onclick = () => {
+	window.location = window.location.href.split("?")[0];
+}
+
 document.getElementById("up_conf").onclick = () => {
 	up_conf.click();
 };
