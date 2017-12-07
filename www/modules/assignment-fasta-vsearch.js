@@ -1,7 +1,7 @@
 
 class AssignFastaVsearchModule extends Module {
 	constructor (params) {
-		super ("assignment-fasta-vsearch");
+		super ("assignment-fasta-vsearch", "https://github.com/yoann-dufresne/amplicon_pipeline/wiki/Fasta-assignment---Vsearch");
 		this.params = params;
 	}
 

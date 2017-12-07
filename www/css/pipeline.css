@@ -226,11 +226,12 @@ input[type="text"].integer {
 
 #add_module {
 	margin-left: 10px;
+	padding: 6px;
 	border: solid grey 3px;
 	background-color: white;
 	border-radius: 100%;
-	width: 30px;
-	height: 30px;
+	width: 40px;
+	height: 40px;
 	font-size: 21px;
 	text-align: center;
 	vertical-align: middle;
