@@ -76,9 +76,9 @@ var compress_mistags = (libraries, token, callback) => {
 	var directory = '/app/data/' + token + '/';
 	// Create the list of the mistag files
 	var files = [];
-	for (let lib in libraries) {
-		files.push(directory + lib + '_mistag_R1.fastq');
-		files.push(directory + lib + '_mistag_R2.fastq');
+	for (let idx=0 ; idx<libraries.length ; idx++) {
+		files.push(libraries[idx] + '_mistag_R1.fastq');
+		files.push(libraries[idx] + '_mistag_R2.fastq');
 	}
 
 	// Compress all the mistag files into one mistag archive
