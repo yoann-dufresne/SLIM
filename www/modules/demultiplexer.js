@@ -9,8 +9,7 @@ class DemultiplexerModule extends Module {
 
 	onLoad () {
 		let as = this.dom.getElementsByClassName('options')[0].getElementsByTagName('a');
-		as[0].href = file_manager.get_download_link('mistag_R1.fastq');
-		as[1].href = file_manager.get_download_link('mistag_R2.fastq');
+		as[0].href = file_manager.get_download_link('mistags.tar.gz');
 
 		this.defineIO();
 		super.onLoad();

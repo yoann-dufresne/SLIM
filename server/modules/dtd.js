@@ -59,7 +59,8 @@ exports.run = function (os, config, callback) {
 			child.on('close', function(code) {
 				if (code == 0) {
 					if (exe_left.length == 0)
-						callback(os, null);
+						if (config.params.params.mistags)
+							compress_mistags (Object.keys(executions), token, () => {callback(os, null);});
 					else
 						run_demux();
 				}
@@ -70,6 +71,28 @@ exports.run = function (os, config, callback) {
 		run_demux();
 	});
 };
+
+var compress_mistags = (libraries, token, callback) {
+	var directory = '/app/data/' + token + '/';
+	// Create the list of the mistag files
+	var files = [];
+	for (let lib in libraries) {
+		files.push(directory + lib + '_mistag_R1.fastq');
+		files.push(directory + lib + '_mistag_R2.fastq');
+	}
+
+	// Compress all the mistag files into one mistag archive
+	var options = ['--use-compress-program=pigz',
+					'-Pcf', directory + 'mistags.tar.gz',
+					'-C', directory].concat(files);
+	
+	var child = exec('tar', options);
+	child.on('close', () => {callback();});
+
+	child.stderr.on('data', function(data) {
+		console.log('compress err', data.toString());
+	});
+}
 
 var parse_inputs = (token, inputs, callback) => {
 	let directory = '/app/data/' + token + '/';

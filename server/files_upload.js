@@ -112,7 +112,7 @@ exports.upload = function (app) {
 			if (exports.deletions[token])
 				clearTimeout(exports.deletions[token]);
 
-			// Delete data after 8h id they are not used.
+			// Delete data after 2h if they are not used.
 			exports.deletions[token] = setTimeout(
 				() => {
 					require('child_process').exec('rm -rf /app/data/' + token, (err)=>{
@@ -122,7 +122,7 @@ exports.upload = function (app) {
 							console.log(token + ': files deleted');
 					});
 				},
-				1000 * 3600 * 8
+				1000 * 3600 * 2
 			);
 		});
 
