@@ -72,7 +72,7 @@ exports.run = function (os, config, callback) {
 	});
 };
 
-var compress_mistags = (libraries, token, callback) {
+var compress_mistags = (libraries, token, callback) => {
 	var directory = '/app/data/' + token + '/';
 	// Create the list of the mistag files
 	var files = [];
