@@ -379,8 +379,47 @@ exports.expose_status = function (app) {
 }
 
 
+var remove_outputs = function (params, token) {
+	let directory = '/app/data/' + token + '/';
+	
+	// For each software
+	for (let key in params) {
+		let soft = params[key];
+
+		// For each output for the current software
+		for (let id in soft.params.outputs) {
+			let file = soft.params.outputs[id];
+			file = file.replace('$', '*');
+
+			// If the file is a joker
+			if (file.includes('*')) {
+				let split = file.split('*');
+				let begin = split[0];
+				let end = split[1];
+
+				// Remove all the files corresponding to the joker
+				all_files = fs.readdirSync(directory);
+				for (let idx=0 ; idx<all_files.length ; all_files++) {
+					let serv_file = all_files[idx];
+					if (serv_file.startsWith(begin) && serv_file.endsWith(end)) {
+						fs.unlink(directory + serv_file, ()=>{});
+					}
+				}
+			}
+			// Remove the corresponding file
+			else {
+				fs.unlink(directory + file, ()=>{})
+			}
+		}
+	}
+};
+
+
 var global_dependencies = {};
 var computeSoftwareOrder = function (params, token) {
+	// Remove the outputs from previous executions
+	remove_outputs(params, token);
+
 	// Compute the dependenciess
 	var dependencies = {};
 	for (let key in params) {
