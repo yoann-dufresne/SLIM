@@ -111,6 +111,7 @@ var sub_process_start = (tok, configs_array) => {
 		// Abord the pipeline if an error occur.
 		if (err) {
 			console.log(token + ': error in sub exec ' + my_sub_idx);
+			console.log("Error: " + err);
 			job.conf[job.running_soft][my_sub_idx].status = 'aborted';
 		} else {
 			// Add software output to the log file and modify the status.

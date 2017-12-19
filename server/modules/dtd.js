@@ -59,10 +59,13 @@ exports.run = function (os, config, callback) {
 			child.on('close', function(code) {
 				if (code == 0) {
 					if (exe_left.length == 0)
-						if (config.params.params.mistags)
+						if (config.params.params.mistags) {
 							compress_mistags (Object.keys(executions), token, () => {callback(os, null);});
-					else
+						} else
+							callback(os, null);
+					else {
 						run_demux();
+					}
 				}
 				else
 					callback(os, "DTD terminate on code " + code);
