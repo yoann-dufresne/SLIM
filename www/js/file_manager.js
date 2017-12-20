@@ -13,13 +13,36 @@ class FileManager {
 		this.timeout_rmv = null;
 	}
 
-	load_from_server (callback) {
+	load_from_server () {
 		var that = this;
 		$.get('/list?token=' + exec_token, (data) => {
-			// Get all the server files
+			// Get alll values in an array of array
+			var previous_files = Object.values(that.server_files);
+			// Reduce array dimentions
+			if (previous_files.length > 1)
+				previous_files = previous_files.reduce((a, b) => {return a.concat(b)});
+			else if (previous_files.length == 1)
+				previous_files = previous_files[0];
+			// Transform into set for set operations
+			
+			// Compute intersection
+			previous_files = new Set(previous_files);
+			var current_files = new Set(data);
+			var intersection = new Set([...previous_files].filter(x => current_files.has(x)));
+
+			// Compute added files
+			var added = new Set([...current_files].filter(x => !intersection.has(x)));
 			var event = new Event('new_file');
-			event.files = data;
-			document.dispatchEvent(event);
+			event.files = [...added];
+			if (event.files.length > 0)
+				document.dispatchEvent(event);
+
+			// Compute removed files
+			var removed = new Set([...previous_files].filter(x => !intersection.has(x)));
+			var event = new Event('rmv_file');
+			event.files = [...removed];
+			if (event.files.length > 0)
+				document.dispatchEvent(event);
 		});
 	}
 
@@ -144,8 +167,9 @@ class FileManager {
 				if (that.server_files[extention] == undefined)
 					that.server_files[extention] = [];
 
-				if (that.server_files[extention].indexOf(filename) == -1)
+				if (that.server_files[extention].indexOf(filename) == -1) {
 					that.server_files[extention].push(filename);
+				}
 			}
 			that.notifyAdd(event);
 		});
@@ -156,10 +180,11 @@ class FileManager {
 				var filename = event.files[idx];
 				var extention = filename.substr(filename.lastIndexOf('.')+1);
 
-				if (that.futur_files[extention] != undefined) {
+				if (that.server_files[extention] != undefined) {
 					var file_idx = that.server_files[extention].indexOf(filename);
-					if (file_idx != -1)
+					if (file_idx != -1) {
 						that.server_files[extention].splice(file_idx, 1);
+					}
 				}
 			}
 			that.notifyRmv(event);

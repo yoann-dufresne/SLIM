@@ -43,7 +43,6 @@ mail_area.addEventListener("focusout", () => {
 
 var status_interval;
 run.onclick = function () {
-	console.log("clic !");
 	// Verify mail address
 	let mail_value = mail_area.value;
 	if ((mail_value.length > 5 && mail_value.includes('@')) || mail_value == 'aaa')
@@ -71,6 +70,7 @@ run.onclick = function () {
 	run.disabled = true;
 	
 	status_interval = setInterval(()=>{update_run_status(exec_token);}, 5000);
+	// Timeout added to wait for the server updated status
 	setTimeout(() => {update_run_status(exec_token);}, 100);
 };
 

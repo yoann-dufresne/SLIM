@@ -101,9 +101,6 @@ document.querySelector("#up_submit").onclick = function (event) {
 									document.querySelector('#start').disabled = false;
 
 									file_manager.load_from_server();
-									var event = new Event('new_file');
-									event.files = null;
-									document.dispatchEvent(event);
 								}
 							})}
 							, 1000
@@ -127,17 +124,17 @@ file_manager.register_observer((manager) => {
 
 	var filenames = [].concat(... Object.values(file_manager.server_files));
 	if (filenames.length > 0) {
-			up_list.innerHTML = '';
-			var ul = document.createElement("ul");
-			
-			for (var idx in filenames) {
-				var filename = filenames[idx];
+		up_list.innerHTML = '';
+		var ul = document.createElement("ul");
+		
+		for (var idx in filenames) {
+			var filename = filenames[idx];
 
-				var li = document.createElement("li");
-				li.innerHTML = '<a href="/data/' + exec_token + '/' + filename + '" download>\
-				<img src="/imgs/download.png" class="download"/></a>  ' + filename;
-				ul.appendChild(li);
-			}
-			up_list.appendChild(ul);
+			var li = document.createElement("li");
+			li.innerHTML = '<a href="/data/' + exec_token + '/' + filename + '" download>\
+			<img src="/imgs/download.png" class="download"/></a>  ' + filename;
+			ul.appendChild(li);
 		}
+		up_list.appendChild(ul);
+	}
 });

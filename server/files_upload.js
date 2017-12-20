@@ -106,7 +106,13 @@ exports.upload = function (app) {
 			if (onError)
 				return;
 
-			res.send('success');
+			var send_success = () => {
+				if (!files_to_process[token] || files_to_process[token].length > 0)
+					setTimeout(send_success, 100);
+				else
+					res.send('success');
+			}
+			send_success();
 
 			// Remove previous deletion delay
 			if (exports.deletions[token])
