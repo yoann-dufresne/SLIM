@@ -43,9 +43,10 @@ mail_area.addEventListener("focusout", () => {
 
 var status_interval;
 run.onclick = function () {
+	console.log("clic !");
 	// Verify mail address
 	let mail_value = mail_area.value;
-	if (mail_value.includes('@'))
+	if ((mail_value.length > 5 && mail_value.includes('@')) || mail_value == 'aaa')
 		document.getElementById('warnings').innerHTML = '';
 	else {
 		document.getElementById('warnings').innerHTML = '<p>A valid mail address should be entered</p>';
@@ -70,7 +71,7 @@ run.onclick = function () {
 	run.disabled = true;
 	
 	status_interval = setInterval(()=>{update_run_status(exec_token);}, 5000);
-	update_run_status(exec_token);
+	setTimeout(() => {update_run_status(exec_token);}, 100);
 };
 
 
