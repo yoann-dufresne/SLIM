@@ -173,7 +173,8 @@ input[type="text"].integer {
 
 /* See the status */
 .running .status {
-	color: yellow;
+	color: #FFD700;
+	font-weight: bold;
 	visibility: visible;
 	width: auto;
 }
@@ -190,6 +191,7 @@ input[type="text"].integer {
 .ended .term_ico, .aborted .term_ico, .errors .term_ico {
 	visibility: visible;
 	width: 25px;
+	margin-left: 15px;
 }
 .aborted .status, .errors .status {
 	color: red;
