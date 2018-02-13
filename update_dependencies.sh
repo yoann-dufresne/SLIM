@@ -57,7 +57,7 @@ fi
 
 
 # QIIME 2
-docker pull qiime2/core:2017.6
+# docker pull qiime2/core:2017.6
 
 
 # Casper
