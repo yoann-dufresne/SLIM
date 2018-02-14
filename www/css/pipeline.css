@@ -1,6 +1,16 @@
 
 * {
 	text-align: center;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* comment */
+
+#slim_logo {
+	width: 283px;
+    margin: auto;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 body {
@@ -10,6 +20,8 @@ body {
 /* ------------------------ Global style ------------------------ */
 input[type="text"] {
 	width: 400px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
 }
 
 .no_vertical_margins {
@@ -19,11 +31,21 @@ input[type="text"] {
 
 select {
 	text-align: left;
+	height: 40;
+	font-size: 14px;
 }
 
 #main_frame {
-	width: 600px;
+	width: 800px;
 	margin: auto;
+}
+
+h3 {
+	font-size:1.5em;
+}
+
+p {
+	font-weight:bold;
 }
 
 /* ------------------------ Configuration area ------------------------ */
@@ -40,6 +62,17 @@ select {
 	margin: 0px;
 	margin-right: 10px;
 }
+
+button {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+#up_files {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
 
 /* ------------------------ General Module ------------------------ */
 
@@ -61,6 +94,8 @@ select {
 
 input[type="text"].integer {
 	width: 80px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
 }
 
 .info {
@@ -163,7 +198,8 @@ input[type="text"].integer {
 
 /* See the status */
 .running .status {
-	color: yellow;
+	color: #FFD700;
+	font-weight: bold;
 	visibility: visible;
 	width: auto;
 }
@@ -180,6 +216,7 @@ input[type="text"].integer {
 .ended .term_ico, .aborted .term_ico, .errors .term_ico {
 	visibility: visible;
 	width: 25px;
+	margin-left: 15px;
 }
 .aborted .status, .errors .status {
 	color: red;
@@ -226,7 +263,8 @@ input[type="text"].integer {
 
 #add_module {
 	margin-left: 10px;
-	padding: 6px;
+	padding: 0px 0px 3px 0px;
+	margin-bottom: 1px;
 	border: solid grey 3px;
 	background-color: white;
 	border-radius: 100%;
