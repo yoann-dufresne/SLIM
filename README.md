@@ -1,5 +1,6 @@
+![SLIM logo](https://github.com/yoann-dufresne/SLIM/blob/master/www/imgs/slim_logo.svg)
 
-Amplicon pipeline is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
+SLIM is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
 All the pipeline is wrapped in a docker to easaly run it.
 
 # Install and run the pipeline
