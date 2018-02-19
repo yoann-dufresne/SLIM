@@ -46,9 +46,9 @@ run.onclick = function () {
 	// Verify mail address
 	let mail_value = mail_area.value;
 	if ((mail_value.length > 5 && mail_value.includes('@')) || mail_value == 'aaa')
-		document.getElementById('warnings').innerHTML = '';
+		document.getElementsByClassName('warnings')[1].innerHTML = '';
 	else {
-		document.getElementById('warnings').innerHTML = '<p>A valid mail address should be entered</p>';
+		document.getElementsByClassName('warnings')[1].innerHTML = '<p>A valid mail address should be entered</p>';
 		return;
 	}
 
@@ -78,11 +78,24 @@ run.onclick = function () {
 // --- Status update ---
 
 var update_run_status = (token, callback=(status)=>{}) => {
+	let warnings_areas = document.getElementsByClassName("warnings");
+
 	$.get('/status?token=' + token).done((data) => {
 		var server_status = JSON.parse(data);
 
-		if (!server_status.global)
+		if (!server_status.global || !server_status.messages)
 			return;
+
+		// Print the messages from the server.
+		msgs = "";
+		for (let idx=0 ; idx<server_status.messages.length ; idx++) {
+			let msg = server_status.messages[idx];
+			msgs += '<p>' + msg + '</p>';
+		}
+
+		for (let idx=0 ; idx<warnings_areas.length ; idx++) {
+			warnings_areas[idx].innerHTML = msgs;
+		}
 
 		// Stop the update when the run is over
 		if (server_status.global == 'ended' || server_status.global == 'aborted') {
