@@ -33,7 +33,10 @@ def main (inputs, output, origins_file):
 			size = 1
 			if ';size=' in seq_record.id:
 				size = seq_record.id[seq_record.id.find(';size=')+6:]
-				size = int(size[:size.find(';')])
+				if size.find(';') != -1:
+					size = int(size[:size.find(';')])
+				else:
+					size = int(size)
 			origins[name][sample_name] = prev + size
 
 	# Save the outputs
