@@ -286,9 +286,13 @@ input[type="text"].integer {
 
 
 /* ----------------------- Run area ------------------------------*/
-#warnings {
+.warnings {
 	color: red;
 	margin-top: 10px;
+}
+
+.warnings p {
+	margin: 5px;
 }
 
 #mail {

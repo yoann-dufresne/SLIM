@@ -4,19 +4,33 @@ const config = require ('./config.js');
 const scheduler = require('./scheduler.js');
 
 
+let transporter = null
 
-let transporter = nodemailer.createTransport(config.mailer);
+if (config.mailer.auth.user == 'username') {
+	console.warn('\nWarning: Mailer not configured ! Please fill the file server/config.js with your own mail address.\n');
+} else {
+	transporter = nodemailer.createTransport(config.mailer);
+}
 
 
 
 let send_mail = (token, subject, text) => {
+	if (transporter == null) {
+		console.warn("Mailer not configured !!!");
+		return;
+	}
+
 	if (!exports.mails[token])
 		return;
 
-	let mail = exports.mails[token]
+	let mail = exports.mails[token];
+	if (mail == 'aaa') {
+		console.warn ("Please only use this fake email only for debug !!");
+		return;
+	}
 
 	let mailOptions = {
-		from: 'Pipeline <pawlowskigroupch@gmail.com>', // sender address
+		from: 'Slim <' + config.mailer.__address + '>', // sender address
 		to: mail, // list of receivers
 		subject: '[No reply] ' + subject, // Subject line
 		text: text
@@ -25,7 +39,8 @@ let send_mail = (token, subject, text) => {
 	// send mail with defined transport object
 	transporter.sendMail(mailOptions, (error, info) => {
 		if (error) {
-			return console.log(error);
+			console.log(error);
+			return;
 		}
 
 		console.log(token + ': email sent');

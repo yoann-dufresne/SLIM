@@ -7,6 +7,7 @@ const sub_process = require('./sub_process.js');
 const uploads = require('./files_upload.js');
 const mailer = require('./mail_manager.js');
 const accounts = require('./accounts.js');
+const config_module = require('./config.js');
 
 
 var waiting_jobs = [];
@@ -313,9 +314,14 @@ var run_job = (params, callback) => {
 
 exports.expose_status = function (app) {
 	app.get('/status', function (req, res) {
+		messages = []
+		if (config_module.mailer.auth.user == "username") {
+			messages.push("No mail address configured for the server<br/>You will not receive updates by email for your job.");
+		}
+
 		// If no token, send back a general status
 		if (req.query.token == undefined) {
-			res.send(JSON.stringify({queue_size: waiting_jobs.length}));
+			res.send(JSON.stringify({queue_size: waiting_jobs.length, messages}));
 			return ;
 		}
 
@@ -323,14 +329,15 @@ exports.expose_status = function (app) {
 		var execFile = '/app/data/' + token + '/exec.log';
 		// Invalid token
 		if (!fs.existsSync(execFile)) {
-			res.send('{}');
+			messages.push("Invalid token");
+			res.send(JSON.stringify({messages: messages}));
 			return ;
 		}
 
 		// Send back execution status
 		let data = fs.readFileSync(execFile);
 		var exec = JSON.parse(data);
-		var status = {global:exec.status, jobs:{}};
+		var status = {global:exec.status, jobs:{}, messages: messages};
 
 		if (status.global == 'aborted')
 			status.msg = exec.msg;
