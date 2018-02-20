@@ -4,9 +4,15 @@
 <p>Motif</p> 
 <input type="text" name="motif" class="param_value" /><br>
 
-<input type="radio" name="trim_mode" value="before" class="param_value" checked>Remove sub-sequence from the beginning to the end of the motif in the sequence<br>
-<input type="radio" name="trim_mode" value="after" class="param_value">Remove sub-sequence from the beginning of the motif to the end of the sequence<br>
-<input type="radio" name="trim_mode" value="motif" class="param_value">Remove the motif from the sequence 
+<p>Which sub-sequence to trim? A-MotiF-B</p> 
+<input type="radio" name="trim_mode" value="before" class="param_value" checked>Remove A-F<br>
+<input type="radio" name="trim_mode" value="after" class="param_value">Remove M-B<br>
+<input type="radio" name="trim_mode" value="motif" class="param_value">Remove M-F
+
+<br><br>
+<p>Keep reads without motif?</p> 
+<input type="radio" name="keep_reads" value="False" class="param_value" checked>No<br>
+<input type="radio" name="keep_reads" value="True" class="param_value">Yes
 
 <br><br>
 <p>Trimmed fasta file</p>

@@ -19,6 +19,7 @@ exports.run = (os, config, callback) => {
 		'--fasta', filename,
 		'--output', out_file,
 		'--motif', config.params.params.motif,
+		'--keep_reads', config.params.params.keep_reads,
 		'--trim_mode', config.params.params.trim_mode];
 
 	console.log(os.token + ': python trim_sequence.py', options.join(' '));

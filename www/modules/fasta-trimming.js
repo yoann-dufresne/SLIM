@@ -17,7 +17,26 @@ class TrimmingModule extends Module {
 			trimmed_fasta.onchange();
 		};
 	}
+	getConfiguration () {
+	let conf = super.getConfiguration();
+
+	// retieve the checked value of the radio html for trim_mode
+	var radios = document.getElementsByName('trim_mode');
+	for (var i=0 ; i<radios.length ; i++)
+		if (radios[i].checked)
+			conf.params.trim_mode = radios[i].value
+
+	radios = document.getElementsByName('keep_reads');
+	// retieve the checked value of the radio html for keep_reads
+	for (var i=0 ; i<radios.length ; i++)
+		if (radios[i].checked)
+			conf.params.keep_reads = radios[i].value
+
+	return conf;
+
+	};
 };
+
 
 
 module_manager.moduleCreators['fasta-trimming'] = (params) => {
