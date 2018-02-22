@@ -42,8 +42,8 @@ exports.run = function (os, config, callback) {
 		config.params.inputs.origins = tmp_origins;
 		otu_search(os, config, (os, msg) => {
 			// Remove unnecessary files
-			// fs.unlink(directory+tmp_origins, ()=>{});
-			// fs.unlink(directory+tmp_merged, ()=>{});
+			fs.unlink(directory+tmp_origins, ()=>{});
+			fs.unlink(directory+tmp_merged, ()=>{});
 
 			callback(os, msg);
 		});
@@ -84,7 +84,7 @@ var otu_search = (os, config, callback) => {
 			config.params.inputs.uc = tmp_output;
 			config.params.params.ordered = config.params.params.ordered_vsearch;
 			otu_manager.write_from_uc(os, config, (os, msg) => {
-				// fs.unlink(directory+tmp_output, ()=>{});
+				fs.unlink(directory+tmp_output, ()=>{});
 				callback(os, msg);
 			});
 		}

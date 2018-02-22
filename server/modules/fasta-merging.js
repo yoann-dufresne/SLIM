@@ -41,7 +41,7 @@ exports.run = (os, config, callback) => {
 			config.params.inputs.fasta = merged;
 			config.params.outputs.derep = config.params.outputs.merged;
 			derep.run(os, config,(_, msg) => {
-				// fs.unlink(directory+merged, ()=>{});
+				fs.unlink(directory+merged, ()=>{});
 				callback(os, msg);
 			});
 		} else
