@@ -58,8 +58,6 @@ def main():
 	parser.add_argument('--output', '-o', required=True, help='output fasta filename')
 	args = parser.parse_args()
 	
-
-	print(args.keep_reads, type(args.keep_reads))
 	with open(str(args.output), 'w') as fw:
 		for record in SeqIO.parse(args.fasta, "fasta"):
 			if args.trim_mode == "before":
