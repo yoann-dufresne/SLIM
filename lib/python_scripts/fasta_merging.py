@@ -36,7 +36,7 @@ def main (inputs, output, origins_file):
 				if size.find(';') != -1:
 					size = int(size[:size.find(';')])
 				else:
-					size = int(size)
+					size = int(size.strip())
 			origins[name][sample_name] = prev + size
 
 	# Save the outputs
@@ -48,12 +48,13 @@ def main (inputs, output, origins_file):
 			total = 0
 			line = ''
 			for sample_name in origins[name]:
-				line = '{}\t{};size={};'.format(line, sample_name, origins[name][sample_name])
+				line = '{}\t{};size={}'.format(line, sample_name, origins[name][sample_name])
 				total += origins[name][sample_name]
-			orip.write('ISU_{};size={};{}\n'.format(name, total, line))
+			orip.write('ISU_{};size={}{}\n'.format(name, total, line))
 
 			# Write the fasta
-			out.write('>ISU_{};size={};\n{}\n'.format(name, total, seq))
+			two_lines = '>ISU_{};size={}\n{}\n'.format(name, total, seq)
+			out.write(two_lines)
 
 
 

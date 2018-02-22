@@ -9,11 +9,11 @@ def trim_before(motif, seq, keep_reads):
 	
 	# if motif is not found 
 	if idx == -1:
-		if keep_reads == True:
+		if keep_reads:
 			return seq
 		else:
 			return -1
-	elif idx != -1:
+	else:
 		# if motif is found
 		return seq[idx+len(motif):]
 	
@@ -23,11 +23,11 @@ def trim_after(motif, seq, keep_reads):
 	
 	# if motif is not found 
 	if idx == -1:
-		if keep_reads == True:
+		if keep_reads:
 			return seq
 		else:
 			return -1
-	elif idx != -1:
+	else:
 		# if motif is found
 		return seq[:idx]
 
@@ -40,11 +40,11 @@ def trim_motif(motif, seq, keep_reads):
 	
 	# if motif is not found 
 	if idx == -1:
-		if keep_reads == True:
+		if keep_reads:
 			return seq
 		else:
 			return -1
-	elif idx != -1:
+	else:
 		# if motif is found
 		return seq[:idx] + seq[idx+len(motif):]
 
@@ -54,7 +54,7 @@ def main():
 	parser.add_argument('--trim_mode', '-tp', required=True, help='what to trim, before / after the motif, or remove the motif itself. Possible values: before, after, motif')
 	parser.add_argument('--fasta', '-f', required=True, help='the fasta containing the sequences to be trimmed with the motif')
 	parser.add_argument('--motif', '-m', required=True, help='the motif to search in the sequence')
-	parser.add_argument('--keep_reads', '-k', required=True, help='do we keep the read that do not contains the motif?')
+	parser.add_argument('--keep_reads', '-k', required=True, type=bool, help='do we keep the read that do not contains the motif?')
 	parser.add_argument('--output', '-o', required=True, help='output fasta filename')
 	args = parser.parse_args()
 	

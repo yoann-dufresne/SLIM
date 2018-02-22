@@ -18,9 +18,9 @@ else
 fi
 
 echo "Rebuild the docker image"
-docker build -t amplicon .
-docker ps --filter status=dead --filter status=exited -aq | xargs docker rm -v
+docker ps --filter status=dead --filter status=exited --filter status=created -aq | xargs docker rm -v
 docker images  -f "dangling=true" -q | xargs docker rmi -f
+docker build -t amplicon .
 #docker rmi -f $(docker images -f "dangling=true" -q)
 
 echo "Restart the docker"
