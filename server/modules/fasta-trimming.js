@@ -20,7 +20,9 @@ exports.run = (os, config, callback) => {
 		'--output', out_file,
 		'--motif', config.params.params.motif,
 		'--keep_reads', config.params.params.keep_reads,
-		'--trim_mode', config.params.params.trim_mode];
+		'--trim_mode', config.params.params.trim_mode,
+		'--window_begin', config.params.params.window_begin,
+		'--window_end', config.params.params.window_end];
 
 	console.log(os.token + ': python trim_sequence.py', options.join(' '));
 
