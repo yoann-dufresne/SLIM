@@ -119,10 +119,10 @@ exports.expose_logs = (app) => {
 exports.run = function (token, config, callback) {
 	var soft_name = config.name;
 
-	if (modules[soft_name])
+	if (modules[soft_name]) {
 		modules[soft_name].run(token, config, callback);
-	else
-		callback(token, 'Software ' + soft_name + ' undetecteed');
+	} else
+		callback(token, 'Software ' + soft_name + ' undetected');
 }
 
 
@@ -168,7 +168,71 @@ exports.compress_outputs = (token, jokers) => {
 }
 
 
+fastx_number = {};
+
+let stats = (token, config, callback) => {
+	let directory = '/app/data/' + token + '/';
+	fastq_number[token] = 0;
+
+	// Input counting
+	for (let idx=0 ; idx<config.inputs.length ; idx++) {
+		let filename = config.inputs[idx];
+
+		if (filename.endsWith(".fastq")) {
+			fastx_number[token] += 1;
+			count_fastq(directory+filename, (count) => {
+
+			});
+		} else if (filename.endsWith(".fasta")) {
+			fastx_number[token] += 1;
+			count_fasta(directory+filename, (count) => {
+
+			});
+		}
+	}
+
+	// Output counting
+	for (let idx=0 ; idx<config.inputs.length ; idx++) {
+		
+	}
+}
 
 
+// Fastq counting
+let count_fastq = (filename, callback) => {
+	// let child = exec('sh', ['-c', shellSyntaxCommand], { stdio: 'inherit' });
+	let child = exec('wc', ['-l'], {stdio: 'inherit'});
 
+	let count = 0;
+
+	child.on('close', () => {
+		callback(count);
+	});
+	child.stderr.on('data', function(data) {
+		console.log('compress err', data.toString());
+	});
+	child.stdout.on('data', function(data) {
+		count = Math.floor(parseFloat(data.toString().split(" ")[0]));
+	});
+}
+
+
+// Fastq counting
+let count_fast& = (filename, callback) => {
+	let shellSyntaxCommand = "";
+	let child = exec('sh', ['-c', shellSyntaxCommand], { stdio: 'inherit' });
+	// let child = exec('wc', ['-l'], {stdio: 'inherit'});
+
+	let count = 0;
+
+	child.on('close', () => {
+		callback(count);
+	});
+	child.stderr.on('data', function(data) {
+		console.log('compress err', data.toString());
+	});
+	child.stdout.on('data', function(data) {
+		count = Math.floor(parseFloat(data.toString().split(" ")[0]));
+	});
+}
 
