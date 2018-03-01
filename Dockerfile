@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev
+	python3-pip python3-dev \
+	r-base
 
 RUN mkdir /app/lib
 
@@ -37,6 +38,15 @@ COPY lib/miniconda /app/lib/miniconda
 # ----- Python dependancies -----
 
 RUN pip3 install --upgrade pip && pip3 install NumPy biopython
+
+
+# ----- R dependancies -----
+
+RUN apt-get -y build-dep libcurl4-gnutls-dev
+RUN apt-get -y install libcurl4-gnutls-dev
+
+RUN R CMD 'install.packages("devtools")'
+RUN R CMD 'library(devtools);install_github("tobiasgf/lulu") '
 
 
 # ----- Libraries deployments -----
