@@ -2,7 +2,7 @@ const exec = require('child_process').spawn;
 const fs = require('fs');
 const tools = require('../toolbox.js');
 
-exports.name = 'LULU';
+exports.name = 'lulu';
 exports.multicore = false;
 exports.category = 'Post-processing';
 
@@ -112,7 +112,7 @@ var lulu_run = (os, config, callback) => {
 		if (code != 0) {
 			fs.unlink(directory+tmp_output, ()=>{});
 			console.log (os.token + ': Error during lulu execution')
-			callback(os, 'EError during lulu execution');
+			callback(os, 'Error during lulu execution');
 		} else {
 			callback(os, null);
 		}

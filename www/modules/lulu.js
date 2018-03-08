@@ -1,7 +1,7 @@
 
 class LuluModule extends Module {
 	constructor (params) {
-		super ("LULU", "https://github.com/tobiasgf/lulu");
+		super ("lulu", "https://github.com/tobiasgf/lulu");
 
 		this.params = params;
 	}
@@ -28,7 +28,7 @@ class LuluModule extends Module {
 };
 
 
-module_manager.moduleCreators['LULU'] = (params) => {
+module_manager.moduleCreators['lulu'] = (params) => {
 	return new LuluModule(params);
 };
 
