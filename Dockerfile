@@ -7,7 +7,6 @@ FROM node:latest
 RUN mkdir /app
 WORKDIR /app
 
-
 # Install packages needed for tools
 RUN apt-get update && apt-get install -y \
 	build-essential \
@@ -42,11 +41,10 @@ RUN pip3 install --upgrade pip && pip3 install NumPy biopython
 
 # ----- R dependancies -----
 
-RUN apt-get -y build-dep libcurl4-gnutls-dev
-RUN apt-get -y install libcurl4-gnutls-dev
-
-RUN R CMD 'install.packages("devtools")'
-RUN R CMD 'library(devtools);install_github("tobiasgf/lulu") '
+###RUN apt-get -y build-dep libcurl4-gnutls-dev
+###RUN apt-get -y install libcurl4-gnutls-dev
+RUN R -e 'install.packages("devtools", repos="http://cran.mirrors.hoobly.com/")'
+RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
 
 
 # ----- Libraries deployments -----
@@ -62,6 +60,7 @@ COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
 COPY lib/python_scripts /app/lib/python_scripts
+COPY lib/lulu /app/lib/lulu
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app

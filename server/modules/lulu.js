@@ -2,36 +2,63 @@ const exec = require('child_process').spawn;
 const fs = require('fs');
 const tools = require('../toolbox.js');
 
-exports.name = 'lulu post-clustering';
+exports.name = 'LULU';
 exports.multicore = false;
-exports.category = 'Clustering';
+exports.category = 'Post-processing';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;
 	let directory = '/app/data/' + token + '/';
 	let rep_set = directory + config.params.inputs.rep_set;
-	let filename = directory + config.params.inputs.otus_table;
+	let otu_input = directory + config.params.inputs.otus_table;
 	let otu_lulu = directory + config.params.outputs.otus_lulu;
 
-	let tmp_match = tools.tmp_filename() + '.txt';
+	// Run the otu_id.py to rename the rep_set file
+	let tmp_rep_set = directory + tools.tmp_filename() + '.fasta';
+	// Command line
+	var options = ['/app/lib/lulu/otu_id.py',
+	'-i', rep_set,
+	'-o', tmp_rep_set];
 
-	console.log ('Produce a match list with vsearch ' + rep_set);
+	console.log ('Renaming header in rep set for file ' + rep_set);
+	console.log(os.token + ': python3 ', options.join(' '));
+
+	var child = exec("python3", options);
+	child.stdout.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
+	child.stderr.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
+	child.on('close', (code) => {
+		if (code != 0) {
+			console.log("Error code " + code + " during renaming header");
+			callback(os, code);
+		} else {
+			console.log("Fasta renammed --");
+			callback(os, null);
+		}	
+	});
+
+	console.log ('Produce a pairwise match list with vsearch for file: ' + rep_set);
+
+	let tmp_match = directory + tools.tmp_filename() + '.txt';
 
 	// Command line
-	var options = ['--usearch_global', directory + config.params.inputs.rep_set,
-		'--db', directory + config.params.inputs.rep_set,
+	var options = ['--usearch_global', tmp_rep_set,
+		'--db', tmp_rep_set,
 		'--self',
-		'--id', '.85',
+		'--id', '0.85',
 		'--iddef', '1',
-		'--userout', directory + tmp_match,
+		'--userout', tmp_match,
 		'-userfields', 'query+target+id',
 		'--maxaccepts', '0',
-		'--query_cov', '.9',
+		'--query_cov', '0.9',
 		'--maxhits', '10'];
 
 	// Execute vsearch
 	console.log("Running vsearch with the command line:");
-	console.log(os.token + ': vsearch ', options.join(' '));
+	console.log(os.token + ': /app/lib/vsearch/bin/vsearch ', options.join(' '));
 
 	// Execution
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
@@ -44,11 +71,13 @@ exports.run = function (os, config, callback) {
 	child.on('close', function(code) {
 		if (code == 0) {
 			config.params.inputs.match = tmp_match;
-			lulu_run (os, config); 	
+			lulu_run (os, config, (otu_lulu) => {
+				fs.unlink(directory + tmp_match, ()=>{}); 	
 			callback(os, code);
+			});
 		} else {
 			fs.unlink(directory + tmp_match, ()=>{});
-			console.log("vsearch terminate on code " + code);
+			console.log("vsearch terminate on code FUCK" + code);
 			callback(os, "vsearch terminate on code " + code);
 		}
 	});
@@ -58,26 +87,20 @@ exports.run = function (os, config, callback) {
 
 var lulu_run = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
-	// let tmp_output = toolbox.tmp_filename() + '.txt';
-	//let tmp_output = toolbox.tmp_filename() + '.uc';
+	let match = directory + config.params.inputs.match
+	let otu_input = directory + config.params.inputs.otus_table;
+	let otu_lulu = directory + config.params.outputs.otus_lulu;
 
 	// Run the R script lulu.r
-	var options = [directory + config.params.inputs.merged,
-	'-o', '/dev/null', //directory + tmp_output,
-	'-u', directory + tmp_output,
-	'-z',
-	'-w', directory + config.params.outputs.centroids,
-	'-t', os.cores];
+	// Command line
+	var options = ['/app/lib/lulu/lulu.R',
+	otu_input,
+	match,
+	otu_lulu];
 
-	if (config.params.params.max_diff == 1)
-		options = options.concat(['-f']);
-	else
-		options = options.concat(['-d', config.params.params.max_diff]);
-
-	// Execute swarm
-	console.log("Running swarm with the command line:");
-	console.log('R CMD BATCH /app/lib/r_scrips/lulu.r', options.join(' '));
-	var child = exec('/app/lib/swarm/bin/swarm', options);
+	// Execute the R script
+	console.log('Rscript ', options.join(' '));
+	var child = exec('Rscript ', options);
 
 	child.stdout.on('data', function(data) {
 		fs.appendFileSync(directory + config.log, data);
@@ -88,15 +111,10 @@ var lulu_run = (os, config, callback) => {
 	child.on('close', function(code) {
 		if (code != 0) {
 			fs.unlink(directory+tmp_output, ()=>{});
-			console.log (os.token + ': Error durong swarm execution')
-			callback(os, 'Error during swarm execution');
+			console.log (os.token + ': Error during lulu execution')
+			callback(os, 'EError during lulu execution');
 		} else {
-			config.params.inputs.uc = tmp_output;
-			config.params.params.ordered = config.params.params.ordered_swarm;
-			otu_manager.write_from_uc(os, config, (os, msg) => {
-				fs.unlink(directory+tmp_output, ()=>{});
-				callback(os, msg);
-			});
+			callback(os, null);
 		}
 	});
 };
