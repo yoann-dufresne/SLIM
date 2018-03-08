@@ -1,0 +1,4 @@
+version 0.8.2 (October, 2015)
++ fixs parallel processing bugs
++ needs jellyfish version 2.2.3 or higher
+
