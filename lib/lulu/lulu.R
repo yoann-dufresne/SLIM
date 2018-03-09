@@ -1,12 +1,13 @@
 ## lulu R script
 
-setwd("/app/data/")
-
 args <- commandArgs(TRUE)
 print(args)
 otu_table <- args[1]
 match <- args[2]
 filename <- args[3]
+token <- args[4]
+
+setwd(paste("/app/data/", token, "/", sep=""))
 
 # import the data
 otu_table <- read.table(otu_table, header=TRUE, sep="\t")

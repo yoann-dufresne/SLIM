@@ -36,13 +36,19 @@ exports.run = function (os, config, callback) {
 			callback(os, code);
 		} else {
 			console.log("Fasta renammed --");
+			match_list(os, config, tmp_rep_set, (match_list) => {
+				fs.unlink(directory + tmp_rep_set, ()=>{}); 	
 			callback(os, null);
+			});
 		}	
 	});
+};
 
-	console.log ('Produce a pairwise match list with vsearch for file: ' + rep_set);
 
-	let tmp_match = directory + tools.tmp_filename() + '.txt';
+var match_list = (os, config, tmp_rep_set, callback) => {
+	console.log ('Produce a pairwise match list with vsearch for file: ' + tmp_rep_set);
+	let directory = '/app/data/' + os.token + '/';
+	let tmp_match = tools.tmp_filename() + '.txt';
 
 	// Command line
 	var options = ['--usearch_global', tmp_rep_set,
@@ -50,7 +56,7 @@ exports.run = function (os, config, callback) {
 		'--self',
 		'--id', '0.85',
 		'--iddef', '1',
-		'--userout', tmp_match,
+		'--userout', directory + tmp_match,
 		'-userfields', 'query+target+id',
 		'--maxaccepts', '0',
 		'--query_cov', '0.9',
@@ -71,35 +77,36 @@ exports.run = function (os, config, callback) {
 	child.on('close', function(code) {
 		if (code != 0) {
 			fs.unlink(directory + tmp_match, ()=>{});
-			console.log("vsearch terminate on code FUCK" + code);
+			console.log("vsearch terminate on code " + code);
 			callback(os, "vsearch terminate on code " + code);
 		} else {
 			config.params.inputs.match = tmp_match;
-			lulu_run (os, config, (otu_lulu) => {
-				fs.unlink(directory + tmp_match, ()=>{}); 	
+			//lulu_run (os, config, (otu_lulu) => {
+			//	fs.unlink(directory + tmp_match, ()=>{}); 	
 			callback(os, code);
-			});
+			//});
 			
 		}
 	});
-};
-
+}
 
 
 var lulu_run = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
-	let match = directory + config.params.inputs.match
-	let otu_input = directory + config.params.inputs.otus_table;
-	let otu_lulu = directory + config.params.outputs.otus_lulu;
+	let match = config.params.inputs.match
+	let otu_input = config.params.inputs.otus_table;
+	let otu_lulu = config.params.outputs.otus_lulu;
 
 	// Run the R script lulu.r
 	// Command line
 	var options = ['/app/lib/lulu/lulu.R',
 	otu_input,
 	match,
-	otu_lulu];
+	otu_lulu,
+	os.token];
 
 	// Execute the R script
+	console.log("Running Rscript lulu.R with the command line:");
 	console.log('Rscript ', options.join(' '));
 	var child = exec('Rscript ', options);
 
