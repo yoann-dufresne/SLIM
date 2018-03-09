@@ -58,7 +58,7 @@ exports.run = function (os, config, callback) {
 
 	// Execute vsearch
 	console.log("Running vsearch with the command line:");
-	console.log(os.token + ': /app/lib/vsearch/bin/vsearch ', options.join(' '));
+	console.log('/app/lib/vsearch/bin/vsearch ', options.join(' '));
 
 	// Execution
 	var child = exec('/app/lib/vsearch/bin/vsearch', options);
@@ -69,16 +69,17 @@ exports.run = function (os, config, callback) {
 		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
-		if (code == 0) {
+		if (code != 0) {
+			fs.unlink(directory + tmp_match, ()=>{});
+			console.log("vsearch terminate on code FUCK" + code);
+			callback(os, "vsearch terminate on code " + code);
+		} else {
 			config.params.inputs.match = tmp_match;
 			lulu_run (os, config, (otu_lulu) => {
 				fs.unlink(directory + tmp_match, ()=>{}); 	
 			callback(os, code);
 			});
-		} else {
-			fs.unlink(directory + tmp_match, ()=>{});
-			console.log("vsearch terminate on code FUCK" + code);
-			callback(os, "vsearch terminate on code " + code);
+			
 		}
 	});
 };
