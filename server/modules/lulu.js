@@ -81,10 +81,10 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 			callback(os, "vsearch terminate on code " + code);
 		} else {
 			config.params.inputs.match = tmp_match;
-			//lulu_run (os, config, (otu_lulu) => {
-			//	fs.unlink(directory + tmp_match, ()=>{}); 	
+			lulu_run (os, config, (otu_lulu) => {
+				fs.unlink(directory + tmp_match, ()=>{}); 	
 			callback(os, code);
-			//});
+			});
 			
 		}
 	});
