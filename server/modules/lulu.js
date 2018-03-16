@@ -1,4 +1,5 @@
 const exec = require('child_process').spawn;
+const Rexec = require('child_process').exec;
 const fs = require('fs');
 const tools = require('../toolbox.js');
 
@@ -16,7 +17,7 @@ exports.run = function (os, config, callback) {
 	// Run the otu_id.py to rename the rep_set file
 	let tmp_rep_set = directory + tools.tmp_filename() + '.fasta';
 	// Command line
-	var options = ['/app/lib/lulu/otu_id.py',
+	var options = ['/app/lib/python_scripts/otu_id_renaming.py',
 	'-i', rep_set,
 	'-o', tmp_rep_set];
 
@@ -82,8 +83,8 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 		} else {
 			config.params.inputs.match = tmp_match;
 			lulu_run (os, config, (otu_lulu) => {
-				fs.unlink(directory + tmp_match, ()=>{}); 	
-			callback(os, code);
+				// fs.unlink(directory + tmp_match, ()=>{}); 	
+			callback(os, null);
 			});
 			
 		}
@@ -93,7 +94,7 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 
 var lulu_run = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
-	let match = config.params.inputs.match
+	let match = config.params.inputs.match;
 	let otu_input = config.params.inputs.otus_table;
 	let otu_lulu = config.params.outputs.otus_lulu;
 
@@ -107,22 +108,22 @@ var lulu_run = (os, config, callback) => {
 
 	// Execute the R script
 	console.log("Running Rscript lulu.R with the command line:");
-	console.log('Rscript ', options.join(' '));
-	var child = exec('Rscript ', options);
+	console.log('Rscript ' + options.join(' '));
+	var child = Rexec('Rscript ' + options.join(' '));
 
 	child.stdout.on('data', function(data) {
-		fs.appendFileSync(directory + config.log, data);
+		console.log('STDOUT:' + data);
 	});
 	child.stderr.on('data', function(data) {
-		fs.appendFileSync(directory + config.log, data);
+		console.log('STDERR:' + data);
 	});
 	child.on('close', function(code) {
 		if (code != 0) {
-			fs.unlink(directory+tmp_output, ()=>{});
+			fs.unlink(directory + otu_lulu, ()=>{});
 			console.log (os.token + ': Error during lulu execution')
 			callback(os, 'Error during lulu execution');
 		} else {
-			callback(os, null);
+			callback(os, code);
 		}
 	});
 };
