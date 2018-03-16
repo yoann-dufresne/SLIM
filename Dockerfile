@@ -65,7 +65,7 @@ COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
 COPY lib/python_scripts /app/lib/python_scripts
-COPY lib/lulu /app/lib/lulu
+COPY lib/R_scripts /app/lib/R_scripts
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app

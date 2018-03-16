@@ -100,7 +100,7 @@ var lulu_run = (os, config, callback) => {
 
 	// Run the R script lulu.r
 	// Command line
-	var options = ['/app/lib/lulu/lulu.R',
+	var options = ['/app/lib/R_scripts/lulu.R',
 	otu_input,
 	match,
 	otu_lulu,
