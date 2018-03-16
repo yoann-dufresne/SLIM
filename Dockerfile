@@ -7,6 +7,9 @@ FROM node:latest
 RUN mkdir /app
 WORKDIR /app
 
+# Add the CRAN repos sources for install latest version of R
+RUN sh -c 'echo "deb http://cran.rstudio.com/bin/linux/debian jessie-cran3/" >> /etc/apt/sources.list' 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480 
 
 # Install packages needed for tools
 RUN apt-get update && apt-get install -y \
@@ -19,7 +22,8 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev
+	python3-pip python3-dev \
+	r-base
 
 RUN mkdir /app/lib
 
@@ -39,6 +43,15 @@ COPY lib/miniconda /app/lib/miniconda
 RUN pip3 install --upgrade pip && pip3 install NumPy biopython
 
 
+# ----- R dependancies -----
+
+###RUN apt-get -y build-dep libcurl4-gnutls-dev
+###RUN apt-get -y install libcurl4-gnutls-dev
+RUN R -e 'install.packages("devtools", repos="http://cran.mirrors.hoobly.com/")'
+RUN R -e 'install.packages("dplyr", repos="http://cran.mirrors.hoobly.com/")'
+RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
+
+
 # ----- Libraries deployments -----
 
 # install app dependencies
@@ -52,6 +65,7 @@ COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
 COPY lib/python_scripts /app/lib/python_scripts
+COPY lib/lulu /app/lib/lulu
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
