@@ -36,7 +36,7 @@ exports.run = function (os, config, callback) {
 			console.log("Error code " + code + " during renaming header");
 			callback(os, code);
 		} else {
-			console.log("Fasta renammed --");
+			console.log("Fasta renammed");
 			match_list(os, config, tmp_rep_set, (match_list) => {
 				fs.unlink(directory + tmp_rep_set, ()=>{}); 	
 			callback(os, null);
@@ -50,12 +50,15 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 	console.log ('Produce a pairwise match list with vsearch for file: ' + tmp_rep_set);
 	let directory = '/app/data/' + os.token + '/';
 	let tmp_match = tools.tmp_filename() + '.txt';
+	let similarity = config.params.params.similarity;
+
+	console.log (config)
 
 	// Command line
 	var options = ['--usearch_global', tmp_rep_set,
 		'--db', tmp_rep_set,
 		'--self',
-		'--id', '0.85',
+		'--id', similarity,
 		'--iddef', '1',
 		'--userout', directory + tmp_match,
 		'-userfields', 'query+target+id',
@@ -97,6 +100,7 @@ var lulu_run = (os, config, callback) => {
 	let match = config.params.inputs.match;
 	let otu_input = config.params.inputs.otus_table;
 	let otu_lulu = config.params.outputs.otus_lulu;
+	let cooccurence = config.params.params.cooccurence;
 
 	// Run the R script lulu.r
 	// Command line
@@ -104,7 +108,7 @@ var lulu_run = (os, config, callback) => {
 	otu_input,
 	match,
 	otu_lulu,
-	os.token];
+	os.token, cooccurence];
 
 	// Execute the R script
 	console.log("Running Rscript lulu.R with the command line:");

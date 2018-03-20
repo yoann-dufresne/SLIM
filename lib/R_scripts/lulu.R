@@ -6,6 +6,7 @@ otu_table <- args[1]
 match <- args[2]
 filename <- args[3]
 token <- args[4]
+coocur <- args[5]
 
 setwd(paste("/app/data/", token, "/", sep=""))
 
@@ -15,7 +16,6 @@ match <- read.table(match, sep="\t")
 
 dim(otu_table)
 dim(match)
-print(filename)
 
 require(lulu)
 # split the otu table as outputed by slim
@@ -27,7 +27,7 @@ ifelse (is.numeric(taxo[,1]), otu <- otu_table[,c(2:(ncol(otu_table)))], otu <- 
 
 rownames(otu) <- rownames(taxo) <- otu_id
 # launch the post-clustering
-tmp <- lulu(otu, match)	
+tmp <- lulu(otu, match, coocur)	
 # remap the taxonomy and OTU id
 ifelse (is.numeric(taxo[,1]), otu_lulu <- cbind(OTU = rownames(tmp$curated_table), tmp$curated_table), otu_lulu <- cbind(OTU = rownames(tmp$curated_table), tmp$curated_table, taxo[rownames(tmp$curated_table),]))
 # resort by OTU id
