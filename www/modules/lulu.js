@@ -20,14 +20,6 @@ class LuluModule extends Module {
 			otus_lulu.onchange();
 		};
 	}
-
-	getConfiguration () {
-		var config = super.getConfiguration();
-
-		// config.params.sorted = this.sorted.checked ? this.t2s.value : "";
-
-		return config;
-	}
 };
 
 
