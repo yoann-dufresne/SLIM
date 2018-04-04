@@ -1,6 +1,6 @@
 # ----- Basic docker constructions -----
 
-# Use an official Python runtime as a base image
+# Use an official node runtime as a base image
 FROM node:latest
 
 # Set the working directory to /app
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev
+	python3-dev python3-numpy python3-biopython
 
 RUN mkdir /app/lib
 
@@ -32,12 +32,6 @@ COPY lib/miniconda /app/lib/miniconda
 #	&& /app/lib/miniconda/install/bin/conda update conda -y
 # Install QIIME 2
 # RUN /app/lib/miniconda/install/bin/conda create -n qiime2-2017.6 --file https://data.qiime2.org/distro/core/qiime2-2017.6-conda-linux-64.txt
-
-
-# ----- Python dependancies -----
-
-RUN pip3 install --upgrade pip && pip3 install NumPy biopython
-
 
 # ----- Libraries deployments -----
 
