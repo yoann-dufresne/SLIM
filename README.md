@@ -75,6 +75,9 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 * [vsearch](https://github.com/torognes/vsearch) uclust
 * [swarm](https://github.com/torognes/swarm)
 
+## Post-clustering
+* [LULU](https://github.com/tobiasgf/lulu)
+
 ## Sequence assignment
 * [vsearch](https://github.com/torognes/vsearch) usearch
 

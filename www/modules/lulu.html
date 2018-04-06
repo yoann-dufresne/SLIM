@@ -1,0 +1,19 @@
+<p>Representatives sequences of OTUs</p>
+<input type="text" name="rep_set" class="input_file fasta" />
+
+<p>OTU table to be post-clustered with LULU</p> 
+<input type="text" name="otus_table" class="input_file tsv" /><br>
+
+<p>LULU post-clustered OTU table</p>
+<span class="output_zone">
+	<input type="text" name="otus_lulu" value="lulu.tsv" />
+	<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
+<div class="options">
+	<p>Sequence similarity threshold<input type="text" name="similarity" class="integer number param_value" value="0.95"></p>
+	<p>Minimum relative co-occurence<input type="text" name="cooccurence" class="integer number param_value" value="0.95"></p>
+</div>
+
+
+
