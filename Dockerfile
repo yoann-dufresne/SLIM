@@ -8,8 +8,8 @@ RUN mkdir /app
 WORKDIR /app
 
 # Add the CRAN repos sources for install latest version of R
-RUN sh -c 'echo "deb http://cran.rstudio.com/bin/linux/debian jessie-cran3/" >> /etc/apt/sources.list' 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480 
+RUN sh -c 'echo "deb http://cran.rstudio.com/bin/linux/debian jessie-cran3/" >> /etc/apt/sources.list'
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 06F90DE5381BA480
 
 # Install packages needed for tools
 RUN apt-get update && apt-get install -y \
@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev python3-numpy python3-biopython \
+	python3-pip python3-dev python3-numpy python3-biopython \   # This installs biopython 1.64, which fails to run fasta_merging.py and matrix_creation.py. Need to update manually biopython within the docker... 
 	r-base
 
 
