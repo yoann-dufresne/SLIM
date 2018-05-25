@@ -22,9 +22,21 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev python3-numpy python3-biopython \   # This installs biopython 1.64, which fails to run fasta_merging.py and matrix_creation.py. Need to update manually biopython within the docker... 
+	python3-pip python3-dev python3-numpy python3-biopython \ 
 	r-base
 
+
+## solving locales issue for biopython
+RUN apt-get install -y locales locales-all
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+RUN dpkg -l locales
+
+
+#RUN export LANGUAGE=en_US.UTF-8
+# RUN dpkg -l locales
+RUN python3 -m pip install biopython --upgrade
 
 RUN mkdir /app/lib
 
