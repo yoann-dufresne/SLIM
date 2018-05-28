@@ -14,40 +14,16 @@ exports.run = function (os, config, callback) {
 	let otu_input = directory + config.params.inputs.otus_table;
 	let otu_lulu = directory + config.params.outputs.otus_lulu;
 
-	// Run the otu_id.py to rename the rep_set file
-	let tmp_rep_set = directory + tools.tmp_filename() + '.fasta';
-	// Command line
-	var options = ['/app/lib/python_scripts/otu_id_renaming.py',
-	'-i', rep_set,
-	'-o', tmp_rep_set];
-
-	console.log ('Renaming header in rep set for file ' + rep_set);
-	console.log(os.token + ': python3 ', options.join(' '));
-
-	var child = exec("python3", options);
-	child.stdout.on('data', function(data) {
-		fs.appendFileSync(directory + config.log, data);
-	});
-	child.stderr.on('data', function(data) {
-		fs.appendFileSync(directory + config.log, data);
-	});
-	child.on('close', (code) => {
-		if (code != 0) {
-			console.log("Error code " + code + " during renaming header");
-			callback(os, code);
-		} else {
-			console.log("Fasta renammed");
-			match_list(os, config, tmp_rep_set, (match_list) => {
-				fs.unlink(directory + tmp_rep_set, ()=>{}); 	
-			callback(os, null);
-			});
-		}	
+	// calling vsearch for producing the pairwise matchlist
+	match_list(os, config, rep_set, (match_list) => {
+		// fs.unlink(directory + tmp_rep_set, ()=>{});
+	callback(os, null);
 	});
 };
 
 
-var match_list = (os, config, tmp_rep_set, callback) => {
-	console.log ('Produce a pairwise match list with vsearch for file: ' + tmp_rep_set);
+var match_list = (os, config, rep_set, callback) => {
+	console.log ('Produce a pairwise match list with vsearch for file: ' + rep_set);
 	let directory = '/app/data/' + os.token + '/';
 	let tmp_match = tools.tmp_filename() + '.txt';
 	let similarity = config.params.params.similarity;
@@ -55,8 +31,8 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 	console.log (config)
 
 	// Command line
-	var options = ['--usearch_global', tmp_rep_set,
-		'--db', tmp_rep_set,
+	var options = ['--usearch_global', rep_set,
+		'--db', rep_set,
 		'--self',
 		'--id', similarity,
 		'--iddef', '1',
@@ -86,13 +62,13 @@ var match_list = (os, config, tmp_rep_set, callback) => {
 		} else {
 			config.params.inputs.match = tmp_match;
 			lulu_run (os, config, (otu_lulu) => {
-				// fs.unlink(directory + tmp_match, ()=>{}); 	
+				// fs.unlink(directory + tmp_match, ()=>{});
 			callback(os, null);
 			});
-			
+
 		}
 	});
-}
+};
 
 
 var lulu_run = (os, config, callback) => {
@@ -131,6 +107,3 @@ var lulu_run = (os, config, callback) => {
 		}
 	});
 };
-
-
-
