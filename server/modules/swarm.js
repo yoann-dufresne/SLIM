@@ -54,13 +54,14 @@ var otu_search = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
 	// let tmp_output = toolbox.tmp_filename() + '.txt';
 	let tmp_output = toolbox.tmp_filename() + '.uc';
-
+	let tmp_centroids = toolbox.tmp_filename() + '.fasta';
+	config.params.inputs.tmp_centroids = tmp_centroids;
 	// Swarm options
 	var options = [directory + config.params.inputs.merged,
 	'-o', '/dev/null', //directory + tmp_output,
 	'-u', directory + tmp_output,
 	'-z',
-	'-w', directory + config.params.outputs.centroids,
+	'-w', directory + tmp_centroids,
 	'-t', os.cores];
 
 	if (config.params.params.max_diff == 1)
@@ -82,7 +83,7 @@ var otu_search = (os, config, callback) => {
 	child.on('close', function(code) {
 		if (code != 0) {
 			fs.unlink(directory+tmp_output, ()=>{});
-			console.log (os.token + ': Error durong swarm execution')
+			console.log (os.token + ': Error durong swarm execution');
 			callback(os, 'Error during swarm execution');
 		} else {
 			config.params.inputs.uc = tmp_output;

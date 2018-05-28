@@ -8,12 +8,13 @@ exports.assignment_to_otu_matrix = (assignments, matrix_in, matrix_out, threshol
 
 	lineReader.eachLine(matrix_in, function(line, last) {
 		// Header
-		if (line.startsWith('OTU')) {
+		if (line.startsWith('OTU_ID')) {
 			fs.appendFileSync(matrix_out, line + '\ttaxon\tmean identity\tref ids\n');
 			return;
 		} else if (line != '') {
 			let split = line.split('\t');
-			let cluster = split[0];
+			let cluster = split[0].split('OTU')[1];
+			// console.log (cluster);
 
 			if (assignments[cluster]) {
 				let cons = consensus(assignments[cluster], threshold);
