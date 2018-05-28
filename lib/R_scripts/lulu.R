@@ -31,7 +31,7 @@ match[,2] <- as.character(match[,2])
 # launch the post-clustering
 tmp <- lulu(otu, match, coocur)
 # remap the taxonomy and OTU id
-ifelse (is.numeric(taxo[,1]), otu_lulu <- cbind(OTU_ID = rownames(tmp$curated_table), tmp$curated_table), otu_lulu <- cbind(OTU = rownames(tmp$curated_table), tmp$curated_table, taxo[rownames(tmp$curated_table),]))
+ifelse (is.numeric(taxo[,1]), otu_lulu <- cbind(OTU_ID = rownames(tmp$curated_table), tmp$curated_table), otu_lulu <- cbind(OTU_ID = rownames(tmp$curated_table), tmp$curated_table, taxo[rownames(tmp$curated_table),]))
 # resort by OTU id
 otu_lulu <- otu_lulu[paste0("OTU", as.character(sort(as.numeric(gsub("OTU", "", rownames(tmp$curated_table)))))),]
 
