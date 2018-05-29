@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 	libboost-all-dev \
 	pigz \
 	dos2unix \
-	python3-pip python3-dev python3-numpy python3-biopython \ 
+	python3-pip python3-dev python3-numpy python3-biopython \
 	r-base
 
 
@@ -33,9 +33,6 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 RUN dpkg -l locales
 
-
-#RUN export LANGUAGE=en_US.UTF-8
-# RUN dpkg -l locales
 RUN python3 -m pip install biopython --upgrade
 
 RUN mkdir /app/lib
