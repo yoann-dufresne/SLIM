@@ -13,12 +13,25 @@ The software can be setup by using the two scripts "get_dependencies_slim_v1.0.s
 * start_slim_v1.0.sh destroy the current running webserver to replace it with a new one updated.
 **/!\\** All the files previously uploaded on the webserver will be detroyed during the process.
 
-So, you can setup the pipeline using the following 3 command lines:
+To install SLIM, you can either get the last stable release (strongly advised):
+```bash
+curl -OL https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz
+tar -xzvf v1.0.tar.gz
+cd SLIM-1.0
+```
+
+Alternatively, you can download the current development version :
+```bash
+git clone https://github.com/trtcrd/SLIM.git
+```
+
+And then deploy SLIM :
 ```bash
 sudo apt-get install docker-ce
 bash get_dependencies_slim_v1.0.sh
 bash start_slim_v1.0.sh
 ```
+
 
 If the apt command doesn't work or you want to install SLIM on macOS, please refer to the docker manual on [https://docs.docker.com](https://docs.docker.com)
 
@@ -78,3 +91,12 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 ## Sequence assignment
 * [vsearch](https://github.com/torognes/vsearch) usearch
+
+
+# Version history
+
+Current 1.0
+
+[![DOI](https://zenodo.org/badge/121395325.svg)](https://zenodo.org/badge/latestdoi/121395325)
+
+First stable release, with third-parties versions handled within the get_dependencies_slim script.
