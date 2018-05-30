@@ -7,7 +7,7 @@ const scheduler = require('./scheduler.js');
 let transporter = null
 
 if (config.mailer.auth.user == 'username') {
-	console.warn('\nWarning: Mailer not configured ! Please fill the file server/config.js with your own mail address.\n');
+	console.warn('\nWarning: Mailer not configured ! Please fill the file server/config.js with your own mailing service login.\n');
 } else {
 	transporter = nodemailer.createTransport(config.mailer);
 }
@@ -30,7 +30,7 @@ let send_mail = (token, subject, text) => {
 	}
 
 	let mailOptions = {
-		from: 'Slim <' + config.mailer.__address + '>', // sender address
+		from: 'SLIM <' + config.mailer.__address + '>', // sender address
 		to: mail, // list of receivers
 		subject: '[No reply] ' + subject, // Subject line
 		text: text
@@ -57,7 +57,7 @@ exports.send_address = (token) => {
 		'Your job ' + token,
 		'Here is the link to follow the execution process.\n' +
 		scheduler.urls[token] + '\n\n' +
-		'The amplicon pipeline staff'
+		'The SLIM pipeline staff'
 	);
 };
 
@@ -68,8 +68,8 @@ exports.send_end_mail = (token) => {
 		'Your job ' + token + ' is over',
 		'Your results are available at this address:\n' +
 		scheduler.urls[token] + '\n\n' +
-		'Your session will automatically deleted in 24h. Don\'t forget to download your results\n\n' +
-		'The amplicon pipeline staff'
+		'Your session will automatically be deleted in 24h. Don\'t forget to download your results\n\n' +
+		'The SLIM pipeline staff'
 	);
 }
 
@@ -77,10 +77,8 @@ exports.send_delete_reminder = (token) => {
 	send_mail(
 		token,
 		'Your job ' + token + ' will be deleted in an hour',
-		'Your results are still available at this address for one hour:\n' +
+		'Your results are still available at this address for only one more hour:\n' +
 		scheduler.urls[token] + '\n\n' +
-		'The amplicon pipeline staff'
+		'The SLIM pipeline staff'
 	);
 }
-
-
