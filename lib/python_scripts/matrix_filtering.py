@@ -30,9 +30,11 @@ def filter_matrix (file, threshold):
 		filtered_clusters = []
 		for line in fp:
 			# Parse line
-			values = [int(val) for val in line.strip().split('\t') if val.isdigit()]
+			values = line.strip().split('\t')
+			# values = [int(val) for val in line.strip().split('\t') if val.isdigit()]
 			id = values[0]
-			values = values[1:]
+			values = [int(val) for val in line.strip().split('\t')[1:] if val.isdigit()]
+			#values = values_int[1:]
 			s = sum(values)
 
 			# Rewrite only if over or equals to the threshold
@@ -52,6 +54,7 @@ def filter_centroids (filename, filtered_clusters, threshold):
 
 	with open(output, 'w') as out:
 		for idx, seq_record in enumerate(SeqIO.parse(filename, "fasta")):
+			idx = str('OTU'+str(idx))
 			if not idx in filtered_clusters:
 				if 'cluster=' in seq_record.id:
 					out.write('>{}\n{}\n'.format(seq_record.id, seq_record.seq))
@@ -73,6 +76,7 @@ def filter_reads (filename, filtered_clusters, threshold):
 			cluster = seq_record.id
 			cluster = cluster[cluster.find(';cluster=')+9:]
 			cluster = int(cluster[:cluster.find(';')])
+			cluster = str('OTU'+str(cluster))
 
 			# Rewrite if cluster is not filtered
 			if not cluster in filtered_clusters:
