@@ -97,6 +97,4 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 Current 1.0
 
-[![DOI](https://zenodo.org/badge/121395325.svg)](https://zenodo.org/badge/latestdoi/121395325)
-
 First stable release, with third-parties versions handled within the get_dependencies_slim script.
