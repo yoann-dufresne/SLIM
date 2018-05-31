@@ -3,14 +3,14 @@
   <img src="https://github.com/yoann-dufresne/SLIM/blob/master/www/imgs/slim_logo.svg" alt="SLIM logo" width="250px"/>
 </p>
 
-SLIM is a node.js web app providing an easy GUI which wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
-All the pipeline is wrapped in a docker to easily run it.
+SLIM is a node.js web app providing an easy Graphical User Interface (GUI) to wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
+All the pipeline is embedded in a [docker](https://www.docker.com/) to easily run it.
 
 # Install and run the pipeline
 
 The software can be setup by using the two scripts "get_dependencies_slim_v1.0.sh" and "start_slim_v1.0.sh".
-* get_dependencies_slim_v1.0.sh get all the bioinformatics tools needed from their respective repositories.
-* start_slim_v1.0.sh destroy the current running webserver to replace it with a new one updated.
+* get_dependencies_slim_v1.0.sh fetches all the bioinformatics tools needed from their respective repositories.
+* start_slim_v1.0.sh destroys the current running webserver to replace it with a new one updated.
 **/!\\** All the files previously uploaded on the webserver will be detroyed during the process.
 
 To install SLIM, you can either get the last stable release (strongly advised):

@@ -1,5 +1,21 @@
 #!/bin/sh
 
+# get docker and install it
+
+sudo apt-get update & install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+curl -OL https://download.docker.com/linux/static/stable/x86_64/docker-17.12.1-ce.tgz
+tar -xzvf docker-17.12.1-ce.tgz
+sudo cp docker/* /usr/bin/
+sudo dockerd &
+sudo docker run hello-world
+
+
+
 if [ ! -d "lib" ]; then
 	mkdir lib
 fi
