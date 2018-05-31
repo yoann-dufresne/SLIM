@@ -15,6 +15,7 @@ The software can be setup by using the two scripts "get_dependencies_slim_v1.0.s
 
 To install SLIM, you can either get the last stable release (strongly advised):
 ```bash
+sudo apt-get update && apt-get install git curl
 curl -OL https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz
 tar -xzvf v1.0.tar.gz
 cd SLIM-1.0
@@ -27,10 +28,10 @@ git clone https://github.com/trtcrd/SLIM.git
 
 And then deploy SLIM :
 ```bash
-sudo apt-get install docker-ce
-bash get_dependencies_slim_v1.0.sh
-bash start_slim_v1.0.sh
+sudo bash get_dependencies_slim_v1.0.sh
+sudo bash start_slim_v1.0.sh
 ```
+
 
 
 If the apt command doesn't work or you want to install SLIM on macOS, please refer to the docker manual on [https://docs.docker.com](https://docs.docker.com)
