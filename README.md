@@ -4,16 +4,16 @@
 </p>
 
 SLIM is a node.js web app providing an easy Graphical User Interface (GUI) to wrap bioinformatics tools for amplicon sequencing analysis (from illumina FASTQ to annotated OTU matrix).
-All the pipeline is embedded in a [docker](https://www.docker.com/) to easily run it.
+All the pipeline is embedded in a [docker](https://www.docker.com/).
 
-# Install and run the pipeline
+# Install and deploy the web app
 
-The software can be setup by using the two scripts "get_dependencies_slim_v1.0.sh" and "start_slim_v1.0.sh".
-* get_dependencies_slim_v1.0.sh fetches all the bioinformatics tools needed from their respective repositories.
-* start_slim_v1.0.sh destroys the current running webserver to replace it with a new one updated.
-**/!\\** All the files previously uploaded on the webserver will be detroyed during the process.
+First of all, docker needs to be installed on the machine. You can find instructions here :
+* [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
+* [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
 
-To install SLIM, you can either get the last stable release (strongly advised):
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz) or, using terminal :
 ```bash
 sudo apt-get update && apt-get install git curl
 curl -OL https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz
@@ -21,20 +21,16 @@ tar -xzvf v1.0.tar.gz
 cd SLIM-1.0
 ```
 
-Alternatively, you can download the current development version :
-```bash
-git clone https://github.com/trtcrd/SLIM.git
-```
+As soon as docker is installed and running, and the software archive downloaded, it can be deployed by using the two scripts "get_dependencies_slim_v1.0.sh" and "start_slim_v1.0.sh" as **super user**.
+* get_dependencies_slim_v1.0.sh fetches all the bioinformatics tools needed from their respective repositories.
+* start_slim_v1.0.sh destroys the current running webserver to replace it with a new one.
+**/!\\** All the files previously uploaded and the results of analysis on the webserver will be detroyed during the process.
 
-And then deploy SLIM :
 ```bash
 sudo bash get_dependencies_slim_v1.0.sh
 sudo bash start_slim_v1.0.sh
 ```
 
-
-
-If the apt command doesn't work or you want to install SLIM on macOS, please refer to the docker manual on [https://docs.docker.com](https://docs.docker.com)
 
 # Analyse data
 

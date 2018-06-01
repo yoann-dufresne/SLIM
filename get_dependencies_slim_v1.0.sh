@@ -1,12 +1,5 @@
 #!/bin/sh
 
-# fetch docker version 17.12.1 and install it
-curl -OL https://download.docker.com/linux/static/stable/x86_64/docker-17.12.1-ce.tgz
-tar -xzvf docker-17.12.1-ce.tgz
-sudo cp docker/* /usr/bin/
-sudo dockerd &
-sudo docker run hello-world
-
 
 if [ ! -d "lib" ]; then
 	mkdir lib
