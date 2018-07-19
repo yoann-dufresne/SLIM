@@ -31,6 +31,22 @@ sudo bash get_dependencies_slim_v1.0.sh
 sudo bash start_slim_v1.0.sh
 ```
 
+Once SLIM is deployed, you need to configure the mailing account that will be used for mailing service.
+We advise to use gmail, as it is already set in the server/config.js file.
+This file need to be updated with your 'user' and 'pass' fields on the server, as below:
+
+```
+exports.mailer = {
+	host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: 'username',
+        pass: 'password'
+    }
+}
+```
+
 
 # Accessing the webserver
 
