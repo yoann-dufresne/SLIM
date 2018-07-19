@@ -37,7 +37,7 @@ sudo bash start_slim_v1.0.sh
 The execution of the `start_slim_v1.0.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
-To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080) from an internet browser (prefer Firefox and Google Chrome)
+To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome)
 If SLIM is deployed on your own machine, type `localhost:8080/`
 
 If the server is correctly set, you should see this:
@@ -126,6 +126,7 @@ see below for the demultiplexing
 <p align="center">
   <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="600px"/>
 </p>
+
 
 and below for the OTU clustering and taxonomic assignement
 
