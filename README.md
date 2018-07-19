@@ -138,16 +138,16 @@ and below for the OTU clustering and taxonomic assignement
 
 Once your workflow is set, please fill the email field and click on the start button.
 Your job will automatically be scheduled on the server.
-You will receive an email when your job is over.
-This email will contain a link to your job, so, you can close the app tab once you started the execution.
+You will receive an email when your job starts and when your job is over.
+This email contains a direct link to your job, so you can close the internet browser tab once you started the execution.
 
 When your job is over, you will have small icons of download on the right of each output field.
 All the uploaded, intermediate and results files are available to download.
 Your files will remain available on the server during 24h, after what they will be removed for disk usage optimisation
 
-For more details on the app, please read the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
+For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
 
-# Create a module for the pipeline
+# Creating your own module
 
 To contribute by adding new softwares, you will have to know a little bit of HTML and javascript.
 Please refer to the wiki pages to learn [how to create a module](https://github.com/yoann-dufresne/SLIM/wiki/How-to-write-a-new-module).
