@@ -42,8 +42,8 @@ If SLIM is deployed on your own machine, type `localhost:8080/`
 
 If the server is correctly set, you should see this:
 
-<p align="center">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_webpage.png" alt="SLIM homepage" width="600px"/>
+<p align="left">
+  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_webpage.png" alt="SLIM homepage" width="800px"/>
 </p>
 
 # Prepare and upload your data
@@ -101,6 +101,7 @@ TTATTTGTTACAGAACCATTTCAGGCTCTGCCTGGTTTTTGGTGAATCAAAATACCTTATGGATTGTGTGGCATCAGCTG
 CTT
 ```
 
+
 # Analyse your data
 
 Usually, a typical workflow would include:
@@ -123,15 +124,15 @@ The same principle applies for OTU matrices, we add the previous processing step
 
 see below for the demultiplexing
 
-<p align="center">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="600px"/>
+<p align="left">
+  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
 </p>
 
 
 and below for the OTU clustering and taxonomic assignement
 
-<p align="center">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="600px"/>
+<p align="left">
+  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
 </p>
 
 
