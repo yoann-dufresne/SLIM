@@ -21,18 +21,8 @@ tar -xzvf v1.1.tar.gz
 cd SLIM-1.1
 ```
 
-As soon as docker is installed and running, and the SLIM archive downloaded, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
-* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
-**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
-
-```bash
-sudo bash get_dependencies_slim_v1.1.sh
-sudo bash start_slim_v1.1.sh
-```
-
-Once SLIM is deployed, you need to configure the mailing account that will be used for mailing service.
-We advise to use gmail, as it is already set in the server/config.js file.
+Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
+We advise to use gmail, as it is already set in the 'server/config.js' file.
 This file need to be updated with your 'user' and 'pass' fields on the server, as below:
 
 ```
@@ -45,6 +35,17 @@ exports.mailer = {
         pass: 'password'
     }
 }
+```
+
+
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
+* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
+**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+
+```bash
+sudo bash get_dependencies_slim_v1.1.sh
+sudo bash start_slim_v1.1.sh
 ```
 
 
