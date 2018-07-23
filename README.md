@@ -21,9 +21,9 @@ tar -xzvf v1.1.tar.gz
 cd SLIM-1.1
 ```
 
-As soon as docker is installed and running, and the SLIM archive downloaded, it can be deployed by using the two scripts `get_dependencies_slim_v1.0.sh` and `start_slim_v1.0.sh` as **super user**.
-* `get_dependencies_slim_v1.0.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.0.sh` destroys the current running webserver to replace it with a new one.
+As soon as docker is installed and running, and the SLIM archive downloaded, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
+* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
 **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
@@ -50,7 +50,7 @@ exports.mailer = {
 
 # Accessing the webserver
 
-The execution of the `start_slim_v1.0.sh` script deploys and start the webserver.
+The execution of the `start_slim_v1.1.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
 To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome)
