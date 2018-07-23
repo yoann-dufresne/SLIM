@@ -13,12 +13,12 @@ First of all, docker needs to be installed on the machine. You can find instruct
 * [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
 
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz) or, using terminal :
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
 ```bash
 sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v1.0.tar.gz
-tar -xzvf v1.0.tar.gz
-cd SLIM-1.0
+curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
+tar -xzvf v1.1.tar.gz
+cd SLIM-1.1
 ```
 
 As soon as docker is installed and running, and the SLIM archive downloaded, it can be deployed by using the two scripts `get_dependencies_slim_v1.0.sh` and `start_slim_v1.0.sh` as **super user**.
@@ -27,8 +27,8 @@ As soon as docker is installed and running, and the SLIM archive downloaded, it 
 **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
-sudo bash get_dependencies_slim_v1.0.sh
-sudo bash start_slim_v1.0.sh
+sudo bash get_dependencies_slim_v1.1.sh
+sudo bash start_slim_v1.1.sh
 ```
 
 Once SLIM is deployed, you need to configure the mailing account that will be used for mailing service.
@@ -193,6 +193,10 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 
 # Version history
+
+v1.1
+
+Updated the `get_dependencies` script.
 
 v1.0
 
