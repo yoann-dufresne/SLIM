@@ -52,8 +52,8 @@ COPY lib/miniconda /app/lib/miniconda
 
 ###RUN apt-get -y build-dep libcurl4-gnutls-dev
 ###RUN apt-get -y install libcurl4-gnutls-dev
-RUN R -e 'install.packages("devtools", repos="http://cran.mirrors.hoobly.com/")'
-RUN R -e 'install.packages("dplyr", repos="http://cran.mirrors.hoobly.com/")'
+RUN R -e 'install.packages("devtools", repos="https://stat.ethz.ch/CRAN/")'
+RUN R -e 'install.packages("dplyr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
 
 
