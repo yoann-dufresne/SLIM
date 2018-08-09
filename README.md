@@ -8,46 +8,7 @@ All the pipeline is embedded in a [docker](https://www.docker.com/).
 
 # Install and deploy the web app
 
-First of all, docker needs to be installed on the machine. You can find instructions here :
-* [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
-* [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-* [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
-
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
-```bash
-sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
-tar -xzvf v1.1.tar.gz
-cd SLIM-1.1
-```
-
-Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
-We advise to use gmail, as it is already set in the 'server/config.js' file.
-This file need to be updated with your 'user' and 'pass' fields on the server, as below:
-
-```
-exports.mailer = {
-	host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: 'username',
-        pass: 'password'
-    }
-}
-```
-
-
-As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
-* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
-**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
-
-```bash
-sudo bash get_dependencies_slim_v1.1.sh
-sudo bash start_slim_v1.1.sh
-```
-
+See below for full instructions
 
 # Accessing the webserver
 
@@ -149,7 +110,7 @@ see below for the demultiplexing
 and below for the OTU clustering and taxonomic assignement
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_otu.png" alt="SLIM example" width="800px"/>
 </p>
 
 
@@ -163,6 +124,50 @@ All the uploaded, intermediate and results files are available to download.
 Your files will remain available on the server during 24h, after what they will be removed for disk usage optimisation
 
 For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
+
+# Install and deploy the web app
+
+First of all, docker needs to be installed on the machine. You can find instructions here :
+* [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
+* [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
+
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
+```bash
+sudo apt-get update && apt-get install git curl
+curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
+tar -xzvf v1.1.tar.gz
+cd SLIM-1.1
+```
+
+Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
+We advise to use gmail, as it is already set in the 'server/config.js' file.
+This file need to be updated with your 'user' and 'pass' fields on the server, as below:
+
+```
+exports.mailer = {
+	host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: 'username',
+        pass: 'password'
+    }
+}
+```
+
+
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
+* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
+**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+
+```bash
+sudo bash get_dependencies_slim_v1.1.sh
+sudo bash start_slim_v1.1.sh
+```
+
+
 
 # Creating your own module
 
