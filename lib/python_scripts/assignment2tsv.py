@@ -1,12 +1,16 @@
 import sys
+from Bio import SeqIO
 
-def read_uc(uc_filename):
+def read_uc(uc_filename, clusters=None):
 	annotations = {}
 	# headers: ['type', 'idx', 'length', 'similarity', 'orientation', 'nuy1', 'nuy2', 'compact', 'name', 'hit']
 
 	with open(uc_filename) as fp:
 		for line in fp:
 			type, _, _, similarity, _, _, _, _, name, hit = line.strip().split("\t")
+
+			if clusters != None:
+				name = clusters[name]
 
 			if not name in annotations:
 				annotations[name] = []
@@ -37,6 +41,27 @@ def to_tsv(uc_filename, outfile, consensus_threshold):
 			cons = consensus(annotation, consensus_threshold)
 			# Write the outfile
 			fw.write("{}\t{}\t{}\t{}\n".format(id, cons["taxon"], cons["identity"], ";".join(cons["ids"])));
+
+
+def to_otu(uc_filename, outfile, consensus_threshold, otu_matrix, fasta_filename):
+	clusters = fasta2cluster(fasta_filename)
+	annotations = read_uc(uc_filename, clusters)
+
+	with open(outfile, "w") as fw, open(otu_matrix) as fr:
+		# Write the header
+		header = fr.readline().strip()
+		fw.write("{}\ttaxon\tmean identity\tref ids\n".format(header))
+
+		# List all the otus
+		for line in fr:
+			line = line.strip()
+			id = line[:line.find("\t")]
+			annotation = annotations[id]
+		# for id, annotation in annotations.items():
+			# Make a consensus taxonomy
+			cons = consensus(annotation, consensus_threshold)
+			# Write the outfile
+			fw.write("{}\t{}\t{}\t{}\n".format(line, cons["taxon"], cons["identity"], ";".join(cons["ids"])));
 
 
 
@@ -93,6 +118,19 @@ def taxo_consensus (detailed_taxa):
 	return cons[1:]
 
 
+def fasta2cluster (fasta_filename):
+	clusters = {}
+
+	for cluster_id, record in enumerate(SeqIO.parse(fasta_filename, "fasta")):
+		header = record.description
+
+		if "cluster=" in header:
+			cluster_id = header.split("cluster=")[1].split[";"][0]
+
+		clusters[header] = "OTU{}".format(cluster_id)
+
+	return clusters
+
 
 
 if "__main__" == __name__:
@@ -101,10 +139,11 @@ if "__main__" == __name__:
 	uc_filename = ""
 	consensus_threshold = 0
 	outfile = ""
+	fasta_filename = ""
+	otu_in = ""
 
 	for idx in range(len(sys.argv)):
-		if sys.argv[idx] == '-tsv_out':
-			function = to_tsv
+		if sys.argv[idx] == '-out':
 			outfile = sys.argv[idx+1]
 			idx += 1
 		elif sys.argv[idx] == "-uc":
@@ -113,6 +152,15 @@ if "__main__" == __name__:
 		elif sys.argv[idx] == "-threshold":
 			consensus_threshold = float(sys.argv[idx+1])
 			idx += 1
+		elif sys.argv[idx] == "-fasta":
+			fasta_filename = sys.argv[idx+1]
+			idx += 1
+		elif sys.argv[idx] == "-otu_in":
+			otu_in = sys.argv[idx+1]
+			idx += 1
 
-	function(uc_filename, outfile, consensus_threshold)
+	if otu_in == "" or fasta_filename == "":
+		to_tsv(uc_filename, outfile, consensus_threshold)
+	else:
+		to_otu(uc_filename, outfile, consensus_threshold, otu_in, fasta_filename)
 	exit(0)
