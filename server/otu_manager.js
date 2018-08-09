@@ -15,13 +15,17 @@ exports.write_from_uc = (os, config, callback) => {
 	var otu_table = config.params.outputs.otus_table;
 	var fin = config.params.inputs.merged;
 	var fout = config.params.outputs.reads;
-	
+	var repset = config.params.outputs.centroids;
+	var tmp_repset = config.params.inputs.tmp_centroids;
+
 	var options = ['/app/lib/python_scripts/matrix_creation.py',
 		'-uc', directory + uc_file,
 		'-so', directory + origins_file,
 		'-o', directory + otu_table,
 		'-fasta_in', directory + fin,
-		'-fasta_out', directory + fout];
+		'-fasta_out', directory + fout,
+		'-tmp_repset', directory + tmp_repset,
+		'-repset', directory + repset];
 
 	if (config.params.params.ordered == true)
 		options = options.concat(['-t2s', directory + config.params.params.t2s]);
@@ -45,4 +49,3 @@ exports.write_from_uc = (os, config, callback) => {
 		}
 	});
 }
-

@@ -55,14 +55,17 @@ var otu_search = (os, config, callback) => {
 	// let tmp_output = toolbox.tmp_filename() + '.txt';
 	let tmp_output = toolbox.tmp_filename() + '.uc';
 	let in_reads = config.params.inputs.merged;
-	let centroids_file = config.params.outputs.centroids;
+	// let centroids_file = config.params.outputs.centroids;
+	let tmp_centroids = toolbox.tmp_filename() + '.fasta';
+
+	config.params.inputs.tmp_centroids = tmp_centroids;
 
 	// Clustering options
 	var options = ['--cluster_fast', directory + in_reads,
 		'--sizein', '--sizeout',
 		'--uc', directory + tmp_output,
 		'--id', config.params.params.similarity,
-		'--centroids', directory + centroids_file,
+		'--centroids', directory + tmp_centroids,
 		'--threads', os.cores,
 		'--qmask', 'none', '--minseqlength', '1'];
 

@@ -87,7 +87,7 @@ var uc_to_assignment = (os, config, callback) => {
 			if (data.type == "N")
 				return;
 
-			let true_header = data.name.substr(0, data.name.indexOf(';'));
+			let true_header = data.name  // .substr(0, data.name.indexOf(';'));
 			let clust_id = clusters[true_header];
 
 			// First assignment => array creation
@@ -109,7 +109,7 @@ var uc_to_assignment = (os, config, callback) => {
 
 	let auto_id = 0;
 	reader.read_sequences((seq)=>{
-		let true_header = seq.header.substr(0, seq.header.indexOf(';'));
+		let true_header = seq.header // .substr(0, seq.header.indexOf(';'));
 		if (seq.header.includes("cluster=")) {
 			let clust_id = seq.header.substr(seq.header.indexOf("cluster=") + 8);
 			clust_id = clust_id.substr(0, clust_id.indexOf(';'));

@@ -10,7 +10,7 @@ def read_uc (filename, origins):
 	read_clusters = {}
 	lines = {}
 	treated = {}
-	
+
 	# File reading
 	with open(filename) as fp:
 		for line in fp:
@@ -34,7 +34,7 @@ def read_uc (filename, origins):
 			# Matrix construction
 			if not cluster_id in clusters:
 				clusters[cluster_id] = {}
-			
+
 			# add values in origins
 			for origin in origins[read_name]:
 				if not origin in clusters[cluster_id]:
@@ -114,15 +114,15 @@ def read_t2s (filename, true_names):
 
 def print_otus (matrix, order):
 	# Print the header
-	print('OTU', end='')
+	print('OTU_ID', end='')
 	for sample in order:
 		print('\t' + sample["dst"], end='')
 	print()
 
 	for idx in range(len(matrix)):
 		# Print the cluster id
-		print(idx, end='')
-		
+		print('OTU', idx, end='', sep='')
+
 		# Print the values for each experiment
 		for sample in order:
 			if sample["src"] in matrix[idx]:
@@ -134,7 +134,7 @@ def print_otus (matrix, order):
 		print()
 
 
-def main (uc_file, origins_file, outfile, t2s, fin, fout):
+def main (uc_file, origins_file, outfile, t2s, fin, fout, tmp_repset, repset):
 	origins, experiments = read_origins (origins_file)
 	matrix, read_clusters = read_uc(uc_file, origins)
 
@@ -155,6 +155,16 @@ def main (uc_file, origins_file, outfile, t2s, fin, fout):
 	if (fin != "" and fout != ""):
 		rewrite_fasta(read_clusters, fin, fout)
 
+	# Rewrite fasta-representatives
+
+	with open(str(repset), 'w') as fw:
+		cpt=0
+		for record in SeqIO.parse(tmp_repset, "fasta"):
+			fw.write('>' + 'OTU' + str(cpt) + '\n')
+			fw.write(str(record.seq + '\n'))
+			cpt += 1
+
+
 
 if __name__ == '__main__':
 	# Arguments parsing
@@ -163,6 +173,7 @@ if __name__ == '__main__':
 	outfile = ""
 	t2s = ""
 	fin = fout = ""
+	tmp_repset = repset = ""
 
 	for idx in range(len(sys.argv)):
 		if sys.argv[idx] == '-uc':
@@ -177,6 +188,10 @@ if __name__ == '__main__':
 			fin = sys.argv[idx+1]
 		elif sys.argv[idx] == '-fasta_out':
 			fout = sys.argv[idx+1]
+		elif sys.argv[idx] == '-tmp_repset':
+			tmp_repset = sys.argv[idx+1]
+		elif sys.argv[idx] == '-repset':
+			repset = sys.argv[idx+1]
 
-	main(uc_file, origins, outfile, t2s, fin, fout)
+	main(uc_file, origins, outfile, t2s, fin, fout, tmp_repset, repset)
 	exit(0)
