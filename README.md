@@ -92,7 +92,13 @@ Usually, a typical workflow would include:
 The "Add a new module" section has a drop-down list containing various modules to pick, set and chain.
 Pick one and hit the "+" button. This will add the module at the bottom of the first section, and prompting you to fill the required fields. For more informations on the modules, you can refer to their manuals on the wiki or by clicking the (i) button on the module interface.
 
-The chaining between module is made through the files names used as input / output. To point to a set of samples (all samples from the tag-to-sample, or all the samples from the library_1 for instance), we use a '*' to mean 'all', and we add the processing step as a suffix :
+**the use of wildcard '*' for file pointing**
+
+The chaining between module is made through the files names used as input / output. To avoid having to select mannually all the samples to be included in an analysis, wildcards '*' (meaning 'all') are generated and used by the application.
+Such wildcards are generated from the compressed libraries fastq files (tar.gz) and by the tag-to-sample file.
+Users cannot type on their own wildcards in the file names. Instead, the application has an autocompletion feature and will make wildcards suggestions for the user to select within the GUI.
+
+To point to a set of samples (all samples from the tag-to-sample, or all the samples from the library_1 for instance), there will be a '*', and the application adds the processing step as a suffix incrementaly:
 - all samples from the tag-to-sample file that have been demultiplexed: 'tag_to_sample*_fwd.fastq' and 'tag_to_sample*_rev.fastq'
 - all samples from the library_1 that have been demultiplexed: 'tag_to_sample_Library_1*_fwd.fastq' and 'tag_to_sample_Library_1*_rev.fastq'
 - all samples from the tag-to-sample file that have been joined: 'tag_to_sample*_merge-vsearch.fasta'
