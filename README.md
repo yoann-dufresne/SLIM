@@ -103,14 +103,14 @@ The same principle applies for OTU matrices, we add the previous processing step
 see below for the demultiplexing
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
 </p>
 
 
 and below for the OTU clustering and taxonomic assignement
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_otu.png" alt="SLIM example" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_otu.png" alt="SLIM example" width="800px"/>
 </p>
 
 
