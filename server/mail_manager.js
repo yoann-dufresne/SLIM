@@ -14,7 +14,7 @@ if (config.mailer.auth.user == 'username') {
 
 
 
-let send_mail = (token, subject, text) => {
+let send_mail = (token, subject, text, files=[]) => {
 	if (transporter == null) {
 		console.warn("Mailer not configured !!!");
 		return;
@@ -35,6 +35,18 @@ let send_mail = (token, subject, text) => {
 		subject: '[No reply] ' + subject, // Subject line
 		text: text
 	};
+
+	if (files.length > 0) {
+		attachments = [];
+		for (let idx=0 ; idx<files.length ; idx++) {
+			attachments.push({
+				filename: "pipeline.conf",
+				path: files[idx]
+			});
+		}
+
+		mailOptions.attachments = attachments;
+	}
 
 	// send mail with defined transport object
 	transporter.sendMail(mailOptions, (error, info) => {
@@ -69,7 +81,8 @@ exports.send_end_mail = (token) => {
 		'Your results are available at this address:\n' +
 		scheduler.urls[token] + '\n\n' +
 		'Your session will automatically be deleted in 24h. Don\'t forget to download your results\n\n' +
-		'The SLIM pipeline staff'
+		'The SLIM pipeline staff',
+		['/app/data/' + token + '/pipeline.conf']
 	);
 }
 
