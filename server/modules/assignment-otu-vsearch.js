@@ -3,7 +3,6 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 const tools = require('../toolbox.js');
-const ass_manager = require('../assignment_manager.js');
 
 
 exports.name = 'assignment-otu-vsearch';
@@ -40,15 +39,6 @@ exports.run = function (os, config, callback) {
 	});
 	child.on('close', function(code) {
 		if (code == 0) {
-
-			/*
-			ass_manager.assignment_to_otu_matrix(
-					assignments,
-					directory + config.params.inputs.otu_table,
-					directory + config.params.outputs.assigned,
-					config.params.params.acceptance,
-					(msg)=>{callback(os, msg);}
-				);*/
 			let options = ['/app/lib/python_scripts/assignment2tsv.py',
 							'-uc', directory + tmp_uc,
 							'-out', directory + config.params.outputs.assigned,
