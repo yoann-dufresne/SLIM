@@ -69,7 +69,8 @@ exports.send_address = (token) => {
 		'Your job ' + token,
 		'Here is the link to follow the execution process.\n' +
 		scheduler.urls[token] + '\n\n' +
-		'The SLIM pipeline staff'
+		'The SLIM pipeline staff',
+		['/app/data/' + token + '/pipeline.conf']
 	);
 };
 
