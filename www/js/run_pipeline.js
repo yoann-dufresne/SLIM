@@ -103,7 +103,7 @@ var update_run_status = (token, callback=(status)=>{}) => {
 			run.disabled = false;
 
 			for (var key in server_status.jobs)
-				if (!['ended', 'errors'].includes(server_status.jobs[key]))
+				if (!['ended', 'warnings'].includes(server_status.jobs[key]))
 					server_status.jobs[key] = 'aborted'
 		}
 
@@ -117,7 +117,7 @@ var update_run_status = (token, callback=(status)=>{}) => {
 			var divIdx = element.idx;
 
 			// Remove previous class values
-			var possible_status = ['waiting', 'running', 'ready', 'ended', 'aborted', 'errors'];
+			var possible_status = ['waiting', 'running', 'ready', 'ended', 'aborted', 'warnings'];
 			for (var sIdx in possible_status) {
 				element.classList.remove(possible_status[sIdx]);
 			}

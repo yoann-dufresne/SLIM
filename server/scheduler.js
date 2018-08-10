@@ -174,6 +174,7 @@ var sub_process_start = (tok, configs_array) => {
 			console.log(err);
 			job.status = 'aborted';
 			fs.writeFileSync('/app/data/' + token + '/exec.log', JSON.stringify(job));
+			mailer.send_crash_email(token);
 			delete running_jobs[token]
 		}
 };
@@ -365,7 +366,7 @@ exports.expose_status = function (app) {
 					if (sub_status['aborted'] == exec.conf[idx].length)
 						status.jobs[idx] = 'aborted';
 					else
-						status.jobs[idx] = 'errors';
+						status.jobs[idx] = 'warnings';
 					break;
 				}
 

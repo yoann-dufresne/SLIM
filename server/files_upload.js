@@ -272,7 +272,7 @@ exports.trigger_job_end = (token) => {
 	// Reminder
 	setTimeout (
 		() => {mailer.send_delete_reminder(token)},
-		1000 * 3600 * 23
+		1000 * 3600 * 21
 	);
 
 	// Delete environment 24h15 after the process end

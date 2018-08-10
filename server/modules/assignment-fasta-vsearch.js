@@ -3,7 +3,6 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 const tools = require('../toolbox.js');
-const ass_manager = require('../assignment_manager.js');
 
 
 exports.name = 'assignment-fasta-vsearch';
@@ -38,17 +37,27 @@ exports.run = function (os, config, callback) {
 	});
 	child.on('close', function(code) {
 		if (code == 0) {
-			config.params.inputs.uc = tmp_uc;
-			uc_to_assignment (os, config, (assignments) => {
-				fs.unlink(directory + tmp_uc, ()=>{});
+			// Parse the results of the analysis and translate them into the right format.
+			let options = ['/app/lib/python_scripts/assignment2tsv.py',
+							'-uc', directory + tmp_uc,
+							'-tsv_out', directory + config.params.outputs.assigned];
+			child = exec("python3", options);
 
-				// Write the assigned otu table
-				ass_manager.assignment_to_tsv(
-					assignments,
-					directory + config.params.outputs.assigned,
-					config.params.params.acceptance,
-					(msg)=>{callback(os, msg);}
-				);
+			child.stdout.on('data', function(data) {
+				fs.appendFileSync(directory + config.log, data);
+			});
+			child.stderr.on('data', function(data) {
+				fs.appendFileSync(directory + config.log, data);
+			});
+
+			child.on('close', function(code) {
+				fs.unlink(directory + tmp_uc, ()=>{});
+				
+				if (code == 0)
+					callback(os, null);
+				else {
+					callback(os, "assignment: Impossible to generate the annotated otu from the clustering files");
+				}
 			});
 		} else {
 			console.log("vsearch terminate on code " + code);
@@ -57,43 +66,3 @@ exports.run = function (os, config, callback) {
 	});
 };
 
-
-
-var uc_to_assignment = (os, config, callback) => {
-	let directory = '/app/data/' + os.token + '/';
-	let uc = config.params.inputs.uc;
-	let out = config.params.outputs.assigned;
-
-	// --- Assignment ---
-	// Header for uc file
-	var parser = csv({
-		separator: '\t',
-		headers: ['type', 'idx', 'length', 'similarity', 'orientation',
-				'nuy1', 'nuy2', 'compact', 'name', 'hit']
-	});
-
-	let hits = {};
-
-	// Parce the uc file
-	fs.createReadStream(directory + uc)
-	.pipe(parser)
-	// --- Read UC file ---
-	.on('data', function (data) {
-		// First assignment => array creation
-		if (hits[data.name] == undefined) {
-			hits[data.name] = [];
-		}
-
-		if (data.type != "N") {
-			// Add candidate assignment for the cluster
-			hits[data.name].push({
-				similarity: (data.similarity / 100.0),
-				sequence_id: data.hit.substr(0, data.hit.indexOf(' ')),
-				taxon: data.hit.substr(data.hit.indexOf(' ')+1)
-			});
-		}
-	})
-	.on('end', () => {
-		callback(hits);
-	});
-};

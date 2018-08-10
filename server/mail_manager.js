@@ -14,7 +14,7 @@ if (config.mailer.auth.user == 'username') {
 
 
 
-let send_mail = (token, subject, text) => {
+let send_mail = (token, subject, text, files=[]) => {
 	if (transporter == null) {
 		console.warn("Mailer not configured !!!");
 		return;
@@ -25,7 +25,7 @@ let send_mail = (token, subject, text) => {
 
 	let mail = exports.mails[token];
 	if (mail == 'aaa') {
-		console.warn ("Please only use this fake email only for debug !!");
+		console.warn ("Please use this fake email ONLY for debug !!");
 		return;
 	}
 
@@ -35,6 +35,18 @@ let send_mail = (token, subject, text) => {
 		subject: '[No reply] ' + subject, // Subject line
 		text: text
 	};
+
+	if (files.length > 0) {
+		attachments = [];
+		for (let idx=0 ; idx<files.length ; idx++) {
+			attachments.push({
+				filename: "pipeline.conf",
+				path: files[idx]
+			});
+		}
+
+		mailOptions.attachments = attachments;
+	}
 
 	// send mail with defined transport object
 	transporter.sendMail(mailOptions, (error, info) => {
@@ -57,7 +69,8 @@ exports.send_address = (token) => {
 		'Your job ' + token,
 		'Here is the link to follow the execution process.\n' +
 		scheduler.urls[token] + '\n\n' +
-		'The SLIM pipeline staff'
+		'The SLIM pipeline staff',
+		['/app/data/' + token + '/pipeline.conf']
 	);
 };
 
@@ -69,15 +82,28 @@ exports.send_end_mail = (token) => {
 		'Your results are available at this address:\n' +
 		scheduler.urls[token] + '\n\n' +
 		'Your session will automatically be deleted in 24h. Don\'t forget to download your results\n\n' +
-		'The SLIM pipeline staff'
+		'The SLIM pipeline staff',
+		['/app/data/' + token + '/pipeline.conf']
+	);
+}
+
+exports.send_crash_email = (token) => {
+	send_mail(
+		token,
+		'Your job ' + token + ' crashed :(',
+		'Your partial results are available at this address:\n' +
+		scheduler.urls[token] + '\n' +
+		'Please check all your configuration before another submission.\n\n' +
+		'Your session will automatically be deleted in 24h.\n\n' +
+		'The SLIM pipeline staff'	
 	);
 }
 
 exports.send_delete_reminder = (token) => {
 	send_mail(
 		token,
-		'Your job ' + token + ' will be deleted in an hour',
-		'Your results are still available at this address for only one more hour:\n' +
+		'Your job ' + token + ' will be deleted in 3 hours',
+		'Your results are still available at this address for only 3 more hours:\n' +
 		scheduler.urls[token] + '\n\n' +
 		'The SLIM pipeline staff'
 	);
