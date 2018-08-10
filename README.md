@@ -8,46 +8,7 @@ All the pipeline is embedded in a [docker](https://www.docker.com/).
 
 # Install and deploy the web app
 
-First of all, docker needs to be installed on the machine. You can find instructions here :
-* [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
-* [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-* [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
-
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
-```bash
-sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
-tar -xzvf v1.1.tar.gz
-cd SLIM-1.1
-```
-
-Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
-We advise to use gmail, as it is already set in the 'server/config.js' file.
-This file need to be updated with your 'user' and 'pass' fields on the server, as below:
-
-```
-exports.mailer = {
-	host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: 'username',
-        pass: 'password'
-    }
-}
-```
-
-
-As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
-* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
-**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
-
-```bash
-sudo bash get_dependencies_slim_v1.1.sh
-sudo bash start_slim_v1.1.sh
-```
-
+See below for full instructions
 
 # Accessing the webserver
 
@@ -60,7 +21,7 @@ If SLIM is deployed on your own machine, type `localhost:8080/`
 If the server is correctly set, you should see this:
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_webpage.png" alt="SLIM homepage" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_webpage.png" alt="SLIM homepage" width="800px"/>
 </p>
 
 # Prepare and upload your data
@@ -73,6 +34,7 @@ The "file uploader" section allows you to upload all the required files. Usually
 
 **Example of tag-to-sample file:**
 This file must contain at least the four four fields: run, sample, forward and reverse. "Run" corresponds to your illumina library identification; "sample" corresponds to the names of your samples in the library; "forward" and "reverse" corresponds to the names of your tagged primers.
+**Samples names MUST be unique, even for replicates sequenced in multiples libraries**
 
 ```
 run,sample,forward,reverse
@@ -98,9 +60,12 @@ ACTACTYCAAATCGG
 ```
 
 **Example of sequences reference database file**
+
 This FASTA file contains reference sequences with unique identifier and taxonomic path in the header.
 Such database can be downloaded for instance from [SILVA](https://www.arb-silva.de/) for both prokaryotes and eukaryotes (16S and 18S), [EUKREF](https://eukref.org/) for eularyotes (18S), [UNITE](https://unite.ut.ee/repository.php) for fungi (ITS), [MIDORI](http://www.reference-midori.info/download.php#) for metazoan (COI).
-Each header include a unique identifier (usually the accession), a space ' ', and the taxonomic path separated by a semi-colon (without any space, please use "_" underscore).
+Each header include a unique identifier (usually the accession),  
+a space ' ', and the taxonomic path separated by a semi-colon (without any space, please use "_" underscore).  
+**Prefer having the same amount of taxonomic rank for each reference sequences**
 
 ```
 >AB353770 Eukaryota;Alveolata;Dinophyta;Dinophyceae;Dinophyceae_X;Dinophyceae_XX;Peridiniopsis;Peridiniopsis_kevei
@@ -131,7 +96,13 @@ Usually, a typical workflow would include:
 The "Add a new module" section has a drop-down list containing various modules to pick, set and chain.
 Pick one and hit the "+" button. This will add the module at the bottom of the first section, and prompting you to fill the required fields. For more informations on the modules, you can refer to their manuals on the wiki or by clicking the (i) button on the module interface.
 
-The chaining between module is made through the files names used as input / output. To point to a set of samples (all samples from the tag-to-sample, or all the samples from the library_1 for instance), we use a '*' to mean 'all', and we add the processing step as a suffix :
+**The use of wildcard '*' for file pointing**
+
+The chaining between module is made through the files names used as input / output. To avoid having to select mannually all the samples to be included in an analysis, wildcards '*' (meaning 'all') are generated and used by the application.
+Such wildcards are generated from the compressed libraries fastq files (tar.gz) and by the tag-to-sample file.
+**Users cannot type on their own wildcards in the file names**. Instead, the application has an autocompletion feature and will make wildcards suggestions for the user to select within the GUI.
+
+To point to a set of samples (all samples from the tag-to-sample, or all the samples from the library_1 for instance), there will be a '*', and the application adds the processing step as a suffix incrementaly:
 - all samples from the tag-to-sample file that have been demultiplexed: 'tag_to_sample*_fwd.fastq' and 'tag_to_sample*_rev.fastq'
 - all samples from the library_1 that have been demultiplexed: 'tag_to_sample_Library_1*_fwd.fastq' and 'tag_to_sample_Library_1*_rev.fastq'
 - all samples from the tag-to-sample file that have been joined: 'tag_to_sample*_merge-vsearch.fasta'
@@ -142,27 +113,71 @@ The same principle applies for OTU matrices, we add the previous processing step
 see below for the demultiplexing
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
 </p>
 
 
 and below for the OTU clustering and taxonomic assignement
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_demultiplexer.png" alt="SLIM example" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_otu.png" alt="SLIM example" width="800px"/>
 </p>
 
 
 Once your workflow is set, please fill the email field and click on the start button.
 Your job will automatically be scheduled on the server.
-You will receive an email when your job starts and when your job is over.
-This email contains a direct link to your job, so you can close the internet browser tab once you started the execution.
+You will receive an email when your job starts, if you job aborted and when your job is over.
+This email contains a direct link to your job so you can close the internet browser tab once you started the execution.
 
 When your job is over, you will have small icons of download on the right of each output field.
 All the uploaded, intermediate and results files are available to download.
 Your files will remain available on the server during 24h, after what they will be removed for disk usage optimisation
 
 For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
+
+# Install and deploy the web app
+
+First of all, docker needs to be installed on the machine. You can find instructions here :
+* [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
+* [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
+
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
+```bash
+sudo apt-get update && apt-get install git curl
+curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
+tar -xzvf v1.1.tar.gz
+cd SLIM-1.1
+```
+
+Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
+We advise to use gmail, as it is already set in the 'server/config.js' file.
+This file need to be updated with your 'user' and 'pass' credentials on the server:
+
+```
+exports.mailer = {
+	host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: 'username',
+        pass: 'password'
+    }
+}
+```
+
+
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
+* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
+**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+
+```bash
+sudo bash get_dependencies_slim_v1.1.sh
+sudo bash start_slim_v1.1.sh
+```
+
+
 
 # Creating your own module
 
