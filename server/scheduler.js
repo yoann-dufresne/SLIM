@@ -365,7 +365,7 @@ exports.expose_status = function (app) {
 					if (sub_status['aborted'] == exec.conf[idx].length)
 						status.jobs[idx] = 'aborted';
 					else
-						status.jobs[idx] = 'errors';
+						status.jobs[idx] = 'warnings';
 					break;
 				}
 

@@ -216,19 +216,19 @@ input[type="text"].integer {
 	visibility: visible;
 	width: auto;
 }
-.ended .term_ico, .aborted .term_ico, .errors .term_ico {
+.ended .term_ico, .aborted .term_ico, .warnings .term_ico {
 	visibility: visible;
 	width: 25px;
 	margin-left: 15px;
 }
-.aborted .status, .errors .status {
+.aborted .status, .warnings .status {
 	color: red;
 	visibility: visible;
 	width: auto;
 }
 
 /* Show the downoad links when the soft is ended */
-.module.ended .download, .module.errors .download {
+.module.ended .download, .module.warnings .download {
 	visibility: visible;
 	width: 20px;
 }
