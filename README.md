@@ -64,7 +64,7 @@ ACTACTYCAAATCGG
 This FASTA file contains reference sequences with unique identifier and taxonomic path in the header.
 Such database can be downloaded for instance from [SILVA](https://www.arb-silva.de/) for both prokaryotes and eukaryotes (16S and 18S), [EUKREF](https://eukref.org/) for eularyotes (18S), [UNITE](https://unite.ut.ee/repository.php) for fungi (ITS), [MIDORI](http://www.reference-midori.info/download.php#) for metazoan (COI).
 Each header include a unique identifier (usually the accession),  
-a space ' ', and the taxonomic path separated by a semi-colon (without any space, please use "_" underscore).
+a space ' ', and the taxonomic path separated by a semi-colon (without any space, please use "_" underscore).  
 **Prefer having the same amount of taxonomic rank for each reference sequences**
 
 ```
