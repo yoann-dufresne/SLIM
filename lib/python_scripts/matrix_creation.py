@@ -107,7 +107,8 @@ def read_t2s (filename, true_names):
 					if brut_name == "" or len(brut_name) > len(name):
 						brut_name = name
 
-			order.append({"src":brut_name, "dst":dst})
+			# Here we use sample that can be ambiguous. For a unambiguous name, use the dst composed string
+			order.append({"src":brut_name, "dst":sample})
 
 	return order
 
