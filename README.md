@@ -34,6 +34,7 @@ The "file uploader" section allows you to upload all the required files. Usually
 
 **Example of tag-to-sample file:**
 This file must contain at least the four four fields: run, sample, forward and reverse. "Run" corresponds to your illumina library identification; "sample" corresponds to the names of your samples in the library; "forward" and "reverse" corresponds to the names of your tagged primers.
+**Samples names MUST be unique, even for replicates sequenced in multiples libraries**
 
 ```
 run,sample,forward,reverse
@@ -92,7 +93,7 @@ Usually, a typical workflow would include:
 The "Add a new module" section has a drop-down list containing various modules to pick, set and chain.
 Pick one and hit the "+" button. This will add the module at the bottom of the first section, and prompting you to fill the required fields. For more informations on the modules, you can refer to their manuals on the wiki or by clicking the (i) button on the module interface.
 
-**the use of wildcard '*' for file pointing**
+**The use of wildcard '*' for file pointing**
 
 The chaining between module is made through the files names used as input / output. To avoid having to select mannually all the samples to be included in an analysis, wildcards '*' (meaning 'all') are generated and used by the application.
 Such wildcards are generated from the compressed libraries fastq files (tar.gz) and by the tag-to-sample file.
@@ -122,8 +123,8 @@ and below for the OTU clustering and taxonomic assignement
 
 Once your workflow is set, please fill the email field and click on the start button.
 Your job will automatically be scheduled on the server.
-You will receive an email when your job starts and when your job is over.
-This email contains a direct link to your job, so you can close the internet browser tab once you started the execution.
+You will receive an email when your job starts, if you job aborted and when your job is over.
+This email contains a direct link to your job so you can close the internet browser tab once you started the execution.
 
 When your job is over, you will have small icons of download on the right of each output field.
 All the uploaded, intermediate and results files are available to download.
@@ -148,7 +149,7 @@ cd SLIM-1.1
 
 Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
 We advise to use gmail, as it is already set in the 'server/config.js' file.
-This file need to be updated with your 'user' and 'pass' fields on the server, as below:
+This file need to be updated with your 'user' and 'pass' credentials on the server:
 
 ```
 exports.mailer = {
