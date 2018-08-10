@@ -25,7 +25,7 @@ let send_mail = (token, subject, text) => {
 
 	let mail = exports.mails[token];
 	if (mail == 'aaa') {
-		console.warn ("Please only use this fake email only for debug !!");
+		console.warn ("Please use this fake email ONLY for debug !!");
 		return;
 	}
 
@@ -73,11 +73,23 @@ exports.send_end_mail = (token) => {
 	);
 }
 
+exports.send_crash_email = (token) => {
+	send_mail(
+		token,
+		'Your job ' + token + ' crashed :(',
+		'Your partial results are available at this address:\n' +
+		scheduler.urls[token] + '\n' +
+		'Please check all your configuration before another submission.\n\n' +
+		'Your session will automatically be deleted in 24h.\n\n' +
+		'The SLIM pipeline staff'	
+	);
+}
+
 exports.send_delete_reminder = (token) => {
 	send_mail(
 		token,
-		'Your job ' + token + ' will be deleted in an hour',
-		'Your results are still available at this address for only one more hour:\n' +
+		'Your job ' + token + ' will be deleted in 3 hours',
+		'Your results are still available at this address for only 3 more hours:\n' +
 		scheduler.urls[token] + '\n\n' +
 		'The SLIM pipeline staff'
 	);
