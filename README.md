@@ -21,7 +21,7 @@ If SLIM is deployed on your own machine, type `localhost:8080/`
 If the server is correctly set, you should see this:
 
 <p align="left">
-  <img src="https://github.com/trtcrd/SLIM/blob/fluent_install/tutos/slim_webpage.png" alt="SLIM homepage" width="800px"/>
+  <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_webpage.png" alt="SLIM homepage" width="800px"/>
 </p>
 
 # Prepare and upload your data
