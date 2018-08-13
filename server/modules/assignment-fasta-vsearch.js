@@ -40,7 +40,7 @@ exports.run = function (os, config, callback) {
 			// Parse the results of the analysis and translate them into the right format.
 			let options = ['/app/lib/python_scripts/assignment2tsv.py',
 							'-uc', directory + tmp_uc,
-							'-tsv_out', directory + config.params.outputs.assigned];
+							'-out', directory + config.params.outputs.assigned];
 			child = exec("python3", options);
 
 			child.stdout.on('data', function(data) {
@@ -52,7 +52,7 @@ exports.run = function (os, config, callback) {
 
 			child.on('close', function(code) {
 				fs.unlink(directory + tmp_uc, ()=>{});
-				
+
 				if (code == 0)
 					callback(os, null);
 				else {
@@ -65,4 +65,3 @@ exports.run = function (os, config, callback) {
 		}
 	});
 };
-
