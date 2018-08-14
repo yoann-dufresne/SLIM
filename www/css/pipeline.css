@@ -286,12 +286,12 @@ input[type="text"].integer {
 
 
 /* ----------------------- Run area ------------------------------*/
-.warnings {
+.gui_warnings {
 	color: red;
 	margin-top: 10px;
 }
 
-.warnings p {
+.gui_warnings p {
 	margin: 5px;
 }
 

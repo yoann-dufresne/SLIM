@@ -46,9 +46,9 @@ run.onclick = function () {
 	// Verify mail address
 	let mail_value = mail_area.value;
 	if ((mail_value.length > 5 && mail_value.includes('@')) || mail_value == 'aaa')
-		document.getElementsByClassName('warnings')[1].innerHTML = '';
+		document.getElementsByClassName('gui_warnings')[1].innerHTML = '';
 	else {
-		document.getElementsByClassName('warnings')[1].innerHTML = '<p>A valid mail address should be entered</p>';
+		document.getElementsByClassName('gui_warnings')[1].innerHTML = '<p>A valid mail address should be entered</p>';
 		return;
 	}
 
@@ -78,7 +78,7 @@ run.onclick = function () {
 // --- Status update ---
 
 var update_run_status = (token, callback=(status)=>{}) => {
-	let warnings_areas = document.getElementsByClassName("warnings");
+	let warnings_areas = document.getElementsByClassName("gui_warnings");
 
 	$.get('/status?token=' + token).done((data) => {
 		var server_status = JSON.parse(data);
