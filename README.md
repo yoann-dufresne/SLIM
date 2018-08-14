@@ -135,7 +135,7 @@ Your files will remain available on the server during 24h, after what they will 
 
 For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
 
-# Install and deploy the web app
+# Install, deploy and manage the web app
 
 First of all, docker needs to be installed on the machine. You can find instructions here :
 * [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
@@ -169,14 +169,14 @@ exports.mailer = {
 
 As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
 * `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
-**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
 sudo bash get_dependencies_slim_v1.1.sh
 sudo bash start_slim_v1.1.sh
 ```
 
+The server is configured to use up to 8 CPU cores per job. The amount of available cores will determine the amount of job that can be executed in parallel (1-8 -> 1 job, 16 -> 2 jobs, etc.). To admin and access SLIM logs, please refer to the docker command line [documentation](https://docs.docker.com/engine/reference/commandline/docker/). 
 
 
 # Creating your own module
