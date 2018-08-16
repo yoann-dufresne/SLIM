@@ -127,11 +127,18 @@ and below for the OTU clustering and taxonomic assignement
 Once your workflow is set, please fill the email field and click on the start button.
 Your job will automatically be scheduled on the server.
 You will receive an email when your job starts, if you job aborted and when your job is over.
-This email contains a direct link to your job so you can close the internet browser tab once you started the execution.
+This email contains a direct link to your job so that the internet browser tab can be closed once the execution started.
 
-When your job is over, you will have small icons of download on the right of each output field.
+When the job is over, you will have small icons of download on the right of each output field.
 All the uploaded, intermediate and results files are available to download.
 Your files will remain available on the server during 24h, after what they will be removed for disk usage optimisation
+
+Each module status is displayed besides its names:
+- waiting: the execution started, the module is waiting for files input.
+- running: the module is busy.
+- warnings: there was some warnings during the execution, but the module is still running. 
+- aborted: the module aborted and the pipeline has stopped its execution. 
+- ended: the module has finnished its task. 
 
 For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
 
