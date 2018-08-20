@@ -41,15 +41,12 @@ exports.run = function (os, config, callback) {
 			let options = ['/app/lib/python_scripts/assignment2tsv.py',
 							'-uc', directory + tmp_uc,
 							'-out', directory + config.params.outputs.assigned];
-<<<<<<< HEAD
-=======
-			
+		
 			// Print the command line
 			fs.appendFileSync(directory + config.log, "python3 " + options.join(" ") + "\n");
 			console.log(os.token + ": python3 " + options.join(" "))
 			
 			// Exec the command line
->>>>>>> fork/master
 			child = exec("python3", options);
 			child.stdout.on('data', function(data) {
 				fs.appendFileSync(directory + config.log, data);
