@@ -46,6 +46,7 @@ def to_tsv(uc_filename, outfile, consensus_threshold):
 def to_otu(uc_filename, outfile, consensus_threshold, otu_matrix, fasta_filename):
 	clusters = fasta2cluster(fasta_filename)
 	annotations = read_uc(uc_filename, clusters)
+	# Normaly, no need for that ! VERIFICATION NEEDED §§ annotations = reads2clusters(annotations)
 
 	with open(outfile, "w") as fw, open(otu_matrix) as fr:
 		# Write the header

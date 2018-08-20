@@ -40,9 +40,14 @@ exports.run = function (os, config, callback) {
 			// Parse the results of the analysis and translate them into the right format.
 			let options = ['/app/lib/python_scripts/assignment2tsv.py',
 							'-uc', directory + tmp_uc,
-							'-tsv_out', directory + config.params.outputs.assigned];
+							'-out', directory + config.params.outputs.assigned];
+			
+			// Print the command line
+			fs.appendFileSync(directory + config.log, "python3 " + options.join(" ") + "\n");
+			console.log(os.token + ": python3 " + options.join(" "))
+			
+			// Exec the command line
 			child = exec("python3", options);
-
 			child.stdout.on('data', function(data) {
 				fs.appendFileSync(directory + config.log, data);
 			});

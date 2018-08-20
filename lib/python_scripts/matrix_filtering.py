@@ -75,8 +75,7 @@ def filter_reads (filename, filtered_clusters, threshold):
 			# Parse the cluster id
 			cluster = seq_record.id
 			cluster = cluster[cluster.find(';cluster=')+9:]
-			cluster = int(cluster[:cluster.find(';')])
-			cluster = str('OTU'+str(cluster))
+			cluster = cluster[:cluster.find(';')]
 
 			# Rewrite if cluster is not filtered
 			if not cluster in filtered_clusters:
