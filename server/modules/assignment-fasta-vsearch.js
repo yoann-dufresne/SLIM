@@ -41,7 +41,7 @@ exports.run = function (os, config, callback) {
 			let options = ['/app/lib/python_scripts/assignment2tsv.py',
 							'-uc', directory + tmp_uc,
 							'-out', directory + config.params.outputs.assigned];
-			
+		
 			// Print the command line
 			fs.appendFileSync(directory + config.log, "python3 " + options.join(" ") + "\n");
 			console.log(os.token + ": python3 " + options.join(" "))
@@ -57,7 +57,7 @@ exports.run = function (os, config, callback) {
 
 			child.on('close', function(code) {
 				fs.unlink(directory + tmp_uc, ()=>{});
-				
+
 				if (code == 0)
 					callback(os, null);
 				else {
@@ -70,4 +70,3 @@ exports.run = function (os, config, callback) {
 		}
 	});
 };
-

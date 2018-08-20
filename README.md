@@ -12,7 +12,7 @@ See below for full instructions
 
 # Accessing the webserver
 
-The execution of the `start_slim_v1.1.sh` script deploys and start the webserver.
+The execution of the `start_slim_v0.2.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
 To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome)
@@ -127,26 +127,33 @@ and below for the OTU clustering and taxonomic assignement
 Once your workflow is set, please fill the email field and click on the start button.
 Your job will automatically be scheduled on the server.
 You will receive an email when your job starts, if you job aborted and when your job is over.
-This email contains a direct link to your job so you can close the internet browser tab once you started the execution.
+This email contains a direct link to your job so that the internet browser tab can be closed once the execution started.
 
-When your job is over, you will have small icons of download on the right of each output field.
+When the job is over, you will have small icons of download on the right of each output field.
 All the uploaded, intermediate and results files are available to download.
 Your files will remain available on the server during 24h, after what they will be removed for disk usage optimisation
 
+Each module status is displayed besides its names:
+- waiting: the execution started, the module is waiting for files input.
+- running: the module is busy.
+- warnings: there was some warnings during the execution, but the module is still running. 
+- aborted: the module aborted and the pipeline has stopped its execution. 
+- ended: the module has finnished its task. 
+
 For more details on the app, you can refer to the [wiki pages](https://github.com/yoann-dufresne/SLIM/wiki)
 
-# Install and deploy the web app
+# Install, deploy and manage the web app
 
 First of all, docker needs to be installed on the machine. You can find instructions here :
 * [docker for Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
 * [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
 
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz) or, using terminal :
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v0.2.tar.gz) or, using terminal :
 ```bash
 sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v1.1.tar.gz
-tar -xzvf v1.1.tar.gz
+curl -OL https://github.com/trtcrd/SLIM/archive/v0.2.tar.gz
+tar -xzvf v0.2.tar.gz
 cd SLIM-1.1
 ```
 
@@ -167,16 +174,16 @@ exports.mailer = {
 ```
 
 
-As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v1.1.sh` and `start_slim_v1.1.sh` as **super user**.
-* `get_dependencies_slim_v1.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v1.1.sh` destroys the current running webserver to replace it with a new one.
-**/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v0.2.sh` and `start_slim_v0.2.sh` as **super user**.
+* `get_dependencies_slim_v0.2.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v0.2.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
-sudo bash get_dependencies_slim_v1.1.sh
-sudo bash start_slim_v1.1.sh
+sudo bash get_dependencies_slim_v0.2.sh
+sudo bash start_slim_v0.2.sh
 ```
 
+The server is configured to use up to 8 CPU cores per job. The amount of available cores will determine the amount of job that can be executed in parallel (1-8 -> 1 job, 16 -> 2 jobs, etc.). To admin and access SLIM logs, please refer to the docker command line [documentation](https://docs.docker.com/engine/reference/commandline/docker/). 
 
 
 # Creating your own module
@@ -210,10 +217,10 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 # Version history
 
-v1.1
+v0.2
 
 Updated the `get_dependencies` script.
 
-v1.0
+v0.1
 
-First stable release, with third-parties versions handled within the `get_dependencies_slim.sh` script.
+First release, with third-parties versions handled within the `get_dependencies_slim.sh` script.
