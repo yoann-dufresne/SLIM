@@ -25,6 +25,7 @@ exports.run = function (os, config, callback) {
 
 	console.log("Running vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', options.join(' '));
+
 	fs.appendFileSync(directory + config.log, '--- Command ---\n');
 	fs.appendFileSync(directory + config.log, 'vsearch ' + options.join(' ') + '\n');
 	fs.appendFileSync(directory + config.log, '--- Exec ---\n');
@@ -45,8 +46,13 @@ exports.run = function (os, config, callback) {
 							'-otu_in', directory + config.params.inputs.otu_table,
 							'-fasta', directory + config.params.inputs.fasta,
 							'-threshold', config.params.params.acceptance];
-			child = exec("python3", options);
+			
+			// Print the command line
+			fs.appendFileSync(directory + config.log, "python3 " + options.join(" ") + "\n");
+			console.log(os.token + ": python3 " + options.join(" "))
 
+			// Exec the command
+			child = exec("python3", options);
 			child.stdout.on('data', function(data) {
 				fs.appendFileSync(directory + config.log, data);
 			});

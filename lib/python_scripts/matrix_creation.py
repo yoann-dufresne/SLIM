@@ -54,7 +54,7 @@ def read_uc (filename, origins):
 def rewrite_fasta (read_clusters, fin, fout):
 	with open(fout, 'w') as fp:
 		for seq_record in SeqIO.parse(fin, "fasta"):
-			fp.write('>{};cluster={};\n'.format(seq_record.id, read_clusters[seq_record.id]))
+			fp.write('>{};cluster=OTU{};\n'.format(seq_record.id, read_clusters[seq_record.id]))
 			fp.write('{}\n'.format(seq_record.seq))
 
 
@@ -122,7 +122,7 @@ def print_otus (matrix, order):
 
 	for idx in range(len(matrix)):
 		# Print the cluster id
-		print('OTU', idx, end='', sep='')
+		print('OTU{}'.format(idx), end='', sep='')
 
 		# Print the values for each experiment
 		for sample in order:
@@ -135,7 +135,7 @@ def print_otus (matrix, order):
 		print()
 
 
-def main (uc_file, origins_file, outfile, t2s, fin, fout, tmp_repset, repset):
+def main (uc_file, origins_file, outfile, t2s, fin, fout):
 	origins, experiments = read_origins (origins_file)
 	matrix, read_clusters = read_uc(uc_file, origins)
 
@@ -156,15 +156,6 @@ def main (uc_file, origins_file, outfile, t2s, fin, fout, tmp_repset, repset):
 	if (fin != "" and fout != ""):
 		rewrite_fasta(read_clusters, fin, fout)
 
-	# Rewrite fasta-representatives
-
-	with open(str(repset), 'w') as fw:
-		cpt=0
-		for record in SeqIO.parse(tmp_repset, "fasta"):
-			fw.write('>' + 'OTU' + str(cpt) + '\n')
-			fw.write(str(record.seq + '\n'))
-			cpt += 1
-
 
 
 if __name__ == '__main__':
@@ -174,7 +165,6 @@ if __name__ == '__main__':
 	outfile = ""
 	t2s = ""
 	fin = fout = ""
-	tmp_repset = repset = ""
 
 	for idx in range(len(sys.argv)):
 		if sys.argv[idx] == '-uc':
@@ -189,10 +179,6 @@ if __name__ == '__main__':
 			fin = sys.argv[idx+1]
 		elif sys.argv[idx] == '-fasta_out':
 			fout = sys.argv[idx+1]
-		elif sys.argv[idx] == '-tmp_repset':
-			tmp_repset = sys.argv[idx+1]
-		elif sys.argv[idx] == '-repset':
-			repset = sys.argv[idx+1]
 
-	main(uc_file, origins, outfile, t2s, fin, fout, tmp_repset, repset)
+	main(uc_file, origins, outfile, t2s, fin, fout)
 	exit(0)

@@ -52,16 +52,13 @@ exports.run = function (os, config, callback) {
 
 var otu_search = (os, config, callback) => {
 	let directory = '/app/data/' + os.token + '/';
-	// let tmp_output = toolbox.tmp_filename() + '.txt';
 	let tmp_output = toolbox.tmp_filename() + '.uc';
-	let tmp_centroids = toolbox.tmp_filename() + '.fasta';
-	config.params.inputs.tmp_centroids = tmp_centroids;
 	// Swarm options
 	var options = [directory + config.params.inputs.merged,
 	'-o', '/dev/null', //directory + tmp_output,
 	'-u', directory + tmp_output,
 	'-z',
-	'-w', directory + tmp_centroids,
+	'-w', directory + config.params.outputs.centroids,
 	'-t', os.cores];
 
 	if (config.params.params.max_diff == 1)
@@ -90,7 +87,11 @@ var otu_search = (os, config, callback) => {
 			config.params.params.ordered = config.params.params.ordered_swarm;
 			otu_manager.write_from_uc(os, config, (os, msg) => {
 				fs.unlink(directory+tmp_output, ()=>{});
-				callback(os, msg);
+
+				config.params.inputs.rewrite = config.params.outputs.centroids;
+				otu_manager.rewrite_fasta_with_OTU_ID(os, config, (os, msg) => {
+					callback(os, msg);
+				});
 			});
 		}
 	});
