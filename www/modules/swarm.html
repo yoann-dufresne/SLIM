@@ -1,7 +1,7 @@
-<p>Sequence files</p>
+<p>Input fasta files</p>
 <div class="input_list fasta agregate"></div>
 
-<p>OTUs table</p>
+<p>OTU table</p>
 <span class="output_zone">
 	<input type="text" name="otus_table" value='otus-swarm.tsv' />
 	<a href="" download><img src="/imgs/download.png" class="download"/></a>
@@ -9,13 +9,13 @@
 <p class="no_vertical_margins"><input type="checkbox" class="param_value t2s_usage" name="ordered_swarm"> Use the libraries file to sort the samples (CSV)</p>
 <input type="text" name="t2s" class="param_value t2s_value">
 
-<p>Most abundant reads</p>
+<p>OTUs representative sequences (most abundant read)</p>
 <span class="output_zone">
 	<input type="text" name="centroids" value='representative-swarm.fasta' />
 	<a href="" download><img src="/imgs/download.png" class="download"/></a>
 </span>
 
-<p>All reads</p>
+<p>Full fasta file with OTU identifier in each read header</p>
 <span class="output_zone">
 	<input type="text" name="reads" value='clustered-reads-swarm.fasta' />
 	<a href="" download><img src="/imgs/download.png" class="download"/></a>

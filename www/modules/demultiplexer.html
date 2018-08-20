@@ -1,4 +1,4 @@
-<p>Tags by libraries/sample</p>
+<p>Tag-to-sample file (CSV)</p>
 <input type="text" name="tags" class="input_file csv tags" value="">
 
 <p>Inputs R1/R2 by library</p>
@@ -6,7 +6,7 @@
 
 </div>
 
-<p>Primers</p>
+<p>Primers file (IUPAC supported)</p>
 <input type="text" name="primers" class="input_file fasta primers" value="">
 
 <h4>Outputs</h4>
@@ -17,6 +17,6 @@ They will be named run_sample_fwd.fastq and run_sample_rev.fastq.</p>
 <div class="file_list" readonly></div>
 
 <div class="options">
-	<p><input type="checkbox" name="mistags" class="param_value"> Output unassigned reads<a href="" download=""><img src="/imgs/download.png" class="download"></a></p>
-	<p>Errors allowed in primers: <input type="text" name="errors" class="param_value number integer" value=0></p>
+	<p><input type="checkbox" name="mistags" class="param_value">Output undertermined reads<a href="" download=""><img src="/imgs/download.png" class="download"></a></p>
+	<p>Mismatch allowed in primers: <input type="text" name="errors" class="param_value number integer" value=0></p>
 </div>
