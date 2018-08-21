@@ -55,17 +55,17 @@ var otu_search = (os, config, callback) => {
 	// let tmp_output = toolbox.tmp_filename() + '.txt';
 	let tmp_output = toolbox.tmp_filename() + '.uc';
 	let in_reads = config.params.inputs.merged;
-	// let centroids_file = config.params.outputs.centroids;
-	let tmp_centroids = toolbox.tmp_filename() + '.fasta';
+	let centroids_file = config.params.outputs.centroids;
+	// let tmp_centroids = toolbox.tmp_filename() + '.fasta';
 
-	config.params.inputs.tmp_centroids = tmp_centroids;
+	// config.params.inputs.tmp_centroids = tmp_centroids;
 
 	// Clustering options
 	var options = ['--cluster_fast', directory + in_reads,
 		'--sizein', '--sizeout',
 		'--uc', directory + tmp_output,
 		'--id', config.params.params.similarity,
-		'--centroids', directory + tmp_centroids,
+		'--centroids', directory + centroids_file,
 		'--threads', os.cores,
 		'--qmask', 'none', '--minseqlength', '1'];
 
@@ -88,7 +88,18 @@ var otu_search = (os, config, callback) => {
 			config.params.params.ordered = config.params.params.ordered_vsearch;
 			otu_manager.write_from_uc(os, config, (os, msg) => {
 				fs.unlink(directory+tmp_output, ()=>{});
-				callback(os, msg);
+
+				// In case of error
+				if (msg != null) {
+					callback(os, msg);
+					return;
+				}
+
+				// OTU representative rewriting
+				config.params.inputs.rewrite = centroids_file;
+				otu_manager.rewrite_fasta_with_OTU_ID(os, config, (os, msg) => {
+					callback(os, msg);
+				});
 			});
 		}
 	});

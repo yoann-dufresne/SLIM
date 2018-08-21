@@ -88,6 +88,13 @@ var otu_search = (os, config, callback) => {
 			otu_manager.write_from_uc(os, config, (os, msg) => {
 				fs.unlink(directory+tmp_output, ()=>{});
 
+				// In case of error return
+				if (msg != null) {
+					callback(os, msg);
+					return;
+				}
+
+				// Rewrite representative otu using OTU id
 				config.params.inputs.rewrite = config.params.outputs.centroids;
 				otu_manager.rewrite_fasta_with_OTU_ID(os, config, (os, msg) => {
 					callback(os, msg);
