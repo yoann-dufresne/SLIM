@@ -61,7 +61,7 @@ var otu_search = (os, config, callback) => {
 	// config.params.inputs.tmp_centroids = tmp_centroids;
 
 	// Clustering options
-	var options = ['--cluster_fast', directory + in_reads,
+	var options = ['--cluster_size', directory + in_reads,
 		'--sizein', '--sizeout',
 		'--uc', directory + tmp_output,
 		'--id', config.params.params.similarity,
