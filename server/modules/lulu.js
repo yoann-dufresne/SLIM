@@ -91,9 +91,11 @@ var lulu_run = (os, config, callback) => {
 
 	child.stdout.on('data', function(data) {
 		console.log('STDOUT:' + data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.stderr.on('data', function(data) {
 		console.log('STDERR:' + data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
 		if (code != 0) {

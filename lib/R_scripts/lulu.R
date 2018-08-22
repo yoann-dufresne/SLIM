@@ -12,7 +12,15 @@ setwd(paste("/app/data/", token, "/", sep=""))
 
 # import the data
 otu_table <- read.table(otu_table, header=TRUE, sep="\t", row.names=1)
-match <- read.table(match, sep="\t")
+# test if file contains actually matches
+info <- file.info(match)
+empty <- rownames(info[info$size == 0, ])
+if (length(empty) > 0)
+{
+	match <- read.table(match, sep="\t")
+} else {
+	print("The match file is empty, your similarity cutoff might be too high...")
+}
 
 require(lulu)
 # split the otu table as outputed by slim
