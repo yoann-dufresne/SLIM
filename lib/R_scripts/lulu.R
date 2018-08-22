@@ -19,7 +19,7 @@ if (length(empty) == 0)
 {
 	match <- read.table(match, sep="\t")
 } else {
-	print("The match file is empty, your similarity cutoff might be too high...")
+	stop("The match file is empty, your similarity cutoff might be too high...")
 }
 
 require(lulu)
