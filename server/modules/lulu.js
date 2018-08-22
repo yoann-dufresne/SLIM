@@ -1,4 +1,4 @@
-const exec = require('child_process').spawn;
+	const exec = require('child_process').spawn;
 const Rexec = require('child_process').exec;
 const fs = require('fs');
 const tools = require('../toolbox.js');
@@ -14,6 +14,7 @@ exports.run = function (os, config, callback) {
 	let otu_input = directory + config.params.inputs.otus_table;
 	let otu_lulu = directory + config.params.outputs.otus_lulu;
 
+<<<<<<< HEAD
 	// Run the otu_id_match_lulu.py to rename the rep_set file
 	let tmp_rep_set = directory + tools.tmp_filename() + '.fasta';
 	// Command line
@@ -40,6 +41,11 @@ exports.run = function (os, config, callback) {
 			callback(os, null);
 			});
 		}
+=======
+	// calling vsearch for producing the pairwise matchlist
+	match_list(os, config, rep_set, (os2, msg) => {
+		callback(os2, msg);
+>>>>>>> 1a053c99480b1622d1e302ec9425dccdfacf6a3b
 	});
 };
 
@@ -83,9 +89,8 @@ var match_list = (os, config, rep_set, callback) => {
 			callback(os, "vsearch terminate on code " + code);
 		} else {
 			config.params.inputs.match = tmp_match;
-			lulu_run (os, config, (otu_lulu) => {
-				// fs.unlink(directory + tmp_match, ()=>{});
-			callback(os, null);
+			lulu_run (os, config, (os2, msg) => {
+				callback(os2, msg);
 			});
 
 		}
