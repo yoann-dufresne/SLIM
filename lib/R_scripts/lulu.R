@@ -15,7 +15,7 @@ otu_table <- read.table(otu_table, header=TRUE, sep="\t", row.names=1)
 # test if file contains actually matches
 info <- file.info(match)
 empty <- rownames(info[info$size == 0, ])
-if (length(empty) > 0)
+if (length(empty) == 0)
 {
 	match <- read.table(match, sep="\t")
 } else {
