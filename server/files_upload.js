@@ -27,7 +27,7 @@ exports.exposeDir = function (app) {
 					idx--;
 				}
 			}
-			
+
 			let jok = exports.jokers[token] ? exports.jokers[token] : {};
 
 			items = items.concat(Object.keys(jok));
@@ -74,7 +74,7 @@ exports.upload = function (app) {
 					res.status(403).send('Invalid token');
 					onError = true;
 				}
-			}	
+			}
 		});
 
 		// every time a file has been uploaded successfully,
@@ -101,6 +101,7 @@ exports.upload = function (app) {
 		// log any errors that occur
 		form.on('error', function(err) {
 			console.log('An error has occured: \n' + err);
+			$('.progress-bar').html('Errors, your files are too big');
 		});
 
 		// once all the files have been uploaded, send a response to the client
@@ -151,7 +152,7 @@ var decompress_gz = (token, archive) => {
 	if (!files_to_process[token])
 		files_to_process[token] = [];
 	files_to_process[token].push(archive.name);
-	
+
 	fs.renameSync(archive.path, '/app/data/' + token + '/' + archive.name);
 	archive.path = '/app/data/' + token + '/' + archive.name;
 
@@ -196,7 +197,7 @@ let decompress_tgz = function (token, archive) {
 			if (prefix == null)
 				prefix = file.name;
 			else {
-				// Get the first idx for different 
+				// Get the first idx for different
 				let cmon_idx;
 				for (cmon_idx=0 ; cmon_idx<prefix.length ; cmon_idx++)
 					if (prefix[cmon_idx] != file.name[cmon_idx])
@@ -210,7 +211,7 @@ let decompress_tgz = function (token, archive) {
 			else {
 				let delta_size = file.name.length - suffix.length;
 
-				// Get the first idx for different 
+				// Get the first idx for different
 				let cmon_idx;
 				for (cmon_idx=suffix.length-1 ; cmon_idx>=0 ; cmon_idx--) {
 					if (suffix[cmon_idx] != file.name[cmon_idx + delta_size])
@@ -284,5 +285,5 @@ exports.trigger_job_end = (token) => {
 				console.log(token + ': files deleted');
 		});},
 		1000 * 3600 * 24 + 15 * 60000
-	);	
+	);
 };
