@@ -101,7 +101,7 @@ exports.upload = function (app) {
 		// log any errors that occur
 		form.on('error', function(err) {
 			console.log('An error has occured: \n' + err);
-			$('.progress-bar').html('Errors, your files are too big');
+			document.querySelector('.progress-bar').html('Errors, your files are too big');
 		});
 
 		// once all the files have been uploaded, send a response to the client
