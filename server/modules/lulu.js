@@ -36,7 +36,7 @@ exports.run = function (os, config, callback) {
 		} else {
 			console.log("OTUs renammed to match OTUs ID of the matrix");
 			// calling vsearch for producing the pairwise matchlist
-			match_list(os, config, tmp_rep_set, (match_list) => {
+			match_list(os, config, tmp_rep_set, (os2, msg) => {
 				fs.unlink(directory + tmp_rep_set, ()=>{});
 			callback(os2, msg);
 			});
