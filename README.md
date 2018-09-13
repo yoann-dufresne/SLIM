@@ -154,7 +154,7 @@ To install SLIM, get the last stable release [here](https://github.com/trtcrd/SL
 sudo apt-get update && apt-get install git curl
 curl -OL https://github.com/trtcrd/SLIM/archive/v0.2.tar.gz
 tar -xzvf v0.2.tar.gz
-cd SLIM-1.1
+cd SLIM-0.2
 ```
 
 Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
