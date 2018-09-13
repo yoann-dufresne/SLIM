@@ -15,8 +15,8 @@ See below for full instructions
 The execution of the `start_slim_v0.2.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
-To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome)
-If SLIM is deployed on your own machine, type `localhost:8080/`
+* To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome).
+* If SLIM is deployed on your own machine, type `localhost:8080/`
 
 If the server is correctly set, you should see this:
 
