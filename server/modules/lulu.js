@@ -1,4 +1,4 @@
-	const exec = require('child_process').spawn;
+const exec = require('child_process').spawn;
 const Rexec = require('child_process').exec;
 const fs = require('fs');
 const tools = require('../toolbox.js');
@@ -14,9 +14,33 @@ exports.run = function (os, config, callback) {
 	let otu_input = directory + config.params.inputs.otus_table;
 	let otu_lulu = directory + config.params.outputs.otus_lulu;
 
-	// calling vsearch for producing the pairwise matchlist
-	match_list(os, config, rep_set, (os2, msg) => {
-		callback(os2, msg);
+	// Run the otu_id.py to rename the rep_set file
+	let tmp_rep_set = directory + tools.tmp_filename() + '.fasta';
+	// Command line
+	var options = ['/app/lib/python_scripts/otu_id_match_lulu.py',
+	'-i', rep_set,
+	'-o', tmp_rep_set];
+ 	console.log ('Renaming header in rep set for file ' + rep_set);
+	console.log(os.token + ': python3 ', options.join(' '));
+ 	var child = exec("python3", options);
+	child.stdout.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
+	child.stderr.on('data', function(data) {
+		fs.appendFileSync(directory + config.log, data);
+	});
+	child.on('close', (code) => {
+		if (code != 0) {
+			console.log("Error code " + code + " during renaming header");
+			callback(os, code);
+		} else {
+			console.log("OTUs renammed to match OTUs ID of the matrix");
+			// calling vsearch for producing the pairwise matchlist
+			match_list(os, config, tmp_rep_set, (os2, msg) => {
+				fs.unlink(directory + tmp_rep_set, ()=>{});
+			callback(os2, msg);
+			});
+		}
 	});
 };
 
@@ -91,9 +115,11 @@ var lulu_run = (os, config, callback) => {
 
 	child.stdout.on('data', function(data) {
 		console.log('STDOUT:' + data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.stderr.on('data', function(data) {
 		console.log('STDERR:' + data);
+		fs.appendFileSync(directory + config.log, data);
 	});
 	child.on('close', function(code) {
 		if (code != 0) {
