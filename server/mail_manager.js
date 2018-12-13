@@ -39,9 +39,13 @@ let send_mail = (token, subject, text, files=[]) => {
 	if (files.length > 0) {
 		attachments = [];
 		for (let idx=0 ; idx<files.length ; idx++) {
+			let name = files[idx];
+			let short_name = name.split('/');
+			short_name = short_name[short_name.length - 1]
+
 			attachments.push({
-				filename: "pipeline.conf",
-				path: files[idx]
+				filename: short_name,
+				path: name
 			});
 		}
 
@@ -70,7 +74,7 @@ exports.send_address = (token) => {
 		'Here is the link to follow the execution process.\n' +
 		scheduler.urls[token] + '\n\n' +
 		'The SLIM pipeline staff',
-		['/app/data/' + token + '/pipeline.conf']
+		['/app/data/' + token + '/pipeline.conf', '/app/versions.tsv']
 	);
 };
 
@@ -82,8 +86,10 @@ exports.send_end_mail = (token) => {
 		'Your results are available at this address:\n' +
 		scheduler.urls[token] + '\n\n' +
 		'Your session will automatically be deleted in 24h. Don\'t forget to download your results\n\n' +
+		'You can use the .conf attached file to reload all your pipeline in the future.\n' +
+		'For used software versions, please look at the attached version.tsv file.' +
 		'The SLIM pipeline staff',
-		['/app/data/' + token + '/pipeline.conf']
+		['/app/data/' + token + '/pipeline.conf', '/app/versions.tsv']
 	);
 }
 
