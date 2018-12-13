@@ -89,6 +89,9 @@ var scheduler = function () {
 			running_jobs[token] = job;
 			fs.writeFileSync(directory + 'exec.log', JSON.stringify(job));
 			console.log (token + ': status updated');
+			let d = new Date();
+			console.log (token + ": Job started at " + d.toDateString() +
+				" " + d.getHours() + ":" + d.getMinutes())
 
 			// Start the sub-process
 			sub_process_start(token, configs_array);
@@ -151,6 +154,10 @@ var sub_process_start = (tok, configs_array) => {
 					sub_process.compress_outputs(token, job.conf[job.running_soft][0].out_jokers);
 				}
 			}
+
+			let d = new Date();
+			console.log (token + ": Job terminated at " + d.toDateString() +
+				" " + d.getHours() + ":" + d.getMinutes())
 
 			delete job.running_soft;
 			delete job.next_sub_idx;
