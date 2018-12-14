@@ -12,7 +12,7 @@ See below for full instructions
 
 # Accessing the webserver
 
-The execution of the `start_slim_v0.3.sh` script deploys and start the webserver.
+The execution of the `start_slim_v0.4.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
 * To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome).
@@ -62,10 +62,10 @@ ACTACTYCAAATCGG
 **Example of sequences reference database file**
 
 This FASTA file contains reference sequences with unique identifier and taxonomic path in the header.
-Such database can be downloaded for instance from [SILVA](https://www.arb-silva.de/) for both prokaryotes and eukaryotes (16S and 18S), [EUKREF](https://eukref.org/) for eularyotes (18S), [UNITE](https://unite.ut.ee/repository.php) for fungi (ITS), [MIDORI](http://www.reference-midori.info/download.php#) for metazoan (COI).
+Such database can be downloaded for instance from [SILVA](https://www.arb-silva.de/) for both prokaryotes and eukaryotes (16S and 18S), [EUKREF](https://eukref.org/) or [PR2](https://github.com/pr2database/pr2database) for eukaryotes (18S), [UNITE](https://unite.ut.ee/repository.php) for fungi (ITS), [MIDORI](http://www.reference-midori.info/download.php#) for metazoan (COI).
 Each header include a unique identifier (usually the accession),  
 a space ' ', and the taxonomic path separated by a semi-colon (without any space, please use "_" underscore).  
-**Prefer having the same amount of taxonomic rank for each reference sequences**
+**You should have the same amount of taxonomic rank for each reference sequences**
 
 ```
 >AB353770 Eukaryota;Alveolata;Dinophyta;Dinophyceae;Dinophyceae_X;Dinophyceae_XX;Peridiniopsis;Peridiniopsis_kevei
@@ -149,12 +149,12 @@ First of all, docker needs to be installed on the machine. You can find instruct
 * [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
 
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v0.3.tar.gz) or, using terminal :
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v0.4.tar.gz) or, using terminal :
 ```bash
 sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v0.3.tar.gz
-tar -xzvf v0.3.tar.gz
-cd SLIM-0.3
+curl -OL https://github.com/trtcrd/SLIM/archive/v0.4.tar.gz
+tar -xzvf v0.4.tar.gz
+cd SLIM-0.4
 ```
 
 Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
@@ -174,13 +174,13 @@ exports.mailer = {
 ```
 
 
-As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v0.3.sh` and `start_slim_v0.3.sh` as **super user**.
-* `get_dependencies_slim_v0.3.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v0.3.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v0.4.sh` and `start_slim_v0.4.sh` as **super user**.
+* `get_dependencies_slim_v0.4.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v0.4.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
-sudo bash get_dependencies_slim_v0.3.sh
-sudo bash start_slim_v0.3.sh
+sudo bash get_dependencies_slim_v0.4.sh
+sudo bash start_slim_v0.4.sh
 ```
 
 The server is configured to use up to 8 CPU cores per job. The amount of available cores will determine the amount of job that can be executed in parallel (1-8 -> 1 job, 16 -> 2 jobs, etc.). To admin and access SLIM logs, please refer to the docker command line [documentation](https://docs.docker.com/engine/reference/commandline/docker/). 
@@ -216,6 +216,10 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 
 # Version history
+
+v0.4
+
+Added timing checkpoints in the logs of the scheduler; Added the third-party software version infos in the email 
 
 v0.3
 
