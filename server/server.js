@@ -1,6 +1,6 @@
 'use strict';
 
-var secured_server = true;
+var secured_server = false;
 
 const express = require('express');
 const pug = require('pug');
