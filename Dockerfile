@@ -89,6 +89,7 @@ RUN cd /app/lib/swarm/src && make && cd /app
 # prepare the web server
 COPY server /app
 COPY www/ /app/www/
+COPY ssl/ /app/ssl/
 EXPOSE 80
 
 # copy npm libraries

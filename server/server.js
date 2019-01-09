@@ -1,5 +1,7 @@
 'use strict';
 
+var secured_server = true;
+
 const express = require('express');
 const pug = require('pug');
 const bodyParser = require('body-parser')
@@ -34,9 +36,23 @@ const sub_process = require('./sub_process.js');
 sub_process.expose_modules(app);
 sub_process.expose_logs(app);
 
+var server = null;
+if (secured_server) {
+  server = require('https');
+  var certOptions = {
+    key: fs.readFileSync('/app/ssl/server.key'),
+    cert: fs.readFileSync('/app/ssl/server.crt')
+  }
 
-app.listen(PORT);
-console.log('Running on http://localhost:' + PORT);
+  server = server.createServer(certOptions, app);
+} else {
+  server = require('http');
+  server = server.createServer(app);
+}
+
+server.listen(PORT);
+
+console.log('Running on http(s)://localhost:' + PORT);
 
 
 // Accounts
