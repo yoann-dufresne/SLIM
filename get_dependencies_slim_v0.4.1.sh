@@ -83,7 +83,7 @@ fi
 # Casper # no repos... oops
 cd casper
 if [ ! -d "casper_v0.8.2" ]; then
-	tar -xzvf casper_v0.8.2.tar.gz
+	tar -xzvf casper_v0.8.2.tar.xz
 fi
 cd ..
 
