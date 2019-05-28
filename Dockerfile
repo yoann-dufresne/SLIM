@@ -55,6 +55,8 @@ COPY lib/miniconda /app/lib/miniconda
 RUN R -e 'install.packages("devtools", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'install.packages("dplyr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
+RUN R -e 'install.packages("BiocManager",dependencies=TRUE,repos="https://stat.ethz.ch/CRAN/")'
+RUN R -e 'BiocManager::install("DECIPHER")'
 
 
 # ----- Libraries deployments -----

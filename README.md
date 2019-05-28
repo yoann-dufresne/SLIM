@@ -210,6 +210,7 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 ## Sequence assignment
 * [vsearch](https://github.com/torognes/vsearch) usearch
+* [IDTAXA](http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html)
 
 ## Post-clustering
 * [LULU](https://github.com/tobiasgf/lulu)
