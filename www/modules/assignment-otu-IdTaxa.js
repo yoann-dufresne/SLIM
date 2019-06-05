@@ -1,7 +1,7 @@
 class AssignOtuIdTaxaModule extends Module {
   constructor (params) {
   // lien de la doc
-  super ("assignment-otu-IdTaxa", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
+  super ("assignment-otu-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
 
   this.params = params;
   }
@@ -16,13 +16,13 @@ class AssignOtuIdTaxaModule extends Module {
 
     let threshold = this.dom.getElementsByClassName('param_value')[0];
 
-    fasta.onchange = () => {
-      assignIdTaxa.value = fasta.value.substr(0,fasta.value.lastIndexOf('.'))+ '_assigned-idtaxa.tsv';
+    out_table.onchange = () => {
+      assignIdTaxa.value = out_table.value.substr(0,out_table.value.lastIndexOf('.'))+ '_assigned-idtaxa.tsv';
       assignIdTaxa.onchange();
     };
   }
 };
 
-module_manager.moduleCreators['assignment-otu-IdTaxa'] = (params) => {
+module_manager.moduleCreators['assignment-otu-IDTAXA'] = (params) => {
   return new AssignOtuIdTaxaModule(params);
 }

@@ -2,7 +2,7 @@ const Rexec = require('child_process').exec;
 const fs = require('fs');
 const tools = require('../toolbox');
 
-exports.name = 'assignment-fasta-IdTaxa';
+exports.name = 'assignment-fasta-IDTAXA';
 exports.category = 'Assignment';
 exports.multicore = true;
 

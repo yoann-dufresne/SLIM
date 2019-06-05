@@ -1,4 +1,4 @@
-library(DECIPHER)
+## IDTAXA for OTU table
 
 args <- commandArgs(TRUE)
 
@@ -9,7 +9,11 @@ threshold <- strtoi(args[4])
 proc <- strtoi(args[5])
 otu <- args[6]
 
-load(classifier)
+require('DECIPHER')
+
+## to rename the object as "trainingSet"
+trainingSet <- load(classifier)
+trainingSet = get(trainingSet)
 
 fastaString <- readDNAStringSet(fasta)
 fastaString <- RemoveGaps(fastaString)
@@ -22,14 +26,24 @@ ids <- IdTaxa(fastaString,
               processors=proc,
               verbose = F)
 
-otu_data_frame <- read.table(otu)
-taxon <- sapply(ids,function(x)paste(x$taxon,collapse=";"))
-taxon <- sub("Root;","",taxon)
-taxon <- as.data.frame(taxon)
+# import the otu table
+otu_data_frame <- read.table(otu, header = T)
 
-temp<-sub(".*cluster=","",rownames(taxon))
-V1<-sub(";","",temp)
-combined<-cbind(V1,taxon)
-output <- merge(otu_data_frame,combined,by.y="V1")
+# extract assignments and confidence
+assign <- array(NA, c(length(ids), 2))
+colnames(assign) <- c("taxon", "idtaxa_confidence")
+for (i in 1:length(ids))
+{
+  assign[i,"taxon"] <- paste0(ids[[i]]$taxon, collapse = ';')
+  assign[i,"idtaxa_confidence"] <- ids[[i]]$confidence[length(ids[[i]]$confidence)]
+}
+# adding the seq ref and cleaning up
+tmp <- sub(".*cluster=","",names(ids))
+rownames(assign) <- sub(";","",tmp)
+assign[,"taxon"] <- sub("Root;","",assign[,"taxon"])
+assign[,"taxon"] <- sub("unclassified_Root","unassigned",assign[,"taxon"])
+assign <- as.data.frame(assign)
+
+output <- cbind(otu_data_frame,assign[otu_data_frame[,"OTU_ID"],])
 
 write.table(output, file = filename, quote = F, sep="\t", row.names = F)

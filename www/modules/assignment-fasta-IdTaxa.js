@@ -1,7 +1,7 @@
 class AssignFastaIdTaxaModule extends Module {
   constructor (params) {
   // lien de la doc
-  super ("assignment-fasta-IdTaxa", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
+  super ("assignment-fasta-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
 
   this.params = params;
   }
@@ -22,6 +22,6 @@ class AssignFastaIdTaxaModule extends Module {
   }
 };
 
-module_manager.moduleCreators['assignment-fasta-IdTaxa'] = (params) => {
+module_manager.moduleCreators['assignment-fasta-IDTAXA'] = (params) => {
   return new AssignFastaIdTaxaModule(params);
 }
