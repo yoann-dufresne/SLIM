@@ -11,8 +11,8 @@ proc <- strtoi(args[5])
 require('DECIPHER')
 
 ## to rename the Taxa object as "trainingSet"
-trainingSet <- load(classifier)
-trainingSet <- get(trainingSet)
+trainedClassif <- load(classifier)
+trainingSet <- get(trainedClassif)
 
 fastaString <- readDNAStringSet(fasta)
 fastaString <- RemoveGaps(fastaString)
