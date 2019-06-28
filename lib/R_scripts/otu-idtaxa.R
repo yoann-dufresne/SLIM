@@ -44,6 +44,6 @@ assign[,"taxon"] <- sub("Root;","",assign[,"taxon"])
 assign[,"taxon"] <- sub("unclassified_Root","unassigned",assign[,"taxon"])
 assign <- as.data.frame(assign)
 
-output <- cbind(otu_data_frame,assign[otu_data_frame[,"OTU_ID"],])
+output <- cbind(otu_data_frame,assign[as.character(otu_data_frame[,"OTU_ID"]),])
 
 write.table(output, file = filename, quote = F, sep="\t", row.names = F)
