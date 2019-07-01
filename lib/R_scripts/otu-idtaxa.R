@@ -44,6 +44,7 @@ assign[,"taxon"] <- sub("Root;","",assign[,"taxon"])
 assign[,"taxon"] <- sub("unclassified_Root","unassigned",assign[,"taxon"])
 assign <- as.data.frame(assign)
 
-output <- cbind(otu_data_frame,assign[as.character(otu_data_frame[,"OTU_ID"]),])
+## merging data frame with assignments, in the same order otu_data_frame[,1] works for both ASVs and OTUs...
+output <- cbind(otu_data_frame,assign[as.character(otu_data_frame[,1]),])
 
 write.table(output, file = filename, quote = F, sep="\t", row.names = F)
