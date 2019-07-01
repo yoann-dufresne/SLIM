@@ -54,9 +54,12 @@ COPY lib/miniconda /app/lib/miniconda
 ###RUN apt-get -y install libcurl4-gnutls-dev
 RUN R -e 'install.packages("devtools", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'install.packages("dplyr", repos="https://stat.ethz.ch/CRAN/")'
+RUN R -e 'install.packages("seqinr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
 RUN R -e 'install.packages("BiocManager",dependencies=TRUE,repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'BiocManager::install("DECIPHER")'
+RUN R -e 'BiocManager::install("dada2")'
+RUN R -e 'install.packages("doMC", repos="https://stat.ethz.ch/CRAN/")'
 
 
 # ----- Libraries deployments -----
