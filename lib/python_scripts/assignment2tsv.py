@@ -127,10 +127,10 @@ def fasta2cluster (fasta_filename):
 
 		if "cluster=" in header:
 			cluster_id = header.split("cluster=")[1].split(";")[0]
-		elif "OTU" in header:
-			cluster_id = "OTU{}".format(cluster_id)
-		else:
+		elif "ASV" in header:
 			cluster_id = "ASV{}".format(cluster_id)
+		else:
+			cluster_id = "OTU{}".format(cluster_id)
 
 		clusters[header] = cluster_id
 
