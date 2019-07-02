@@ -20,6 +20,9 @@ exports.run = function(os,config,callback){
   //let fwd = Object.values(config.params.inputs.fwd);
   //let rev = Object.values(config.params.inputs.rev);
 
+  let fwd = config.params.inputs.fwd;
+  let rev = config.params.inputs.rev;
+
 	fwd = fwd.map((fastq) => {return directory + fastq})
   rev = rev.map((fastq) => {return directory + fastq})
   fwd = fwd.join(';')
