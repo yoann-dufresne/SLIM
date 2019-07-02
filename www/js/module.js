@@ -176,7 +176,7 @@ class Module {
 					if (in_list.classList.contains('agregate'))
 						config.inputs['list_' + list_id + '_' + in_id] = input.name.replace('*', '$');
 					else if (in_list.classList.contains('as_character'))
-						config.inputs['list_' + list_id + '_' + in_id] = input.name;
+						config.inputs[input.name] = input.value;
 					else
 						config.inputs['list_' + list_id + '_' + in_id] = input.name;
 				}
