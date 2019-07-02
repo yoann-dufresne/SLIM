@@ -8,6 +8,8 @@ repseq_file <- args[3]
 asv_table <- args[4]
 token <- args[5]
 cpus <- as.numeric(args[6])
+fwd <- args[7]
+rev <- args[8]
 
 require(dada2)
 require(seqinr)
@@ -19,6 +21,7 @@ path <- paste("/app/data/", token, sep="")
 
 # import the t2s
 t2s <- read.table(t2s_file, header=TRUE, sep=",")
+t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 
 # if dada by lib
 if (by_lib == "true")  lib_list <- unique(t2s$run)
@@ -28,22 +31,31 @@ message("dada2: filterAndTrim")
 message("###")
 
 # Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
-## if output drom DTD (uncompressed in SLIM at this stage)
-fnFs <- sort(list.files(path, pattern="_fwd.fastq$", full.names = TRUE))
-fnRs <- sort(list.files(path, pattern="_rev.fastq$", full.names = TRUE))
-# test if not empty --> output from DTD if empty --> R1 and R2 (to be done later...)
-if (length(fnFs) == 0)
+## if output from DTD (uncompressed in SLIM at this stage) with a wildcard argument
+# extract the string before the wildcard, if any
+tmp_fwd <- strsplit(fwd, "*", fixed = T)[[1]]
+tmp_rev <- strsplit(rev, "*", fixed = T)[[1]]
+if (length(tmp_fwd)>1)
 {
-  fnFs <- sort(list.files(path, pattern="_R1.fastq.gz", full.names = TRUE))
-  fnRs <- sort(list.files(path, pattern="_R2.fastq.gz", full.names = TRUE))
-  ## R1 and R2 are raw output, to be oriented with primers
-  to_orient <- TRUE
-}
-# if R1 and R2 compressed
-if (length(fnFs) == 0)
-{
-  fnFs <- sort(list.files(path, pattern="_R1.fastq", full.names = TRUE))
-  fnRs <- sort(list.files(path, pattern="_R2.fastq", full.names = TRUE))
+  # check if tmp_fwd == t2s name (if so, all samples are to be processed)
+  if (tmp_fwd[1] == t2s_name)
+  {
+    # build the list of sample to be processed
+    fnFs <- paste0(path, "/", t2s_name, "_", t2s$run, "_", t2s$sample, "_fwd.fastq")
+    fnRs <- paste0(path, "/", t2s_name, "_", t2s$run, "_", t2s$sample, "_rev.fastq")
+  }
+  # check if tmp_fwd == t2s name (if so, all samples are to be processed)
+  if (tmp_fwd[1] != t2s_name && gsub(paste(t2s_name, "_", sep=""), "", tmp_fwd[1]) %in% t2s$run)
+  {
+    lib_tmp <- gsub(paste(t2s_name, "_", sep=""), "", tmp_fwd[1])
+    # build the list of sample to be processed
+    fnFs <- paste0(path, "/", t2s_name, "_", lib_tmp, "_", t2s$sample, "_fwd.fastq")
+    fnRs <- paste0(path, "/", t2s_name, "_", lib_tmp, "_", t2s$sample, "_rev.fastq")
+  }
+} else {
+  # this is a single sample
+  fnFs <- paste0(path, "/", fwd)
+  fnRs <- paste0(path, "/", rev)
 }
 
 # filter and trim (to be adjusted if raw input data, with primers...)

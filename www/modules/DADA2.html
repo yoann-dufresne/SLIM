@@ -2,13 +2,20 @@
 <input type="text" name="tags" class="input_file csv tags" />
 <br>
 
+<p>Forward reads</p>
+<input type="text" name="fwd" class='input_file fastq'>
+
+<p>Reverse reads</p>
+<input type="text" name="rev" class='input_file fastq'>
+
+
 <p>Do we make an error model for each library or for each sample?</p>
 <input type="radio" name="by_lib" value="true" class="param_value dada2_lib" checked>for each library<br>
 <input type="radio" name="by_lib" value="false" class="param_value dada2_lib">for each sample
 <br>
 
 <br>
-<p>ASVs sequences (sequence variants)</p>
+<p>ASVs sequences (Amplicon Sequence Variants)</p>
 <span class="output_zone">
 <input type="text" name="asvs_seq" value="representative-asvs.fasta" />
 <a href="" download><img src="/imgs/download.png" class="download"/></a>

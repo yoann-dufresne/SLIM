@@ -10,11 +10,10 @@ class Dada2Module extends Module {
     super.onLoad();
     // t2s
     let tags = this.dom.getElementsByClassName('input_file')[0];
-    // box for by_lib
-    //this.dada2_lib = this.dom.getElementsByClassName('dada2_lib')[0];
-		//if (this.params.params && this.params.params.dada2_lib && this.params.params.dada2_lib == true) {
-		//	this.dada2_lib.checked = this.params.params.dada2_lib;
-		//}
+    // fastq to be processed
+    let fwd = this.dom.getElementsByClassName('input_file')[1].getElementsByTagName('fwd')[0];
+    let rev = this.dom.getElementsByClassName('input_file')[2].getElementsByTagName('rev')[0];
+
     let rep_set = this.dom.getElementsByClassName('output_zone')[0].getElementsByTagName('input')[0];
     let asv_table = this.dom.getElementsByClassName('output_zone')[1].getElementsByTagName('input')[0];
 
