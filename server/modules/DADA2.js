@@ -22,6 +22,8 @@ exports.run = function(os,config,callback){
 
 	fwd = fwd.map((fastq) => {return directory + fastq})
   rev = rev.map((fastq) => {return directory + fastq})
+  fwd = fwd.join(';')
+  rev = rev.join(';')
 
   console.log('value of by_lib: ' + by_lib)
 
