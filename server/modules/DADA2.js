@@ -4,7 +4,7 @@ const tools = require('../toolbox');
 
 exports.name = 'DADA2';
 exports.category = 'Clustering';
-exports.multicore = true;
+exports.multicore = false;
 
 exports.run = function(os,config,callback){
   let token = os.token;
@@ -17,8 +17,8 @@ exports.run = function(os,config,callback){
   let asvs_table = config.params.outputs.asvs_tab;
   let proc = os.cores;
 
-  let fwd = Object.values(config.params.inputs.fwd);
-  let rev = Object.values(config.params.inputs.rev);
+  //let fwd = Object.values(config.params.inputs.fwd);
+  //let rev = Object.values(config.params.inputs.rev);
 
 	fwd = fwd.map((fastq) => {return directory + fastq})
   rev = rev.map((fastq) => {return directory + fastq})
