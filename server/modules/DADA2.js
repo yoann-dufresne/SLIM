@@ -10,11 +10,11 @@ exports.run = function(os,config,callback){
   let token = os.token;
   let directory = '/app/data/' + token + '/';
   let tags = directory + config.params.inputs.tags;
+  let fwd = config.params.inputs.fwd;
+  let rev = config.params.inputs.rev;
   let by_lib = config.params.params.by_lib;
   let asvs_seq = config.params.outputs.asvs_seq;
   let asvs_table = config.params.outputs.asvs_tab;
-  let fwd = config.params.outputs.fwd;
-  let rev = config.params.outputs.rev;
   let proc = os.cores;
 
   console.log('value of by_lib: ' + by_lib)
