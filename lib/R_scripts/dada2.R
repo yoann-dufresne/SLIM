@@ -33,8 +33,11 @@ message("###")
 # Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
 ## if output from DTD (uncompressed in SLIM at this stage) with a wildcard argument
 # extract the string before the wildcard, if any
-tmp_fwd <- strsplit(fwd, "£", fixed = T)[[1]]
-tmp_rev <- strsplit(rev, "£", fixed = T)[[1]]
+tmp_fwd <- strsplit(fwd, ";", fixed = T)[[1]]
+tmp_rev <- strsplit(rev, ";", fixed = T)[[1]]
+print(fwd)
+print(rev)
+
 if (length(tmp_fwd)>1)
 {
   # check if tmp_fwd == t2s name (if so, all samples are to be processed)
