@@ -11,8 +11,8 @@ class Dada2Module extends Module {
     // t2s
     let tags = this.dom.getElementsByClassName('input_file')[0];
     // fastq to be processed
-    let fwd = this.dom.getElementsByClassName('fastq_files')[1].getElementsByTagName('fwd')[0];
-    let rev = this.dom.getElementsByClassName('fastq_files')[2].getElementsByTagName('rev')[0];
+    let fwd = this.dom.getElementsByClassName('input_file')[1].getElementsByTagName('fwd')[0];
+    let rev = this.dom.getElementsByClassName('input_file')[2].getElementsByTagName('rev')[0];
 
     let rep_set = this.dom.getElementsByClassName('output_zone')[0].getElementsByTagName('input')[0];
     let asv_table = this.dom.getElementsByClassName('output_zone')[1].getElementsByTagName('input')[0];

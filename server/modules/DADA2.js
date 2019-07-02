@@ -17,9 +17,10 @@ exports.run = function(os,config,callback){
   let rev = config.params.outputs.rev;
   let proc = os.cores;
 
-  console.log('value of by_lib:  ' + by_lib)
+  console.log('value of by_lib: ' + by_lib)
 
   var command = ['/app/lib/R_scripts/dada2.R',by_lib,tags,asvs_seq,asvs_table,token,proc,fwd,rev];
+  console.log('R command line:' + command);
 
   var child = Rexec('Rscript '+command.join(' '));
 
