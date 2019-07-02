@@ -4,7 +4,7 @@ const tools = require('../toolbox');
 
 exports.name = 'DADA2';
 exports.category = 'Clustering';
-exports.multicore = false;
+exports.multicore = true;
 
 exports.run = function(os,config,callback){
   let token = os.token;
