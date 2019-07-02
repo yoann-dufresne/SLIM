@@ -3,10 +3,10 @@
 <br>
 
 <p>Forward reads (oriented and primer trimmed fastq)</p>
-<input type="text" name="fwd" class='input_file fastq agregate'>
+<input type="text" name="fwd" class='input_list fastq agregate'>
 
 <p>Reverse reads (oriented and primer trimmed fastq)</p>
-<input type="text" name="rev" class='input_file fastq agregate'>
+<input type="text" name="rev" class='input_list fastq agregate'>
 
 
 <p>Do we make an error model for each library or for each sample?</p>
@@ -15,17 +15,19 @@
 <br>
 
 <br>
+<p>ASV table</p>
+<span class="output_zone">
+<input type="text" name="asvs_tab" value="asvs-table.tsv" />
+<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
 <p>ASVs sequences (Amplicon Sequence Variants)</p>
 <span class="output_zone">
 <input type="text" name="asvs_seq" value="representative-asvs.fasta" />
 <a href="" download><img src="/imgs/download.png" class="download"/></a>
 </span>
 
-<p>ASV table</p>
-<span class="output_zone">
-<input type="text" name="asvs_tab" value="asvs-table.tsv" />
-<a href="" download><img src="/imgs/download.png" class="download"/></a>
-</span>
+
 
 
 
