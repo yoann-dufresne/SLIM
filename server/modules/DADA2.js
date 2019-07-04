@@ -37,9 +37,9 @@ exports.run = function(os,config,callback){
     fwd = [fwd];
     rev = [rev];
   }
-  
-  fwd = fwd.join(';');
-  rev = rev.join(';');
+
+  fwd = fwd.join('£');
+  rev = rev.join('£');
 
   var command = ['/app/lib/R_scripts/dada2.R',by_lib,tags,asvs_seq,asvs_table,token,proc,fwd,rev];
   console.log('R command line:' + command.join(' '));

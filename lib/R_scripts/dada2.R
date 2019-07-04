@@ -31,8 +31,8 @@ message("dada2: filterAndTrim")
 message("###")
 
 # parse the list of fastq given by SLIM, sample separated by ";"
-tmp_fwd <- strsplit(fwd, ";", fixed = T)[[1]]
-tmp_rev <- strsplit(rev, ";", fixed = T)[[1]]
+tmp_fwd <- strsplit(fwd, "£", fixed = T)[[1]]
+tmp_rev <- strsplit(rev, "£", fixed = T)[[1]]
 
 # get the path to the fastq
 fnFs <- paste0(path, "/", tmp_fwd)
