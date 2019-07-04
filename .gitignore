@@ -23,6 +23,9 @@ coverage
 # DS_store from macOS
 .DS_Store
 
+# R history
+.Rhistory
+
 # node-waf configuration
 .lock-wscript
 
