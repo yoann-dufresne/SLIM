@@ -7,8 +7,7 @@ class Dada2Module extends Module {
 
   getConfiguration () {
     let conf = super.getConfiguration();
-    console.log(conf);
-    
+
     // retieve the checked value of the radio html for trim_mode
     var radios = document.getElementsByName('by_lib');
     for (let i=0 ; i<radios.length ; i++)

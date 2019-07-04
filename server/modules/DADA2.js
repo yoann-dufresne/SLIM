@@ -25,7 +25,6 @@ exports.run = function(os,config,callback){
     tagfilename = tagfilename.substring(0, tagfilename.lastIndexOf('.'));
 
     for (let name in config.params.inputs) {
-      console.log(name);
       if (name.startsWith(tagfilename)) {
         if (name.includes("fwd")) {
           fwd.push(config.params.inputs[name]);
@@ -39,11 +38,8 @@ exports.run = function(os,config,callback){
     rev = [rev];
   }
   
-  fwd = fwd.join(';')
-  rev = rev.join(';')
-
-  console.log("GROSOMODO: ", fwd, rev);
-  console.log(config.params.inputs);
+  fwd = fwd.join(';');
+  rev = rev.join(';');
 
   var command = ['/app/lib/R_scripts/dada2.R',by_lib,tags,asvs_seq,asvs_table,token,proc,fwd,rev];
   console.log('R command line:' + command.join(' '));
