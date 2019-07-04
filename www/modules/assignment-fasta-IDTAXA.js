@@ -1,7 +1,7 @@
 class AssignFastaIdTaxaModule extends Module {
   constructor (params) {
   // lien de la doc
-  super ("assignment-fasta-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
+  super ("assignment-fasta-IDTAXA", "https://github.com/trtcrd/SLIM/wiki/FASTA-IDTAXA-classifier");
 
   this.params = params;
   }

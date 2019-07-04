@@ -1,7 +1,7 @@
 class AssignOtuIdTaxaModule extends Module {
   constructor (params) {
   // lien de la doc
-  super ("assignment-otu-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
+  super ("assignment-otu-IDTAXA", "https://github.com/trtcrd/SLIM/wiki/OTU---IDTAXA-classifier");
 
   this.params = params;
   }
