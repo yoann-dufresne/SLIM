@@ -24,42 +24,19 @@ t2s <- read.table(t2s_file, header=TRUE, sep=",")
 t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 
 # if dada by lib
-if (by_lib == "true")  lib_list <- unique(t2s$run)
-if (by_lib == "false") lib_list <- unique(t2s$sample)
+if (by_lib == "true") lib_list <- unique(t2s$run)
+if (by_lib != "true") lib_list <- t2s$sample
 
 message("dada2: filterAndTrim")
 message("###")
 
-# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
-## if output from DTD (uncompressed in SLIM at this stage) with a wildcard argument
-# extract the string before the wildcard, if any
+# parse the list of fastq given by SLIM, sample separated by ";"
 tmp_fwd <- strsplit(fwd, ";", fixed = T)[[1]]
 tmp_rev <- strsplit(rev, ";", fixed = T)[[1]]
-print(fwd)
-print(rev)
 
-if (length(tmp_fwd)>1)
-{
-  # check if tmp_fwd == t2s name (if so, all samples are to be processed)
-  if (tmp_fwd[1] == t2s_name)
-  {
-    # build the list of sample to be processed
-    fnFs <- paste0(path, "/", t2s_name, "_", t2s$run, "_", t2s$sample, "_fwd.fastq")
-    fnRs <- paste0(path, "/", t2s_name, "_", t2s$run, "_", t2s$sample, "_rev.fastq")
-  }
-  # check if tmp_fwd == t2s name (if so, all samples are to be processed)
-  if (tmp_fwd[1] != t2s_name && gsub(paste(t2s_name, "_", sep=""), "", tmp_fwd[1]) %in% t2s$run)
-  {
-    lib_tmp <- gsub(paste(t2s_name, "_", sep=""), "", tmp_fwd[1])
-    # build the list of sample to be processed
-    fnFs <- paste0(path, "/", t2s_name, "_", lib_tmp, "_", t2s$sample, "_fwd.fastq")
-    fnRs <- paste0(path, "/", t2s_name, "_", lib_tmp, "_", t2s$sample, "_rev.fastq")
-  }
-} else {
-  # this is a single sample
-  fnFs <- paste0(path, "/", fwd)
-  fnRs <- paste0(path, "/", rev)
-}
+# get the path to the fastq
+fnFs <- paste0(path, "/", tmp_fwd)
+fnRs <- paste0(path, "/", tmp_rev)
 
 # filter and trim (to be adjusted if raw input data, with primers...)
 path.filt <- file.path(path, "filterAndTrimed")
@@ -77,16 +54,21 @@ filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, mul
 # DADA2 workflow
 message("Learning error model be passed to DADA2")
 message(paste("###", length(lib_list)), " models to learn")
+# to collect processed samples
+names_list <- c()
+
 for (i in lib_list)
 {
+  # fetch here either the list of sample to be processed, or the unique sample from the list
   assign(paste("filtFs_",i, sep=""), filtFs[grep(paste(i, "_", sep=""), filtFs)])
   assign(paste("filtRs_",i, sep=""), filtRs[grep(paste(i, "_", sep=""), filtRs)])
+  # to ensure reproducibility
   set.seed(100)
   assign(paste("errFWD_",i, sep=""), learnErrors(get(paste("filtFs_",i, sep="")), nbases = 1e8, multithread=cpus, randomize=TRUE))
   set.seed(100)
   assign(paste("errREV_",i, sep=""), learnErrors(get(paste("filtRs_",i, sep="")), nbases = 1e8, multithread=cpus, randomize=TRUE))
-
-  message("DADA2 workflow")
+  message("Done... ")
+  message("Now denoising.")
   # get the samples
   filtFs_n <- get(paste("filtFs_",i, sep=""))
   filtRs_n <- get(paste("filtRs_",i, sep=""))
@@ -106,6 +88,7 @@ for (i in lib_list)
     suffix <- "_fwd.fastq"
     name <- sub(prefix, "", name)
     name <- sub(suffix, "", name)
+    names_list <- c(names_list, name)
     saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
     message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for library: ", i, sep=""))
   }
@@ -140,7 +123,10 @@ write.fasta(as.list(seqs), ASV_headers, repseq_file)
 
 # now paste the ASV instead of sequences in the matrix before writing it, sort it to match the t2s and transpose
 colnames(ASV_table_consensus) <- ASV_headers
-ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
+# collect the processed sample in the order as in the t2s_file
+samples_order <- subset(as.character(t2s$sample), t2s$sample %in% names_list)
+
+ASV_table_consensus <- t(ASV_table_consensus[samples_order,])
 ASV_table_consensus <- data.frame(cbind(ASV_ID = ASV_headers, ASV_table_consensus))
 # finally
 write.table(ASV_table_consensus, file = asv_table, quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
