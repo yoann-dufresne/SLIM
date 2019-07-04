@@ -159,6 +159,9 @@ class Module {
 		var in_files = this.dom.getElementsByClassName('input_file');
 		for (let in_id=0 ; in_id<in_files.length ; in_id++) {
 			let input = in_files[in_id];
+			if (input.classList.contains('agregate')) {
+				input.value = input.value.replace('*', '$');
+			}
 
 			config.inputs[input.name] = input.value;
 		}
