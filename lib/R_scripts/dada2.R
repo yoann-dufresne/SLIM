@@ -25,8 +25,7 @@ t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 if (by_lib == "true") lib_list <- unique(t2s$run)
 if (by_lib != "true") lib_list <- t2s$sample
 
-message("dada2: filterAndTrim")
-message("###")
+message("DADA2: filterAndTrim step")
 
 # parse the list of fastq given by SLIM, sample separated by ";"
 tmp_fwd <- strsplit(fwd, "£", fixed = T)[[1]]
@@ -42,7 +41,7 @@ filtFs <- file.path(path.filt, basename(fnFs))
 filtRs <- file.path(path.filt, basename(fnRs))
 filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, multithread=cpus, verbose=TRUE)
 filtering <- cbind(sample_ID = rownames(filtering), filtering)
-write.table(filtering, file = paste0(t2s_name, "_filtering.tsv"), quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
+write.table(filtering, file = paste0(t2s_name, "_filteringStats.tsv"), quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
 
 # extract samples with no reads if any
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
@@ -50,28 +49,33 @@ noReads <- sub("_fwd.fastq", "", noReads)
 
 ##keep only samples with reads
 keep <- filtering[,"reads.out"] > 0
-### file path
+### adjust samples list
 filtFs_kept <- filtFs[keep]
 filtRs_kept <- filtRs[keep]
+t2s_keep <- t2s[keep,]
+message("DADA2: filterAndTrim done...")
 
 # DADA2 workflow
-message("Learning error model be passed to DADA2")
-message(paste("###", length(lib_list)), " models to learn")
+message("DADA2: Learning error model(s) step")
 # to collect processed samples
 #names_list <- c()
+cpt <- 1
 
 for (i in lib_list)
 {
+  message(paste("DADA2: learning ", paste(cpt, "/", length(lib_list))))
   # fetch here either the list of sample to be processed, or the unique sample from the list
   assign(paste("filtFs_",i, sep=""), filtFs_kept[grep(paste(i, "_", sep=""), filtFs_kept)])
   assign(paste("filtRs_",i, sep=""), filtRs_kept[grep(paste(i, "_", sep=""), filtRs_kept)])
+  # get the same rows from t2s
+  assign(paste("t2s_",i, sep=""), t2s_keep[grep(paste(i, "_", sep=""), filtFs_kept),])
   # to ensure reproducibility
   set.seed(100)
   assign(paste("errFWD_",i, sep=""), learnErrors(get(paste("filtFs_",i, sep="")), nbases = 1e8, multithread=cpus, randomize=TRUE))
   set.seed(100)
   assign(paste("errREV_",i, sep=""), learnErrors(get(paste("filtRs_",i, sep="")), nbases = 1e8, multithread=cpus, randomize=TRUE))
-  message("Done... ")
-  message("Now denoising.")
+  message("DADA2: model ready...")
+  message("DADA2: denoising step")
   # get the samples
   filtFs_n <- get(paste("filtFs_",i, sep=""))
   filtRs_n <- get(paste("filtRs_",i, sep=""))
@@ -87,13 +91,13 @@ for (i in lib_list)
     ## fetch the name of the sample
     name <- tail(strsplit(filtFs_n[[j]], "/")[[1]],1)
     # then remove the prefix from t2s
-    prefix <- paste(sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_", as.character(t2s[j,1]), "_", sep="")
+    prefix <- paste(sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_", as.character(get(paste("t2s_",i, sep=""))[j,1]), "_", sep="")
     suffix <- "_fwd.fastq"
     name <- sub(prefix, "", name)
     name <- sub(suffix, "", name)
     #names_list <- c(names_list, name)
     saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
-    message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for library: ", i, sep=""))
+    message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
   }
 }
 
