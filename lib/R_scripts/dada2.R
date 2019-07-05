@@ -40,8 +40,17 @@ path.filt <- file.path(path, "filterAndTrimed")
 filtFs <- file.path(path.filt, basename(fnFs))
 filtRs <- file.path(path.filt, basename(fnRs))
 filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, multithread=cpus, verbose=TRUE)
-filtering <- cbind(sample_ID = rownames(filtering), filtering)
-write.table(filtering, file = "filtering-stats.tsv", quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
+
+# copying it to do the stats and keep match between filtering and filtFs
+filter_stats <- filtering
+# cleaning the rownames
+for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub(paste0(t2s_name, "_"), "", rownames(filter_stats)[i])
+for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
+for (i in unique(t2s$run)) rownames(filter_stats) <- sub(paste0(i,"_"), "", rownames(filter_stats))
+
+# sorting as in the t2s
+filter_stats <- filter_stats[as.character(t2s$sample),]
+filter_stats <- cbind(sample_ID = rownames(filter_stats), filter_stats)
 
 # extract samples with no reads if any
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
@@ -158,3 +167,10 @@ ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
 ASV_table_consensus <- data.frame(cbind(ASV_ID = ASV_headers, ASV_table_consensus))
 # finally
 write.table(ASV_table_consensus, file = asv_table, quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
+
+# adding the statistics on dada2 discarding reads
+tmp <- data.frame(ASV_table_consensus[,c(2:ncol(ASV_table_consensus))])
+# annoying no numeric
+for (i in 1:ncol(tmp)) tmp[,i] <- as.numeric(as.character(tmp[,i]))
+filter_stats <- cbind(filter_stats, reads.out.dada2 = colSums(tmp))
+write.table(filter_stats, file = "filtering-stats.tsv", quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
