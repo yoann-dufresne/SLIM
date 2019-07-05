@@ -55,6 +55,8 @@ keep <- filtering[,"reads.out"] > 0
 filtFs_kept <- filtFs[keep]
 filtRs_kept <- filtRs[keep]
 t2s_keep <- t2s[keep,]
+# if by sample, remove the empty samples
+if (by_lib != "true") lib_list[keep]
 message("DADA2: filterAndTrim done...")
 
 # DADA2 workflow
