@@ -9,7 +9,7 @@ token <- args[5]
 cpus <- as.numeric(args[6])
 fwd <- args[7]
 rev <- args[8]
-stats <- args[8]
+stats <- args[9]
 
 require(dada2)
 require(seqinr)
