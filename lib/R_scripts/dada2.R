@@ -146,7 +146,7 @@ if (length(noReads) > 0)
 }
 
 # add the samples with no reads in the ASV table
-ASV_table_consensus <- cbind(ASV_table_consensus, tmp)
+ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
 
 # transpose and sort as in the t2s
 ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
