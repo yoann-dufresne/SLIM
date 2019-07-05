@@ -41,7 +41,7 @@ filtFs <- file.path(path.filt, basename(fnFs))
 filtRs <- file.path(path.filt, basename(fnRs))
 filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, multithread=cpus, verbose=TRUE)
 filtering <- cbind(sample_ID = rownames(filtering), filtering)
-write.table(filtering, file = paste0(t2s_name, "_filteringStats.tsv"), quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
+write.table(filtering, file = "filtering-stats.tsv", quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
 
 # extract samples with no reads if any
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
@@ -99,6 +99,7 @@ for (i in lib_list)
     saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
     message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
   }
+  cpt <- cpt + 1
 }
 
 ### Create sequence table, and remove chimeras
