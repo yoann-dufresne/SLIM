@@ -9,6 +9,7 @@ token <- args[5]
 cpus <- as.numeric(args[6])
 fwd <- args[7]
 rev <- args[8]
+stats <- args[8]
 
 require(dada2)
 require(seqinr)
@@ -41,16 +42,8 @@ filtFs <- file.path(path.filt, basename(fnFs))
 filtRs <- file.path(path.filt, basename(fnRs))
 filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, multithread=cpus, verbose=TRUE)
 
-# copying it to do the stats and keep match between filtering and filtFs
+# copying it to do the stats later and keep match between filtering and filtFs
 filter_stats <- filtering
-# cleaning the rownames
-for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub(paste0(t2s_name, "_"), "", rownames(filter_stats)[i])
-for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
-for (i in unique(t2s$run)) rownames(filter_stats) <- sub(paste0(i,"_"), "", rownames(filter_stats))
-
-# sorting as in the t2s
-filter_stats <- filter_stats[as.character(t2s$sample),]
-filter_stats <- cbind(sample_ID = rownames(filter_stats), filter_stats)
 
 # extract samples with no reads if any
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
@@ -66,8 +59,6 @@ message("DADA2: filterAndTrim done...")
 
 # DADA2 workflow
 message("DADA2: Learning error model(s) step")
-# to collect processed samples
-#names_list <- c()
 cpt <- 1
 
 for (i in lib_list)
@@ -104,7 +95,6 @@ for (i in lib_list)
     suffix <- "_fwd.fastq"
     name <- sub(prefix, "", name)
     name <- sub(suffix, "", name)
-    #names_list <- c(names_list, name)
     saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
     message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
   }
@@ -129,6 +119,9 @@ for(sample in all_samples_file) {
 # Make table, chimeras not yet removed
 ASV_table <- makeSequenceTable(mergers)
 rownames(ASV_table) <- all_samples_names
+
+# count total reads per sample (with chimeras)
+withChim <- rowSums(ASV_table)
 
 # Consensus chimera removal, recommended
 ASV_table_consensus <- removeBimeraDenovo(ASV_table, method = "consensus", multithread=cpus)
@@ -157,20 +150,35 @@ if (length(noReads) > 0)
     tmp <- rbind(tmp, rep(0, length(ASV_headers)))
   }
   rownames(tmp) <- noReads
+  # and for the filtering stats
+  emptySamples <- c(rep(0,length(noReads)))
+  names(emptySamples) <- noReads
+  withChim <- c(withChim, emptySamples)
 }
 
 # add the samples with no reads in the ASV table
 ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
 
-# transpose and sort as in the t2s
+# transpose table and sort table and noChimera count as in the t2s
 ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
+withChim <- withChim[as.character(t2s$sample)]
 ASV_table_consensus <- data.frame(cbind(ASV_ID = ASV_headers, ASV_table_consensus))
-# finally
+# finally write the ASV sorted table
 write.table(ASV_table_consensus, file = asv_table, quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
 
 # adding the statistics on dada2 discarding reads
+
+# cleaning the rownames of filter_stat
+for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub(paste0(t2s_name, "_"), "", rownames(filter_stats)[i])
+for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
+for (i in unique(t2s$run)) rownames(filter_stats) <- sub(paste0(i,"_"), "", rownames(filter_stats))
+# sorting as in the t2s
+filter_stats <- filter_stats[as.character(t2s$sample),]
+filter_stats <- cbind(sample_ID = rownames(filter_stats), filter_stats, reads.dada2 = withChim)
+
 tmp <- data.frame(ASV_table_consensus[,c(2:ncol(ASV_table_consensus))])
 # annoying no numeric
 for (i in 1:ncol(tmp)) tmp[,i] <- as.numeric(as.character(tmp[,i]))
-filter_stats <- cbind(filter_stats, reads.out.dada2 = colSums(tmp))
-write.table(filter_stats, file = "filtering-stats.tsv", quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
+filter_stats <- cbind(filter_stats, reads.dada2.noChimera = colSums(tmp))
+
+write.table(filter_stats, file = stats, quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")

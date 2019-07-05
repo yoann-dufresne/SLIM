@@ -16,6 +16,7 @@ exports.run = function(os,config,callback){
   let asvs_seq = config.params.outputs.asvs_seq;
   let asvs_table = config.params.outputs.asvs_tab;
   let proc = os.cores;
+  let stats = config.params.outputs.filter_stat;
 
   if (fwd == undefined && rev == undefined) {
     fwd = [];
@@ -41,7 +42,7 @@ exports.run = function(os,config,callback){
   fwd = fwd.join('£');
   rev = rev.join('£');
 
-  var command = ['/app/lib/R_scripts/dada2.R',by_lib,tags,asvs_seq,asvs_table,token,proc,fwd,rev];
+  var command = ['/app/lib/R_scripts/dada2.R',by_lib,tags,asvs_seq,asvs_table,token,proc,fwd,rev,stats];
   console.log('R command line:' + command.join(' '));
 
   var child = Rexec('Rscript '+command.join(' '));
