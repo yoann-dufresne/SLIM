@@ -13,11 +13,12 @@ exports.run = function(os,config,callback){
   let fwd = config.params.inputs.fwd;
   let rev = config.params.inputs.rev;
   let by_lib = config.params.params.by_lib;
+  let pool = config.params.params.pool;
   let asvs_seq = config.params.outputs.asvs_seq;
   let asvs_table = config.params.outputs.asvs_tab;
   let proc = os.cores;
   let stats = config.params.outputs.filter_stat;
-  let pool = config.params.outputs.pool;
+
 
   if (fwd == undefined && rev == undefined) {
     fwd = [];
