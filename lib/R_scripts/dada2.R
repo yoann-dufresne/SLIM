@@ -7,10 +7,11 @@ repseq_file <- args[3]
 asv_table <- args[4]
 token <- args[5]
 cpus <- as.numeric(args[6])
-fwd <- args[7]
-rev <- args[8]
-stats <- args[9]
-pool <- args[10]
+stats <- args[7]
+pool <- args[8]
+fwd <- args[9]
+rev <- args[10]
+
 
 require(dada2)
 require(seqinr)
