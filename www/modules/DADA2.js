@@ -14,6 +14,11 @@ class Dada2Module extends Module {
     	if (radios[i].checked)
     		conf.params.by_lib = radios[i].value
 
+    var radios = document.getElementsByName('pool');
+    for (let i=0 ; i<radios.length ; i++)
+        if (radios[i].checked)
+        conf.params.pool = radios[i].value
+
     return conf;
   };
 };

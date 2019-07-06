@@ -10,6 +10,7 @@ cpus <- as.numeric(args[6])
 fwd <- args[7]
 rev <- args[8]
 stats <- args[9]
+pool <- args[10]
 
 require(dada2)
 require(seqinr)
@@ -25,6 +26,11 @@ t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 # if dada by lib
 if (by_lib == "true") lib_list <- unique(t2s$run)
 if (by_lib != "true") lib_list <- t2s$sample
+
+# pool option
+if (pool == "false") pool <- FALSE
+if (pool == "pseudo") pool <- "pseudo"
+if (pool == "true") pool <- TRUE
 
 message("DADA2: filterAndTrim step")
 
@@ -89,9 +95,9 @@ for (i in lib_list)
   errR <- get(paste("errREV_",i, sep=""))
   for(j in seq_along(filtFs_n)) {
     drpF <- derepFastq(filtFs_n[[j]])
-    ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus)
+    ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus, pool = pool)
     drpR <- derepFastq(filtRs_n[[j]])
-    ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus)
+    ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus, pool = pool)
     merger <- mergePairs(ddF, drpF, ddR, drpR)
     ## fetch the name of the sample
     name <- tail(strsplit(filtFs_n[[j]], "/")[[1]],1)
