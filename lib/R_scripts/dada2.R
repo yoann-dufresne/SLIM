@@ -162,7 +162,7 @@ if (length(noReads) > 0)
 }
 
 # add the samples with no reads in the ASV table
-ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
+if (length(noReads) > 0) ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
 
 # transpose table and sort table and noChimera count as in the t2s
 ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
