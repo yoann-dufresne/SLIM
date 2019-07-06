@@ -1,7 +1,7 @@
 
 args <- commandArgs(TRUE)
 
-by_lib <- args[1]
+dada_lib <- args[1]
 t2s_file <- args[2]
 repseq_file <- args[3]
 asv_table <- args[4]
@@ -25,8 +25,10 @@ t2s <- read.table(t2s_file, header=TRUE, sep=",")
 t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 
 # if dada by lib
-if (by_lib == "true") lib_list <- unique(t2s$run)
-if (by_lib != "true") lib_list <- t2s$sample
+if (dada_lib == "true") by_lib <- TRUE
+if (dada_lib != "true") by_lib <- FALSE
+if (by_lib)  lib_list <- unique(t2s$run)
+if (!by_lib) lib_list <- t2s$sample
 
 # pool option
 if (pool == "false") pool <- FALSE
@@ -64,7 +66,7 @@ filtRs_kept <- filtRs[!parsfiltFs %in% noReads]
 # for the t2s
 t2s_keep <- t2s[!paste0(t2s_name, "_", t2s$run, "_", t2s$sample) %in% noReads,]
 # and for lib_list (if by denoising by sample)
-if (by_lib != "true") lib_list <- t2s_keep$sample
+if (!by_lib) lib_list <- t2s_keep$sample
 
 message("DADA2: filterAndTrim done...")
 
@@ -79,8 +81,8 @@ for (i in lib_list)
   assign(paste("filtFs_",i, sep=""), filtFs_kept[grep(paste0(i, "_"), filtFs_kept)])
   assign(paste("filtRs_",i, sep=""), filtRs_kept[grep(paste0(i, "_"), filtRs_kept)])
   # get the same rows from t2s
-  if (by_lib == "true") assign(paste("t2s_keep_",i, sep=""), t2s_keep[grep(paste0("^", i, "$"), t2s_keep$run),])
-  if (by_lib != "true") assign(paste("t2s_keep_",i, sep=""), t2s_keep[grep(paste0("^", i, "$"), t2s_keep$sample),])
+  if (by_lib)  assign(paste("t2s_keep_",i, sep=""), t2s_keep[grep(paste0("^", i, "$"), t2s_keep$run),])
+  if (!by_lib) assign(paste("t2s_keep_",i, sep=""), t2s_keep[grep(paste0("^", i, "$"), t2s_keep$sample),])
   # to ensure reproducibility
   set.seed(100)
   assign(paste("errFWD_",i, sep=""), learnErrors(get(paste0("filtFs_",i)), nbases = 1e8, multithread=cpus, randomize=TRUE))
@@ -94,43 +96,68 @@ for (i in lib_list)
   # and the errors profiles
   errF <- get(paste("errFWD_",i, sep=""))
   errR <- get(paste("errREV_",i, sep=""))
-  for(j in seq_along(filtFs_n)) {
-    drpF <- derepFastq(filtFs_n[[j]])
-    ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus, pool = pool)
-    drpR <- derepFastq(filtRs_n[[j]])
-    ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus, pool = pool)
-    merger <- mergePairs(ddF, drpF, ddR, drpR)
-    ## fetch the name of the sample
-    name <- tail(strsplit(filtFs_n[[j]], "/")[[1]],1)
-    # then remove the prefix from t2s
-    prefix <- paste(sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_", as.character(get(paste("t2s_keep_",i, sep=""))[j,1]), "_", sep="")
+  ## derep and dada
+  drpF <- derepFastq(filtFs_n)
+  drpR <- derepFastq(filtRs_n)
+  # rename with sample names
+
+  for (j in 1:length(filtFs_n))
+  {
+    name_full <- filtFs_n[j]
+    prefix <- paste(path, "/filterAndTrimed/", sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_",
+      as.character(get(paste0("t2s_keep_",i))[j,1]), "_", sep="")
     suffix <- "_fwd.fastq"
-    name <- sub(prefix, "", name)
+    name <- sub(prefix, "", name_full)
     name <- sub(suffix, "", name)
-    saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
-    message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
+    if (by_lib) names(drpF)[j] <- name
+    if (by_lib) names(drpR)[j] <- name
   }
+
+  ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus, pool = pool)
+  ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus, pool = pool)
+  merger <- mergePairs(ddF, drpF, ddR, drpR)
+  # export merger file
+  if (by_lib)
+  {
+    saveRDS(merger, file.path(path, paste0(i, "_merger.rds")))
+    for (k in 1:length(merger)) saveRDS(merger[k], file.path(path, paste0(names(merger)[k], "_merger.rds")))
+  }
+  if (!by_lib) saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
+  message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
   cpt <- cpt + 1
 }
 
 ### Create sequence table, and remove chimeras
-all_samples <- sort(list.files(path, pattern="_merger.rds", full.names = TRUE))
-all_samples_file <- all_samples_names <- all_samples
-for(i in 1:length(all_samples_names))
+all_rds <- sort(list.files(path, pattern="_merger.rds", full.names = TRUE))
+all_rds_file <- all_rds_names <- all_rds
+
+for(i in 1:length(all_rds))
 {
-  all_samples_file[i] <- gsub(paste(path, "/", sep=""), "", all_samples_names[i])
-  all_samples_names[i] <- gsub("_merger.rds", "", all_samples_file[i])
+  all_rds_file[i] <- gsub(paste(path, "/", sep=""), "", all_rds_names[i])
+  all_rds_names[i] <- gsub("_merger.rds", "", all_rds_file[i])
 }
-# Read the merged data back in
-mergers <- vector("list", length(all_samples_file))
-names(mergers) <- all_samples_file
-for(sample in all_samples_file) {
-  mergers[[sample]] <- readRDS(file.path(path, paste0(sample)))
+
+# if by lib, we need to reconstruct the merger
+if (by_lib)
+{
+  all_merger <- c()
+  for(i in 1:length(all_rds))
+  {
+    assign(paste0("merger_",all_rds_names[i]), readRDS(file.path(path, paste0(all_rds_file[i]))))
+    all_merger <- c(all_merger, get(paste0("merger_",all_rds_names[i])))
+  }
+} else {
+  all_merger <- vector("list", length(all_rds_file))
+  names(all_merger) <- all_rds_names
+  for(i in all_rds_names)
+  {
+    all_merger[[i]] <- readRDS(file.path(path, "/", paste0(i,"_merger.rds")))
+  }
 }
 
 # Make table, chimeras not yet removed
-ASV_table <- makeSequenceTable(mergers)
-rownames(ASV_table) <- all_samples_names
+ASV_table <- makeSequenceTable(all_merger)
+#rownames(ASV_table) <- all_rds_names
 
 # count total reads per sample (with chimeras)
 withChim <- rowSums(ASV_table)
@@ -145,9 +172,6 @@ write.fasta(as.list(seqs), ASV_headers, repseq_file)
 
 # now paste the ASV instead of sequences in the matrix before writing it, sort it to match the t2s and transpose
 colnames(ASV_table_consensus) <- ASV_headers
-
-# collect the processed sample in the order as in the t2s_file
-#samples_order <- subset(as.character(t2s$sample), t2s$sample %in% names_list)
 
 # create empty vector for samples with no reads
 if (length(noReads) > 0)
