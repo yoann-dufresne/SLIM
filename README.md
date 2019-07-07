@@ -3,7 +3,7 @@
   <img src="https://github.com/yoann-dufresne/SLIM/blob/master/www/imgs/slim_logo.svg" alt="SLIM logo" width="250px"/>
 </p>
 
-SLIM is a node.js web app providing an easy Graphical User Interface (GUI) to wrap bioinformatics tools for amplicon sequencing analysis (from illumina paired-end FASTQ to annotated OTU matrix).
+SLIM is a node.js web app providing an easy Graphical User Interface (GUI) to wrap bioinformatics tools for amplicon sequencing analysis (from illumina paired-end FASTQ to annotated ASV/OTU matrix).
 All the pipeline is embedded in a [docker](https://www.docker.com/).
 
 # Install and deploy the web app
@@ -12,7 +12,7 @@ See below for full instructions
 
 # Accessing the webserver
 
-The execution of the `start_slim_v0.5.1.sh` script deploys and start the webserver.
+The execution of the `start_slim_v0.5.2.sh` script deploys and start the webserver.
 By default, the webserver is accessible on the 8080 port.
 
 * To access it on a remote server from your machine, type the server IP address followed by ":8080" (for example `156.241.0.12:8080`) from an internet browser (prefer Firefox and Google Chrome).
@@ -90,7 +90,7 @@ Usually, a typical workflow would include:
 1. Demultiplexing the libraries (if each library corresponds to a single sample, adapt your tag-to-sample file accordingly, and proceed to the joining step)
 2. Joining the paired-end reads
 3. Chimera removal
-4. OTU clustering
+4. ASVs inference / OTUs clustering
 5. Taxonomic assignement
 
 The "Add a new module" section has a drop-down list containing various modules to pick, set and chain.
@@ -108,7 +108,7 @@ To point to a set of samples (all samples from the tag-to-sample, or all the sam
 - all samples from the tag-to-sample file that have been joined: 'tag_to_sample*_merge-vsearch.fasta'
 - all samples from the tag-to-sample file that have been joined and chimera filtered: 'tag_to_sample*_merge-vsearch_uchime.fasta'
 
-The same principle applies for OTU matrices, we add the previous processing step as a suffix in the file name.
+The same principle applies for ASV/OTU matrices, we add the previous processing step as a suffix in the file name.
 
 see below for the demultiplexing
 
@@ -117,7 +117,7 @@ see below for the demultiplexing
 </p>
 
 
-and below for the OTU clustering and taxonomic assignement
+and below for an OTU clustering using vsearch and taxonomic assignement
 
 <p align="left">
   <img src="https://github.com/trtcrd/SLIM/blob/master/tutos/slim_otu.png" alt="SLIM example" width="800px"/>
@@ -149,12 +149,12 @@ First of all, docker needs to be installed on the machine. You can find instruct
 * [docker for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [docker for macOS](https://docs.docker.com/docker-for-mac/install/)
 
-To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v0.5.1.tar.gz) or, using terminal :
+To install SLIM, get the last stable release [here](https://github.com/trtcrd/SLIM/archive/v0.5.2.tar.gz) or, using terminal :
 ```bash
 sudo apt-get update && apt-get install git curl
-curl -OL https://github.com/trtcrd/SLIM/archive/v0.5.1.tar.gz
-tar -xzvf v0.5.1.tar.gz
-cd SLIM-0.5.1
+curl -OL https://github.com/trtcrd/SLIM/archive/v0.5.2.tar.gz
+tar -xzvf v0.5.2.tar.gz
+cd SLIM-0.5.2
 ```
 
 Before deploying SLIM, you need to configure the mailing account that will be used for mailing service.
@@ -174,13 +174,13 @@ exports.mailer = {
 ```
 
 
-As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v0.5.1.sh` and `start_slim_v0.5.1.sh` as **super user**.
-* `get_dependencies_slim_v0.5.1.sh` fetches all the bioinformatics tools needed from their respective repositories.
-* `start_slim_v0.5.1.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
+As soon as docker is installed and running, the SLIM archive downloaded and the mailing account set, it can be deployed by using the two scripts `get_dependencies_slim_v0.5.2.sh` and `start_slim_v0.5.2.sh` as **super user**.
+* `get_dependencies_slim_v0.5.2.sh` fetches all the bioinformatics tools needed from their respective repositories.
+* `start_slim_v0.5.2.sh` destroys the current running webserver to replace it with a new one. **/!\\** All the files previously uploaded and the results of analysis will be detroyed during the process.
 
 ```bash
-sudo bash get_dependencies_slim_v0.5.1.sh
-sudo bash start_slim_v0.5.1.sh
+sudo bash get_dependencies_slim_v0.5.2.sh
+sudo bash start_slim_v0.5.2.sh
 ```
 
 The server is configured to use up to 8 CPU cores per job. The amount of available cores will determine the amount of job that can be executed in parallel (1-8 -> 1 job, 16 -> 2 jobs, etc.). To admin and access SLIM logs, please refer to the docker command line [documentation](https://docs.docker.com/engine/reference/commandline/docker/).
@@ -204,7 +204,8 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 ## Chimera detection
 * [vsearch](https://github.com/torognes/vsearch) uchime
 
-## Sequence clustering
+## ASVs inference / OTUs clustering
+* [DADA2](https://github.com/benjjneb/dada2)
 * [vsearch](https://github.com/torognes/vsearch) uclust
 * [swarm](https://github.com/torognes/swarm)
 
@@ -217,6 +218,10 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 
 # Version history
+
+v0.5.2
+
+DADA2 beta integration, small fix on IDATAXA
 
 v0.5.1
 
