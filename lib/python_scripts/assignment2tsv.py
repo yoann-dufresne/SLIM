@@ -125,7 +125,7 @@ def fasta2cluster (fasta_filename):
 	for cluster_id, record in enumerate(SeqIO.parse(fasta_filename, "fasta")):
 		header = record.description
 
-		if "cluster=" in header:
+		if "cluster=" in header and "ASV" not in header:
 			cluster_id = header.split("cluster=")[1].split(";")[0]
 		else:
 			cluster_id = header.split(";")[0]
