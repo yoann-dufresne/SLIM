@@ -21,13 +21,13 @@ class Module {
 		this.specific.innerHTML = module_manager.htmls[this.name];
 		var that = this;
 		that.onLoad();
-		callback();	
+		callback();
 	}
 
 	createOptionBox (option) {
 		var box = document.createElement("div");
 		box.style.marginTop = '10px';
-		
+
 		// Expand options
 		var expand = document.createElement("button");
 		expand.classList.add('expandOptions');
@@ -138,12 +138,12 @@ class Module {
 				else
 					that.output_onchange ([out_input.old_value], [out_input.value]);
 				out_input.old_value = out_input.value;
-				
+
 				// Joker case
 				let val = out_input.value;
 				if (val.includes('*'))
 					val += '.tar.gz';
-				
+
 				// Create the download link
 				if (link)
 					link.href = '/data/' + exec_token + '/' + val;
@@ -159,6 +159,9 @@ class Module {
 		var in_files = this.dom.getElementsByClassName('input_file');
 		for (let in_id=0 ; in_id<in_files.length ; in_id++) {
 			let input = in_files[in_id];
+			if (input.classList.contains('agregate')) {
+				input.value = input.value.replace('*', '$');
+			}
 
 			config.inputs[input.name] = input.value;
 		}
@@ -186,7 +189,7 @@ class Module {
 		var out_zones = this.dom.getElementsByClassName('output_zone');
 		for (let zone_id=0 ; zone_id<out_zones.length ; zone_id++) {
 			let out_input = out_zones[zone_id].getElementsByTagName('input')[0];
-			
+
 			if (out_input.value != '')
 				config.outputs[out_input.name] = out_input.value;
 		}
@@ -319,7 +322,7 @@ class ModuleManager {
 						that.htmls[modules[idx]] = data;
 					}).done (() => {that.loadings -= 1;});
 				}
-				
+
 				modules_list.appendChild(opt_grp);
 			}
 
@@ -385,5 +388,3 @@ class ModuleManager {
 };
 var module_manager = new ModuleManager();
 module_manager.loadModules();
-
-

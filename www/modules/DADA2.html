@@ -1,0 +1,46 @@
+<p>Tag-to-sample file (CSV)</p>
+<input type="text" name="tags" class="input_file csv tags" />
+<br>
+
+<p>Forward reads (oriented and primer trimmed fastq)</p>
+<input type="text" name="fwd" class='input_file fastq agregate'>
+
+<p>Reverse reads (oriented and primer trimmed fastq)</p>
+<input type="text" name="rev" class='input_file fastq agregate'>
+
+
+<p>Do we make an error model for each library or for each sample?</p>
+<input type="radio" name="by_lib" value="true" class="param_value dada2_lib" checked>for each library<br>
+<input type="radio" name="by_lib" value="false" class="param_value dada2_lib">for each sample
+<br>
+<br>
+<p>Do we (pseudo) pool samples of each library to perform the ASV inference? (only if error model by library)</p>
+<input type="radio" name="pool" value="false" class="param_value dada2_pool" checked>no pool<br>
+<input type="radio" name="pool" value="pseudo" class="param_value dada2_pool">pseudo-pool<br>
+<input type="radio" name="pool" value="true" class="param_value dada2_pool">pool<br>
+<br>
+
+<br>
+<p>ASV table</p>
+<span class="output_zone">
+<input type="text" name="asvs_tab" value="asvs-table.tsv" />
+<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
+<p>ASVs sequences (Amplicon Sequence Variants)</p>
+<span class="output_zone">
+<input type="text" name="asvs_seq" value="representative-asvs.fasta" />
+<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
+<p>Filtering statistics per sample</p>
+<span class="output_zone">
+<input type="text" name="filter_stat" value="filtering-stats.tsv" />
+<a href="" download><img src="/imgs/download.png" class="download"/></a>
+</span>
+
+
+
+
+
+</div>
