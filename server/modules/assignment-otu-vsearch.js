@@ -5,7 +5,7 @@ const csv = require('csv-parser');
 const tools = require('../toolbox.js');
 
 
-exports.name = 'assignment-otu-vsearch';
+exports.name = 'assignment-table-vsearch';
 exports.multicore = true;
 exports.category = 'Assignment';
 
@@ -46,7 +46,7 @@ exports.run = function (os, config, callback) {
 							'-otu_in', directory + config.params.inputs.otu_table,
 							'-fasta', directory + config.params.inputs.fasta,
 							'-threshold', config.params.params.acceptance];
-			
+
 			// Print the command line
 			fs.appendFileSync(directory + config.log, "python3 " + options.join(" ") + "\n");
 			console.log(os.token + ": python3 " + options.join(" "))
@@ -75,6 +75,3 @@ exports.run = function (os, config, callback) {
 		}
 	});
 };
-
-
-

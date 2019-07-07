@@ -1,6 +1,6 @@
-<p>Minimum read abundance per OTU: <input type="text" name="threshold" class="param_value number integer" value="2"></p>
+<p>Minimum read abundance per ASV/OTU: <input type="text" name="threshold" class="param_value number integer" value="2"></p>
 
-<p>OTU table</p>
+<p>ASV/OTU table</p>
 <input type="text" name="matrix" class="input_file tsv">
 <p>Filtered matrix</p>
 <span class="output_zone">
@@ -8,7 +8,7 @@
 	<a href="" download><img src="/imgs/download.png" class="download"></a>
 </span>
 
-<p>OTUs representative sequences (can be empty)</p>
+<p>ASVs/OTUs representative sequences (can be empty)</p>
 <input type="text" name="centroids" class="input_file fasta">
 <p>Filtered representative sequences</p>
 <span class="output_zone">
@@ -16,7 +16,7 @@
 	<a href="" download><img src="/imgs/download.png" class="download"></a>
 </span>
 
-<p>Full fasta file with OTU identifier in each read header (can be empty)</p>
+<p>Full fasta file with OTU identifier in each read header (only after swarm or vsearch, can be empty)</p>
 <input type="text" name="reads" class="input_file fasta">
 <p>Filtered reads</p>
 <span class="output_zone">

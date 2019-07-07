@@ -11,7 +11,7 @@ const otu_manager = require('../otu_manager.js');
 
 exports.name = 'otu-vsearch';
 exports.multicore = true;
-exports.category = 'Clustering';
+exports.category = 'ASVs inference / OTUs clustering';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;

@@ -39,7 +39,7 @@ class OtuVsearchModule extends Module {
 
 		this.sorted.onchange = () => {
 			that.sorted.value = that.sorted.checked;
-			
+
 			if (that.sorted.checked) {
 				that.t2s.style.display = "inline-block";
 			} else {
@@ -65,4 +65,3 @@ class OtuVsearchModule extends Module {
 module_manager.moduleCreators['otu-vsearch'] = (params) => {
 	return new OtuVsearchModule(params);
 };
-

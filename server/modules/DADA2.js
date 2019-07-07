@@ -3,7 +3,7 @@ const fs = require('fs');
 const tools = require('../toolbox');
 
 exports.name = 'DADA2';
-exports.category = 'Clustering';
+exports.category = 'ASVs inference / OTUs clustering';
 exports.multicore = true;
 
 exports.run = function(os,config,callback){

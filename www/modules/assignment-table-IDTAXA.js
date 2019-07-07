@@ -1,7 +1,7 @@
 class AssignOtuIdTaxaModule extends Module {
   constructor (params) {
   // lien de la doc
-  super ("assignment-otu-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
+  super ("assignment-table-IDTAXA", "http://www2.decipher.codes/Documentation/Documentation-ClassifySequences.html");
 
   this.params = params;
   }
@@ -23,6 +23,6 @@ class AssignOtuIdTaxaModule extends Module {
   }
 };
 
-module_manager.moduleCreators['assignment-otu-IDTAXA'] = (params) => {
+module_manager.moduleCreators['assignment-table-IDTAXA'] = (params) => {
   return new AssignOtuIdTaxaModule(params);
 }

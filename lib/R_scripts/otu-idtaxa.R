@@ -11,6 +11,9 @@ otu <- args[6]
 
 require('DECIPHER')
 
+# import the otu table
+otu_data_frame <- read.table(otu, header = T)
+
 ## to rename the object as "trainingSet"
 trainedClassif <- load(classifier)
 trainingSet <- get(trainedClassif)
@@ -25,9 +28,6 @@ ids <- IdTaxa(fastaString,
               threshold=threshold,
               processors=proc,
               verbose = F)
-
-# import the otu table
-otu_data_frame <- read.table(otu, header = T)
 
 # extract assignments and confidence
 assign <- array(NA, c(length(ids), 2))
