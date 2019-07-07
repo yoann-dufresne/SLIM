@@ -1,7 +1,7 @@
 class Dada2Module extends Module {
   constructor (params) {
     // lien de la doc
-    super ("DADA2", "https://benjjneb.github.io/dada2/tutorial.html");
+    super ("DADA2", "https://github.com/trtcrd/SLIM/wiki/DADA2");
     this.params = params;
   }
 
