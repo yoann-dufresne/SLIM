@@ -18,7 +18,7 @@ class AssignOtuIdTaxaModule extends Module {
 
     otu_table.onchange = () => {
       assignIdTaxa.value = otu_table.value.substr(0,otu_table.value.lastIndexOf('.'))+ '_assigned-idtaxa.tsv';
-      otu_table.onchange();
+      assignIdTaxa.onchange();
     };
   }
 };
