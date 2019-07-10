@@ -13,8 +13,8 @@ exports.run = function (os, config, callback) {
 	let fwd = directory + config.params.inputs.fwd;
 	let rev = directory + config.params.inputs.rev;
 	let primers = directory + config.params.inputs.primers;
-	let tmp_match_fwd = directory + toolbox.tmp_filename() + '.uc';
-	let tmp_match_rev = directory + toolbox.tmp_filename() + '.uc';
+	let tmp_match_fwd = directory + toolbox.tmp_filename() + 'fwd.uc';
+	let tmp_match_rev = directory + toolbox.tmp_filename() + 'rev.uc';
 	let out_fwd = directory + config.params.outputs.out_fwd;
 	let out_rev = directory + config.params.outputs.out_rev;
 
@@ -22,9 +22,9 @@ exports.run = function (os, config, callback) {
 	console.log ('Checking and removing primers');
 
 	var optionsR1 = ['--usearch_global', primers,
-		'--strand both', '--notrunclabels', '--db', fwd,
-		'--uc', tmp_match_fwd, '--id 0.8', '--uc_allhits',
-		'--maxaccept 0', '--maxrejects 0', '--threads', os.cores];
+		'--strand', 'both', '--notrunclabels', '--db', fwd,
+		'--uc', tmp_match_fwd, '--id', '0.8', '--uc_allhits',
+		'--maxaccept', '0', '--maxrejects', '0', '--threads', os.cores];
 
 	console.log("Running vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', optionsR1.join(' '));
@@ -49,7 +49,8 @@ exports.run = function (os, config, callback) {
 			config.params.inputs.matchR1 = tmp_match_fwd;
 			match_rev(os, config, (os2, msg) => {
 				fs.unlink(directory + tmp_match_fwd, ()=>{});
-			callback(os, msg);
+				fs.unlink(directory + tmp_match_rev, ()=>{});
+			callback(os2, msg);
 			});
 		}
 	});
@@ -63,15 +64,15 @@ var match_rev = function (os, config, callback) {
 	let rev = directory + config.params.inputs.rev;
 	let primers = directory + config.params.inputs.primers;
 	//let tmp_match_fwd = directory + toolbox.tmp_filename() + '.uc';
-	let tmp_match_rev = directory + toolbox.tmp_filename() + '.uc';
+	let tmp_match_rev = directory + toolbox.tmp_filename() + 'rev.uc';
 
 	// searching primers in the fastq
 	console.log ('Checking and removing primers');
 
 	var optionsR2 = ['--usearch_global', primers,
-		'--strand both', '--notrunclabels', '--db', rev,
-		'--uc', tmp_match_rev, '--id 0.8', '--uc_allhits',
-		'--maxaccept 0', '--maxrejects 0', '--threads', os.cores];
+		'--strand', 'both', '--notrunclabels', '--db', rev,
+		'--uc', tmp_match_rev, '--id', '0.8', '--uc_allhits',
+		'--maxaccept', '0', '--maxrejects', '0', '--threads', os.cores];
 
 	console.log("Running vsearch with the command line:");
 	console.log('/app/lib/vsearch/bin/vsearch', optionsR2.join(' '));
@@ -94,7 +95,7 @@ var match_rev = function (os, config, callback) {
 			console.log("Now filtering the remaining matchin reads from both fastqs");
 			// calling vsearch for producing the pairwise matchlist
 			config.params.inputs.matchR2 = tmp_match_rev;
-			filter_reads(os, config, (os, msg) => {
+			filter_reads(os, config, (os2, msg) => {
 				fs.unlink(directory + tmp_match_rev, ()=>{});
 			callback(os2, msg);
 			});
@@ -109,8 +110,8 @@ var filter_reads = (os, config, callback) => {
 	let rev = directory + config.params.inputs.rev;
 	let match_fwd = config.params.inputs.matchR1;
 	let match_rev = config.params.inputs.matchR2;
-	let outR1 = directory + config.params.outputs.no_primersR1;
-	let outR2 = directory + config.params.outputs.no_primersR2;
+	let outR1 = directory + config.params.outputs.out_fwd;
+	let outR2 = directory + config.params.outputs.out_rev;
 
 	// filter options
 	var options = ['/app/lib/python_scripts/primers-filtering.py',
