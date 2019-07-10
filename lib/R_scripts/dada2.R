@@ -196,8 +196,9 @@ if (length(noReads) > 0)
 if (length(noReads) > 0) ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
 
 # transpose table and sort table and noChimera count as in the t2s
-ASV_table_consensus <- t(ASV_table_consensus[as.character(t2s$sample),])
-withChim <- withChim[as.character(t2s$sample)]
+samples_names <- sub("_noPrimers", "", as.character(t2s$sample))
+ASV_table_consensus <- t(ASV_table_consensus[samples_names,])
+withChim <- withChim[samples_names]
 ASV_table_consensus <- data.frame(cbind(ASV_ID = ASV_headers, ASV_table_consensus))
 # finally write the ASV sorted table
 write.table(ASV_table_consensus, file = asv_table, quote = F, sep="\t", row.names = F, fileEncoding = "UTF-8")
@@ -209,7 +210,7 @@ for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub(pas
 for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
 for (i in unique(t2s$run)) rownames(filter_stats) <- sub(paste0(i,"_"), "", rownames(filter_stats))
 # sorting as in the t2s
-filter_stats <- filter_stats[as.character(t2s$sample),]
+filter_stats <- filter_stats[samples_names,]
 filter_stats <- cbind(sample_ID = rownames(filter_stats), filter_stats, reads.dada2 = withChim)
 
 tmp <- data.frame(ASV_table_consensus[,c(2:ncol(ASV_table_consensus))])
