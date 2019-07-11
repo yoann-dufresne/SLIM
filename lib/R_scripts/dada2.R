@@ -56,10 +56,12 @@ filter_stats <- filtering
 
 # extract samples with no reads if any
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
+noReads <- sub("_fwd_noPrimers.fastq", "", noReads)
 noReads <- sub("_fwd.fastq", "", noReads)
 
 ##keep only samples with reads
 parsfiltFs <- sub(paste0(path, "/filterAndTrimed/"), "", filtFs)
+parsfiltFs <- sub("_fwd_noPrimers.fastq", "", parsfiltFs)
 parsfiltFs <- sub("_fwd.fastq", "", parsfiltFs)
 filtFs_kept <- filtFs[!parsfiltFs %in% noReads]
 filtRs_kept <- filtRs[!parsfiltFs %in% noReads]
@@ -106,20 +108,24 @@ for (i in lib_list)
     name_full <- filtFs_n[j]
     prefix <- paste(path, "/filterAndTrimed/", sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_",
       as.character(get(paste0("t2s_keep_",i))[j,1]), "_", sep="")
-    suffix <- "_fwd.fastq"
+    suffix <- "_fwd_noPrimers.fastq"
+    suffix2 <- "_fwd.fastq"
     name <- sub(prefix, "", name_full)
     name <- sub(suffix, "", name)
+    name <- sub(suffix2, "", name)
     if (by_lib) names(drpF)[j] <- name
     if (by_lib) names(drpR)[j] <- name
   }
 
+  message("DADA2: denoising forward reads")
   ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus, pool = pool)
+  message("DADA2: denoising reverse reads")
   ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus, pool = pool)
   merger <- mergePairs(ddF, drpF, ddR, drpR)
   # export merger file
   if (by_lib)
   {
-    saveRDS(merger, file.path(path, paste0(i, "_merger.rds")))
+    saveRDS(merger, file.path(path, paste0(i, "_merger_lib.rds")))
     for (k in 1:length(merger)) saveRDS(merger[k], file.path(path, paste0(names(merger)[k], "_merger.rds")))
   }
   if (!by_lib) saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
@@ -205,8 +211,13 @@ write.table(ASV_table_consensus, file = asv_table, quote = F, sep="\t", row.name
 # adding the statistics on dada2 discarding reads
 
 # cleaning the rownames of filter_stat
-for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub(paste0(t2s_name, "_"), "", rownames(filter_stats)[i])
-for (i in 1:length(rownames(filter_stats))) rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
+for (i in 1:length(rownames(filter_stats)))
+{
+  rownames(filter_stats)[i] <- sub(paste0(t2s_name, "_"), "", rownames(filter_stats)[i])
+  rownames(filter_stats)[i] <- sub("_fwd_noPrimers.fastq", "", rownames(filter_stats)[i])
+  rownames(filter_stats)[i] <- sub("_fwd.fastq", "", rownames(filter_stats)[i])
+}
+
 for (i in unique(t2s$run)) rownames(filter_stats) <- sub(paste0(i,"_"), "", rownames(filter_stats))
 # sorting as in the t2s
 filter_stats <- filter_stats[as.character(t2s$sample),]
