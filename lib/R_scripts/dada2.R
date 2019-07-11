@@ -58,6 +58,16 @@ filter_stats <- filtering
 noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
 noReads <- sub("_fwd_noPrimers.fastq", "", noReads)
 noReads <- sub("_fwd.fastq", "", noReads)
+withReads <- rownames(filtering[filtering[,"reads.out"]!=0,])
+withReads <- sub("_fwd_noPrimers.fastq", "", withReads)
+withReads <- sub("_fwd.fastq", "", withReads)
+# if there was primer filtering on fastq before, the filtering table won't have the empty samples,
+# similarly, if we don't use the full tag-to-sample
+# for thoses cases, we don't deal with them...
+if (nrow(filtering) != length(t2s$sample))
+{
+  noReads_track <- FALSE
+} else  {noReads_track <- TRUE}
 
 ##keep only samples with reads
 parsfiltFs <- sub(paste0(path, "/filterAndTrimed/"), "", filtFs)
@@ -66,7 +76,8 @@ parsfiltFs <- sub("_fwd.fastq", "", parsfiltFs)
 filtFs_kept <- filtFs[!parsfiltFs %in% noReads]
 filtRs_kept <- filtRs[!parsfiltFs %in% noReads]
 # for the t2s
-t2s_keep <- t2s[!paste0(t2s_name, "_", t2s$run, "_", t2s$sample) %in% noReads,]
+if (noReads_track) t2s_keep <- t2s[!paste0(t2s_name, "_", t2s$run, "_", t2s$sample) %in% noReads,]
+if (!noReads_track) t2s_keep <- t2s[paste0(t2s_name, "_", t2s$run, "_", t2s$sample) %in% withReads,]
 # and for lib_list (if by denoising by sample)
 if (!by_lib) lib_list <- t2s_keep$sample
 
@@ -180,7 +191,7 @@ write.fasta(as.list(seqs), ASV_headers, repseq_file)
 colnames(ASV_table_consensus) <- ASV_headers
 
 # create empty vector for samples with no reads
-if (length(noReads) > 0)
+if (length(noReads) > 0 && noReads_track == TRUE)
 {
   tmp <- c()
   for (i in 1:length(noReads))
@@ -199,10 +210,11 @@ if (length(noReads) > 0)
 }
 
 # add the samples with no reads in the ASV table
-if (length(noReads) > 0) ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
+if (length(noReads) > 0  && noReads_track == TRUE) ASV_table_consensus <- rbind(ASV_table_consensus, tmp)
 
 # transpose table and sort table and noChimera count as in the t2s
-samples_names <- sub("_noPrimers", "", as.character(t2s$sample))
+if (noReads_track) samples_names <- as.character(t2s$sample)
+if (!noReads_track) samples_names <- as.character(t2s_keep$sample[paste0(t2s_name, "_", t2s_keep$run, "_", t2s_keep$sample) %in% withReads])
 ASV_table_consensus <- t(ASV_table_consensus[samples_names,])
 withChim <- withChim[samples_names]
 ASV_table_consensus <- data.frame(cbind(ASV_ID = ASV_headers, ASV_table_consensus))
