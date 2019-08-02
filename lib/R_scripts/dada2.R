@@ -132,7 +132,7 @@ for (i in lib_list)
   ddF <- dada(drpF, err=errF, selfConsist=F, multithread=cpus, pool = pool)
   message("DADA2: denoising reverse reads")
   ddR <- dada(drpR, err=errR, selfConsist=F, multithread=cpus, pool = pool)
-  merger <- mergePairs(ddF, drpF, ddR, drpR)
+  merger <- mergePairs(ddF, drpF, ddR, drpR, trimOverhang=TRUE)
   # export merger file
   if (by_lib)
   {
