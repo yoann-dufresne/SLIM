@@ -118,7 +118,7 @@ for (i in lib_list)
   {
     name_full <- filtFs_n[j]
     prefix <- paste(path, "/filterAndTrimed/", sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]],1)), "_",
-      as.character(get(paste0("t2s_keep_",i))[j,1]), "_", sep="")
+      as.character(get(paste0("t2s_keep_",i))[j,"run"]), "_", sep="")
     suffix <- "_fwd_noPrimers.fastq"
     suffix2 <- "_fwd.fastq"
     name <- sub(prefix, "", name_full)
