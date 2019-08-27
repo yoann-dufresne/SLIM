@@ -6,8 +6,15 @@
 
 </div>
 
+<br>
 <p>Primers file (IUPAC supported)</p>
 <input type="text" name="primers" class="input_file fasta primers" value="">
+
+<br>
+<p class="no_vertical_margins"><input type="checkbox" class="param_value trim_end" name="trim_end">Trim also the primer sequence at the end of the read (if present)</p>
+<br>
+<p> Filtering by length the trimmed read (discarded ones will be in empty.fasta)<a href="" download=""><img src="/imgs/download.png" class="download"></a></p>
+<input type="text" name="trim_length" class="param_value number integer" value="1">
 
 <h4>Outputs</h4>
 
@@ -17,6 +24,9 @@ They will be named run_sample_fwd.fastq and run_sample_rev.fastq.</p>
 <div class="file_list" readonly></div>
 
 <div class="options">
-	<p><input type="checkbox" name="mistags" class="param_value">Output undertermined reads<a href="" download=""><img src="/imgs/download.png" class="download"></a></p>
+
+	<br>
+	<p><input type="checkbox" name="mistags" class="param_value">Output undertermined reads (no tags retrieved)<a href="" download=""><img src="/imgs/download.png" class="download"></a></p>
+	<br>
 	<p>Mismatch allowed in primers: <input type="text" name="errors" class="param_value number integer" value=0></p>
 </div>

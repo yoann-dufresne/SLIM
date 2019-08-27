@@ -38,9 +38,13 @@ fi
 
 # Demultiplexing tool # no stable release yet... oops
 if [ ! -d "DTD" ]; then
-	git clone https://github.com/yoann-dufresne/DoubleTagDemultiplexer.git DTD/
+	mkdir DTD
 	cd DTD
-	git pull
+	# git clone https://github.com/yoann-dufresne/DoubleTagDemultiplexer.git DTD/
+	curl -OL https://github.com/yoann-dufresne/DoubleTagDemultiplexer/archive/f687329ac846193605af97ef2b3f65d1bf5bce04.zip
+	unzip f687329ac846193605af97ef2b3f65d1bf5bce04.zip
+	mv DoubleTagDemultiplexer-f687329ac846193605af97ef2b3f65d1bf5bce04/* .
+	# git pull
 	cd ..
 else
 	echo "DTD is already there..."

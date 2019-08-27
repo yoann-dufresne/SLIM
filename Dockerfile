@@ -54,9 +54,11 @@ COPY lib/miniconda /app/lib/miniconda
 ###RUN apt-get -y install libcurl4-gnutls-dev
 RUN R -e 'install.packages("devtools", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'install.packages("dplyr", repos="https://stat.ethz.ch/CRAN/")'
+RUN R -e 'install.packages("seqinr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
 RUN R -e 'install.packages("BiocManager",dependencies=TRUE,repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'BiocManager::install("DECIPHER")'
+RUN R -e 'BiocManager::install("dada2")'
 
 
 # ----- Libraries deployments -----
@@ -71,8 +73,6 @@ COPY lib/pandaseq /app/lib/pandaseq
 COPY lib/vsearch /app/lib/vsearch
 COPY lib/casper /app/lib/casper
 COPY lib/swarm /app/lib/swarm
-COPY lib/python_scripts /app/lib/python_scripts
-COPY lib/R_scripts /app/lib/R_scripts
 
 # Compile DTD
 RUN cd /app/lib/DTD && make && cd /app
@@ -85,6 +85,9 @@ RUN cd /app/lib/casper/casper_v0.8.2 && make && cd /app
 # Compile swarm
 RUN cd /app/lib/swarm/src && make && cd /app
 
+# Copy Python and R scripts
+COPY lib/python_scripts /app/lib/python_scripts
+COPY lib/R_scripts /app/lib/R_scripts
 
 # ----- Webserver -----
 

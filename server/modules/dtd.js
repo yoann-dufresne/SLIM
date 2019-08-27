@@ -9,15 +9,20 @@ exports.category = 'Demultiplexing';
 
 exports.run = function (os, config, callback) {
 	let token = os.token;
+
 	var directory = '/app/data/' + token + '/';
 	var options = ['-l', directory + config.params.inputs.tags,
 		'-p', directory + config.params.inputs.primers,
 		'-d', directory,
 		'-e', config.params.params.errors,
-		'-t'];
+		'-t',
+		'-ml', config.params.params.trim_length];
 
 	if (config.params.params.mistags == true)
 		options = options.concat(['-m']);
+
+	if (config.params.params.trim_end == true)
+		options = options.concat(['-te']);
 
 	parse_inputs(os.token, config.params.inputs, (executions) => {
 		// On errors
@@ -37,7 +42,7 @@ exports.run = function (os, config, callback) {
 
 			var local_options = options.concat([
 				'-rl', library,
-				'-r1', directory + executions[library].r1, 
+				'-r1', directory + executions[library].r1,
 				'-r2', directory + executions[library].r2,
 			]);
 
@@ -88,7 +93,7 @@ var compress_mistags = (libraries, token, callback) => {
 	var options = ['--use-compress-program=pigz',
 					'-Pcf', directory + 'mistags.tar.gz',
 					'-C', directory].concat(files);
-	
+
 	var child = exec('tar', options);
 	child.on('close', () => {callback();});
 

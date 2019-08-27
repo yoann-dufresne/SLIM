@@ -54,7 +54,7 @@ class DemultiplexerModule extends Module {
 			}
 			this.out_area.innerHTML = html;
 		}
-		
+
 		// Change the output files using the tags file
 		var that = this;
 		tags_text.onchange = () => {that.generate_R1R2fields(()=>{})};
@@ -179,7 +179,7 @@ class DemultiplexerModule extends Module {
 			var filename = this.out_files[idx];
 			config.outputs[filename] = filename;
 		}
-		
+
 		return config;
 	}
 };
@@ -187,4 +187,3 @@ class DemultiplexerModule extends Module {
 module_manager.moduleCreators.demultiplexer = (params) => {
 	return new DemultiplexerModule(params);
 };
-

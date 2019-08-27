@@ -2,7 +2,7 @@ const exec = require('child_process').spawn;
 const fs = require('fs');
 
 
-exports.name = 'otu-filtering';
+exports.name = 'asv-otu-filtering';
 exports.multicore = false;
 exports.category = 'Utils';
 
@@ -15,7 +15,7 @@ exports.run = function (os, config, callback) {
 	// Init file values
 	let matrix = config.params.inputs.matrix;
 	let matrix_filtered = matrix.substr(0, matrix.lastIndexOf('.')) + '_filtered_' + thresh + '.tsv';
-	
+
 	let centroids = '';
 	let centroids_filtered = '';
 	if (config.params.inputs.centroids != undefined) {
@@ -35,7 +35,7 @@ exports.run = function (os, config, callback) {
 		'-m', directory + matrix,
 		'-c', centroids == '' ? '' : directory + centroids,
 		'-r', reads == '' ? '' : directory + reads,
-		'-t', thresh];	
+		'-t', thresh];
 
 	console.log("Running OTU filtering with the command line:");
 	console.log('python3', options.join(' '));
