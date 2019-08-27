@@ -58,8 +58,6 @@ class FileUpdater {
 					autocomplete[idx] = {value:autocomplete[idx], data:autocomplete[idx]};
 				}
 
-				console.log("autocomplete")
-
 				// Setup the jquery autocomplete
 				$(input_file).autocomplete({
 					lookup: autocomplete,
