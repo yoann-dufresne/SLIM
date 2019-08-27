@@ -101,69 +101,95 @@ class DemultiplexerModule extends Module {
 		var that = this;
 		var libs = [];
 
+		let warnings = this.dom.getElementsByClassName("demux_warnings")[0];
+		warnings.style.color = "red";
+		warnings.innerHTML = "";
+
 		let csv_filename = this.dom.getElementsByClassName('tags')[0].value;
 		csv_filename = csv_filename.substr(0, csv_filename.lastIndexOf('.'));
 		let out_fwd = csv_filename + '*_fwd.fastq';
 		let out_rev = csv_filename + '*_rev.fastq';
 
 		let out_files = [out_fwd, out_rev];
+		let error = false;
 
-		Papa.parse("/data/" + exec_token + '/' + csv_filename + '.csv', {
-			download: true,
-			worker: true,
-			header: true,
-			step: function(row) {
-				// Parse each line
-				let lib = row.data[0].run;
-				let sample = row.data[0].sample;
+		try {
+			Papa.parse("/data/" + exec_token + '/' + csv_filename + '.csv', {
+				download: true,
+				worker: true,
+				header: true,
+				step: function(row) {
+					// Parse each line
+					let lib = row.data[0].run;
+					let sample = row.data[0].sample;
 
-				if (!lib || lib == "")
-					return;
+					if (!lib || lib == "")
+						return;
 
-				// Add library
-				if (!libs.includes(lib))
-					libs.push(lib);
+					// Add library
+					if (!libs.includes(lib))
+						libs.push(lib);
 
-				// Generate filenames
-				let out_fwd = csv_filename + '_' + lib + '_' + sample + '_fwd.fastq';
-				let out_rev = csv_filename + '_' + lib + '_' + sample + '_rev.fastq';
-				out_files.push(out_fwd);
-				out_files.push(out_rev);
-			},
-			complete: function() {
-				that.illumina_div.innerHTML = "";
-				that.out_area.innerHTML = "";
+					// Generate filenames
+					let out_fwd = csv_filename + '_' + lib + '_' + sample + '_fwd.fastq';
+					let out_rev = csv_filename + '_' + lib + '_' + sample + '_rev.fastq';
 
-				for (let idx=0 ; idx<libs.length ; idx++) {
-					// Create the fields R1 and R2 for each library
-					that.illumina_div.appendChild(that.create_R1R2_pair(libs[idx]));
+					// Verify existing previous files
+					if (out_files.indexOf(out_fwd) != -1 || out_files.indexOf(out_rev) != -1) {
+						console.log("Regarding the tag to sample, the out file " + out_fwd + " is used a multiple time.");
+						console.log("Please verify your tag to sample for sample collision.");
 
-					// Generate jokers
-					let out_fwd = csv_filename + '_' + libs[idx] + '*_fwd.fastq';
-					let out_rev = csv_filename + '_' + libs[idx] + '*_rev.fastq';
+						warnings.innerHTML = "<p>Sample name collision. Please check your t2s file.</p>";
+
+						error = true;
+						throw new Error("Multiple declaration of a sample");
+
+						return;
+					}
+
 					out_files.push(out_fwd);
 					out_files.push(out_rev);
+				},
+				complete: function() {
+					if (error)
+						return;
+
+					that.illumina_div.innerHTML = "";
+					that.out_area.innerHTML = "";
+
+					for (let idx=0 ; idx<libs.length ; idx++) {
+						// Create the fields R1 and R2 for each library
+						that.illumina_div.appendChild(that.create_R1R2_pair(libs[idx]));
+
+						// Generate jokers
+						let out_fwd = csv_filename + '_' + libs[idx] + '*_fwd.fastq';
+						let out_rev = csv_filename + '_' + libs[idx] + '*_rev.fastq';
+						out_files.push(out_fwd);
+						out_files.push(out_rev);
+					}
+
+					// Print outputs
+					out_files.sort();
+					for (let idx in out_files) {
+						let filename = out_files[idx];
+						that.out_area.innerHTML += that.format_output(filename);
+					}
+
+					// Notify the file adds
+					var event = new Event('new_output');
+					event.files = out_files;
+					document.dispatchEvent(event);
+
+					that.out_files = out_files;
+					callback(that.illumina_div);
+				},
+				error: function(e) {
+					console.log("Papaparse error:", e);
 				}
+			});
+		} catch(e) {
 
-				// Print outputs
-				out_files.sort();
-				for (let idx in out_files) {
-					let filename = out_files[idx];
-					that.out_area.innerHTML += that.format_output(filename);
-				}
-
-				// Notify the file adds
-				var event = new Event('new_output');
-				event.files = out_files;
-				document.dispatchEvent(event);
-
-				that.out_files = out_files;
-				callback(that.illumina_div);
-			},
-			error: function(e) {
-				console.log("Papaparse error:", e);
-			}
-		});
+		}
 	}
 
 	format_output(filename) {
