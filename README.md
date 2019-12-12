@@ -221,7 +221,7 @@ Please refer to the wiki pages to learn [how to create a module](https://github.
 
 ### v0.5.3
 
-DTD: added an option for trimming the primers at the end of the reads in and a length filtering (primers dimers issue)
+DTD: added an option for trimming the primers at the end of the reads in (for fully overlapping pair-end reads) and a contig length filtering
 
 ### v0.5.2
 
