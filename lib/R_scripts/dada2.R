@@ -55,10 +55,10 @@ filtering <- filterAndTrim(fwd=fnFs, rev=fnRs, filt=filtFs, filt.rev=filtRs, mul
 filter_stats <- filtering
 
 # extract samples with no reads if any
-noReads <- rownames(filtering[filtering[,"reads.out"]==0,])
+noReads <- rownames(subset(filtering, filtering[,"reads.out"] == 0))
 noReads <- sub("_fwd_noPrimers.fastq", "", noReads)
 noReads <- sub("_fwd.fastq", "", noReads)
-withReads <- rownames(filtering[filtering[,"reads.out"]!=0,])
+withReads <- rownames(subset(filtering, filtering[,"reads.out"] != 0))
 withReads <- sub("_fwd_noPrimers.fastq", "", withReads)
 withReads <- sub("_fwd.fastq", "", withReads)
 # if there was primer filtering on fastq before, the filtering table won't have the empty samples,

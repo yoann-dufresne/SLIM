@@ -455,7 +455,6 @@ var computeSoftwareOrder = function (params, token) {
 		}
 	}
 
-
 	// Compute the order from the dependencies
 	var order = [];
 	var filesAvailable = [];
@@ -476,18 +475,16 @@ var computeSoftwareOrder = function (params, token) {
 		if (dependencies[filename] == undefined)
 			continue;
 
-		var dep = dependencies[filename];
+		var dependancies_idxs = dependencies[filename];
 		delete dependencies[filename];
 
 		// Will look for each soft if it can be executed
-		for (var soft_id in dep) {
-			soft_id = dep[soft_id];
-
-			var soft = params[soft_id];
+		for (let soft_idx in params) {
+			let soft = params[soft_idx]; 
 
 			// Look if each dependencie is satisfied
 			var isExecutable = true;
-			for (var id in soft.params.inputs) {
+			for (var idx in soft.params.inputs) {
 				var file = soft.params.inputs[id];
 				if (dependencies[file] != undefined) {
 					isExecutable = false;
@@ -496,8 +493,8 @@ var computeSoftwareOrder = function (params, token) {
 			}
 
 			// Add the software in the queue if it's not already present
-			if (isExecutable && order.indexOf(soft_id) == -1) {
-				order.push(soft_id);
+			if (isExecutable && order.indexOf(soft.params.id) == -1) {
+				order.push(soft.params.id);
 				for (var id in soft.params.outputs) {
 					var file = soft.params.outputs[id];
 					filesAvailable.push(file);
@@ -507,6 +504,8 @@ var computeSoftwareOrder = function (params, token) {
 	}
 
 	global_dependencies[token] = dependencies;
+	console.log(global_dependencies);
+	console.log(order);
 	return order;
 }
 

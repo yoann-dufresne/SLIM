@@ -72,7 +72,6 @@ class FileUpdater {
 
 						// Update previous values
 						that.prev_values[mod_idx + '_' + input_file.name] = suggestion.data;
-						console.log(suggestion.data)
 					}
 				});
 			}

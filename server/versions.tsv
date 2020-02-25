@@ -1,7 +1,8 @@
-### SLIM v0.5.3 ###
+### SLIM v0.6 ###
 #Third-party software version:
 casper		0.8.2
 DTD		0.1
 Pandaseq	2.11
 vsearch		2.8
 swarm		2.2.2
+DADA2		1.12.1
