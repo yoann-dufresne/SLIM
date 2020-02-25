@@ -81,7 +81,10 @@ class Module {
 
 			// Reload parameters
 			if (this.params.params)
-				param.value = this.params.params[param.name];
+				if (param.tagName.toUpperCase() == "INPUT" && param.type == "checkbox") {
+					param.checked = this.params.params[param.name];
+				} else
+					param.value = this.params.params[param.name];
 		}
 
 		// --- Inputs ---
