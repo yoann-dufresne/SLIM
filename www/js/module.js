@@ -81,9 +81,17 @@ class Module {
 
 			// Reload parameters
 			if (this.params.params)
-				if (param.tagName.toUpperCase() == "INPUT" && param.type == "checkbox") {
-					param.checked = this.params.params[param.name];
+				if (param.tagName.toUpperCase() == "INPUT") {
+					if (param.type == "checkbox") {
+						// Reload checkboxes
+						param.checked = this.params.params[param.name];
+					} else if (param.type == "radio") {
+						// Reload radio buttons
+						if (this.params.params[param.name] == param.value)
+							param.checked = true;
+					}
 				} else
+					// reload all other parameters
 					param.value = this.params.params[param.name];
 		}
 
@@ -203,9 +211,17 @@ class Module {
 		for (let par_id=0 ; par_id<params.length ; par_id++) {
 			let param = params[par_id];
 
-			if (param.tagName.toUpperCase() == "INPUT" && param.type == "checkbox")
-				config.params[param.name] = param.checked;
-			else
+			if (param.tagName.toUpperCase() == "INPUT") {
+				if (param.type == "checkbox") {
+					// Get checkbox values
+					config.params[param.name] = param.checked;
+				} else if (param.type == "radio") {
+					// Get radio button values
+					if (param.checked)
+						config.params[param.name] = param.value;
+				}
+			} else
+				// Get all other parameter values
 				config.params[param.name] = param.value;
 		}
 
