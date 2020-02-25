@@ -89,7 +89,9 @@ class Module {
 						// Reload radio buttons
 						if (this.params.params[param.name] == param.value)
 							param.checked = true;
-					}
+					}	else
+						// reload all other input parameters
+						param.value = this.params.params[param.name];
 				} else
 					// reload all other parameters
 					param.value = this.params.params[param.name];
@@ -219,7 +221,9 @@ class Module {
 					// Get radio button values
 					if (param.checked)
 						config.params[param.name] = param.value;
-				}
+				} else
+					// Get all other input parameter values
+					config.params[param.name] = param.value;
 			} else
 				// Get all other parameter values
 				config.params[param.name] = param.value;
