@@ -35,7 +35,7 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 RUN dpkg -l locales
 
-RUN python3 -m pip install biopython --upgrade
+#RUN python3 -m pip install biopython --upgrade
 
 RUN mkdir /app/lib
 
