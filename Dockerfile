@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Add the CRAN repos sources for install latest version of R
 RUN sh -c 'echo "deb http://cloud.r-project.org/bin/linux/debian stretch-cran35/" >> /etc/apt/sources.list'
-RUN apt-key adv --keyserver keys.gnupg.net --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF'
+RUN apt-key adv --keyserver keys.gnupg.net --recv-key '49561F2F'
 
 # Install packages needed for tools
 RUN apt-get update && apt-get install -y \
