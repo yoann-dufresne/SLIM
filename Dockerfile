@@ -6,9 +6,11 @@ FROM node:latest
 # Set the working directory to /app
 RUN mkdir /app
 WORKDIR /app
+COPY jranke.asc /app
 
 # Add the CRAN repos sources for install latest version of R
 RUN sh -c 'echo "deb http://cloud.r-project.org/bin/linux/debian stretch-cran35/" >> /etc/apt/sources.list'
+RUN apt-key add /app/jranke.asc
 RUN apt-key adv --keyserver keys.gnupg.net --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF'
 
 # Install packages needed for tools
@@ -33,7 +35,7 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 RUN dpkg -l locales
 
-RUN python3 -m pip install biopython --upgrade
+#RUN python3 -m pip install biopython --upgrade
 
 RUN mkdir /app/lib
 
@@ -57,8 +59,10 @@ RUN R -e 'install.packages("dplyr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'install.packages("seqinr", repos="https://stat.ethz.ch/CRAN/")'
 RUN R -e 'library(devtools);install_github("tobiasgf/lulu")'
 RUN R -e 'install.packages("BiocManager",dependencies=TRUE,repos="https://stat.ethz.ch/CRAN/")'
-RUN R -e 'BiocManager::install("DECIPHER")'
-RUN R -e 'BiocManager::install("dada2")'
+#RUN R -e 'BiocManager::install("DECIPHER")'
+#RUN R -e 'BiocManager::install("dada2")'
+RUN R -e 'library(devtools);devtools::install_github("benjjneb/dada2", ref="v1.16")'
+RUN R -e 'install.packages("https://www.bioconductor.org/packages/3.11/bioc/src/contrib/Archive/DECIPHER/DECIPHER_2.16.0.tar.gz", repos = NULL, type = "source")'
 
 
 # ----- Libraries deployments -----

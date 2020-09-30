@@ -24,6 +24,10 @@ path <- paste("/app/data/", token, sep="")
 t2s <- read.table(t2s_file, header=TRUE, sep=",")
 t2s_name <- sub(".csv", "", tail(strsplit(t2s_file, "/")[[1]], 1))
 
+# is one lib per sample?
+ifelse(length(unique(t2s$run)) == length(unique(t2s$sample)), lib_sample <- TRUE, lib_sample <- FALSE)
+
+
 # if dada by lib
 if (dada_lib == "true") by_lib <- TRUE
 if (dada_lib != "true") by_lib <- FALSE
@@ -136,8 +140,9 @@ for (i in lib_list)
   # export merger file
   if (by_lib)
   {
-    saveRDS(merger, file.path(path, paste0(i, "_merger_lib.rds")))
-    for (k in 1:length(merger)) saveRDS(merger[k], file.path(path, paste0(names(merger)[k], "_merger.rds")))
+    if (lib_sample) saveRDS(merger, file.path(path, paste0(i, "_merger.rds")))
+    if (!lib_sample) saveRDS(merger, file.path(path, paste0(i, "_merger_lib.rds")))
+    if (!lib_sample) for (k in 1:length(merger)) saveRDS(merger[k], file.path(path, paste0(names(merger)[k], "_merger.rds")))
   }
   if (!by_lib) saveRDS(merger, file.path(path, paste0(name, "_merger.rds")))
   message(paste(j, "/", length(filtFs_n), " sample ", name, " is done for : ", i, sep=""))
@@ -155,7 +160,7 @@ for(i in 1:length(all_rds))
 }
 
 # if by lib, we need to reconstruct the merger
-if (by_lib)
+if (by_lib & !lib_sample)
 {
   all_merger <- c()
   for(i in 1:length(all_rds))
