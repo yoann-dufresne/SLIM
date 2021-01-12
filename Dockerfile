@@ -48,18 +48,6 @@ RUN dpkg -l locales
 RUN mkdir /app/lib
 
 
-# ----- Very long updates -----
-
-RUN apt-get install wget
-COPY lib/miniconda /app/lib/miniconda
-# Install miniconda
-RUN bash /app/lib/miniconda/Miniconda3-latest-Linux-x86_64.sh -b -p /app/lib/miniconda/install \
-	&& /app/lib/miniconda/install/bin/conda update conda -y
-# Install QIIME 2
-RUN wget https://data.qiime2.org/distro/core/qiime2-2019.10-py36-linux-conda.yml
-RUN /app/lib/miniconda/install/bin/conda env create -n qiime2-2019.10 --file qiime2-2019.10-py36-linux-conda.yml
-
-
 # ----- R dependancies -----
 
 ###RUN apt-get -y build-dep libcurl4-gnutls-dev
